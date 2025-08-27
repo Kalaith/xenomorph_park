@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/* Custom CSS for Xenomorph Park */
+
+/* Sci-fi theme colors and effects */
+:root {
+  --color-primary: #00ff41;
+  --color-danger: #ff0040;
+  --color-warning: #ffaa00;
+  --color-info: #00aaff;
+  --color-alien: #8b4513;
+  --color-metal: #708090;
+  --color-dark: #0d1117;
+  --color-darker: #090a0d;
+}
+
+body {
+  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-darker) 100%);
+  color: var(--color-primary);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Glowing effects for sci-fi look */
+.glow {
+  text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+}
+
+.border-glow {
+  box-shadow: 0 0 5px currentColor, inset 0 0 5px currentColor;
+}
+
+/* Animation classes */
+.pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.flicker {
+  animation: flicker 2s linear infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00cc33;
+}
