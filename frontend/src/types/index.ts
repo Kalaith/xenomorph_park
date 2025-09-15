@@ -148,5 +148,12 @@ export interface GameStore extends GameState {
   completeResearch: (species: string) => void;
   updateHorrorState: (state: Partial<HorrorState>) => void;
   addStatusMessage: (message: string, type: StatusMessage['type']) => void;
+  
+  // Save/Load actions
+  saveGame: (slotId: string, name?: string) => boolean;
+  loadGame: (slotId: string) => boolean;
+  quickSave: () => boolean;
+  quickLoad: () => boolean;
+  
   reset: () => void;
 }

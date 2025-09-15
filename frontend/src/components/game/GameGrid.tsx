@@ -57,6 +57,15 @@ export function GameGrid() {
       'Runner': '🐺',
       'Praetorian': '🦖',
       'Predalien': '👑',
+      'Queen': '👸',
+      'Facehugger': '🕷️',
+      'Chestburster': '🐛',
+      'Crusher': '🦏',
+      'Spitter': '🐍',
+      'Lurker': '🦎',
+      'Boiler': '💥',
+      'Neomorph': '🧬',
+      'Deacon': '👺',
     };
     return icons[speciesName] || '👾';
   };

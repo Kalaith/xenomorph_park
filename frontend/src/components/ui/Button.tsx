@@ -10,6 +10,7 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
+  as?: 'button' | 'span';
 }
 
 const variantClasses = {
@@ -35,34 +36,53 @@ export function Button({
   className = '',
   onClick,
   type = 'button',
+  as = 'button',
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+
+  const commonProps = {
+    className: `
+      font-mono font-medium border-2 rounded-md transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-green-400/50
+      disabled:opacity-50 disabled:cursor-not-allowed
+      ${variantClasses[variant]}
+      ${sizeClasses[size]}
+      ${isDisabled ? 'hover:scale-100' : ''}
+      ${className}
+    `,
+    onClick: isDisabled ? undefined : onClick,
+  };
+
+  const content = loading ? (
+    <div className="flex items-center justify-center">
+      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+      Loading...
+    </div>
+  ) : (
+    children
+  );
+
+  if (as === 'span') {
+    return (
+      <motion.span
+        whileHover={!isDisabled ? { scale: 1.02 } : {}}
+        whileTap={!isDisabled ? { scale: 0.98 } : {}}
+        {...commonProps}
+      >
+        {content}
+      </motion.span>
+    );
+  }
 
   return (
     <motion.button
       type={type}
       whileHover={!isDisabled ? { scale: 1.02 } : {}}
       whileTap={!isDisabled ? { scale: 0.98 } : {}}
-      className={`
-        font-mono font-medium border-2 rounded-md transition-all duration-200
-        focus:outline-none focus:ring-2 focus:ring-green-400/50
-        disabled:opacity-50 disabled:cursor-not-allowed
-        ${variantClasses[variant]}
-        ${sizeClasses[size]}
-        ${isDisabled ? 'hover:scale-100' : ''}
-        ${className}
-      `}
       disabled={isDisabled}
-      onClick={onClick}
+      {...commonProps}
     >
-      {loading ? (
-        <div className="flex items-center justify-center">
-          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-          Loading...
-        </div>
-      ) : (
-        children
-      )}
+      {content}
     </motion.button>
   );
 }

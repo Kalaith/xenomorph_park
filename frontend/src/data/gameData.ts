@@ -45,6 +45,87 @@ export const XENOMORPH_SPECIES: XenomorphSpecies[] = [
     researchCost: 1000,
     foodRequirement: "Very High",
     specialAbilities: ["Royal jelly production", "Advanced intelligence"]
+  },
+  {
+    name: "Queen",
+    description: "The ultimate xenomorph matriarch capable of laying eggs",
+    dangerLevel: 8,
+    containmentDifficulty: 8,
+    researchCost: 2000,
+    foodRequirement: "Very High",
+    specialAbilities: ["Egg laying", "Hive mind control", "Massive size", "Acid spray"]
+  },
+  {
+    name: "Facehugger",
+    description: "Spider-like parasite that implants embryos in hosts",
+    dangerLevel: 2,
+    containmentDifficulty: 9,
+    researchCost: 150,
+    foodRequirement: "Low",
+    specialAbilities: ["Host implantation", "Extreme agility", "Acidic blood"]
+  },
+  {
+    name: "Chestburster",
+    description: "Juvenile form that emerges from infected hosts",
+    dangerLevel: 1,
+    containmentDifficulty: 7,
+    researchCost: 75,
+    foodRequirement: "Low",
+    specialAbilities: ["Rapid growth", "Host dependency", "Small size advantage"]
+  },
+  {
+    name: "Crusher",
+    description: "Heavily armored xenomorph bred for demolition",
+    dangerLevel: 7,
+    containmentDifficulty: 6,
+    researchCost: 1500,
+    foodRequirement: "High",
+    specialAbilities: ["Battering ram skull", "Extreme durability", "Structure destruction"]
+  },
+  {
+    name: "Spitter",
+    description: "Long-range acid projectile specialist",
+    dangerLevel: 5,
+    containmentDifficulty: 4,
+    researchCost: 800,
+    foodRequirement: "Medium",
+    specialAbilities: ["Acid projectiles", "Ranged combat", "Corrosive attacks"]
+  },
+  {
+    name: "Lurker",
+    description: "Ceiling-dwelling ambush predator",
+    dangerLevel: 4,
+    containmentDifficulty: 5,
+    researchCost: 600,
+    foodRequirement: "Medium",
+    specialAbilities: ["Ceiling traversal", "Ambush tactics", "Silent movement"]
+  },
+  {
+    name: "Boiler",
+    description: "Volatile xenomorph that explodes when threatened",
+    dangerLevel: 6,
+    containmentDifficulty: 7,
+    researchCost: 1200,
+    foodRequirement: "High",
+    specialAbilities: ["Explosive death", "Chemical warfare", "Area damage"]
+  },
+  {
+    name: "Neomorph",
+    description: "Evolved strain with enhanced regeneration",
+    dangerLevel: 5,
+    containmentDifficulty: 5,
+    researchCost: 900,
+    foodRequirement: "Medium",
+    specialAbilities: ["Rapid healing", "Evolutionary adaptation", "Genetic instability"]
+  },
+  {
+    name: "Deacon",
+    description: "Ancient variant with unique physiology",
+    dangerLevel: 7,
+    containmentDifficulty: 8,
+    researchCost: 1800,
+    foodRequirement: "High",
+    specialAbilities: ["Pharyngeal jaw", "Ancient genetics", "Aggressive behavior"]
   }
 ];
 

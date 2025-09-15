@@ -1,24 +1,86 @@
+import { useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { ResourceCounter } from './components/game/ResourceCounter';
 import { FacilityPanel } from './components/game/FacilityPanel';
 import { SpeciesPanel } from './components/game/SpeciesPanel';
 import { GameGrid } from './components/game/GameGrid';
 import { GameControls } from './components/game/GameControls';
+import { NotificationSystem } from './components/ui/NotificationSystem';
+import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
+import { SettingsModal } from './components/ui/SettingsModal';
+import { ResearchTree } from './components/game/ResearchTree';
+import { AchievementSystem } from './components/game/AchievementSystem';
+import { ResourceTrends } from './components/game/ResourceTrends';
+import { FacilityUpgrade } from './components/game/FacilityUpgrade';
+import { useCrisisManager } from './components/game/CrisisEventModal';
+import { HorrorMode } from './components/game/HorrorMode';
+import { SkipNavigation, ScreenReaderAnnouncement, useMobileViewport, useHighContrastMode, useReducedMotion } from './components/ui/AccessibilityFeatures';
+import { AnimatedBackground } from './components/ui/AdvancedAnimations';
 
 function App() {
   const { mode } = useGameStore();
+  const [showSettings, setShowSettings] = useState(false);
+  const [showResearchTree, setShowResearchTree] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState(null);
+  
+  const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
+  
+  // Accessibility and optimization hooks
+  useMobileViewport();
+  const [highContrast] = useHighContrastMode();
+  const reducedMotion = useReducedMotion();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400">
-      <div className="container mx-auto px-4 py-6">
+      {/* Accessibility Features */}
+      <SkipNavigation />
+      
+      {/* Animated Background */}
+      {!reducedMotion && <AnimatedBackground />}
+      
+      {/* Screen Reader Announcements */}
+      {activeCrisis && (
+        <ScreenReaderAnnouncement 
+          message={`Crisis event: ${activeCrisis.event.name}`} 
+          priority="assertive" 
+        />
+      )}
+      
+      <div id="main-content" className="container mx-auto px-4 py-6 relative z-10">
         {/* Header */}
-        <header className="text-center mb-8">
+        <header className="text-center mb-8 relative">
           <h1 className="text-4xl font-bold text-green-400 glow mb-2">
             XENOMORPH PARK
           </h1>
           <p className="text-slate-400 text-lg">
             Building & Survival Simulation
           </p>
+          
+          {/* Header Buttons */}
+          <div className="absolute top-0 right-0 flex gap-2">
+            <button
+              onClick={() => setShowAchievements(true)}
+              className="p-2 text-slate-400 hover:text-yellow-400 transition-colors"
+              title="Achievements"
+            >
+              🏆
+            </button>
+            <button
+              onClick={() => setShowResearchTree(true)}
+              className="p-2 text-slate-400 hover:text-purple-400 transition-colors"
+              title="Research Tree"
+            >
+              🔬
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 text-slate-400 hover:text-green-400 transition-colors"
+              title="Settings (H for help)"
+            >
+              ⚙️
+            </button>
+          </div>
         </header>
 
         {/* Resource Dashboard */}
@@ -28,60 +90,60 @@ function App() {
         <GameControls />
 
         {mode === 'building' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel - Facilities & Species */}
-            <div className="lg:col-span-1 space-y-6">
-              <FacilityPanel />
-              <SpeciesPanel />
-            </div>
+          <div className="space-y-6">
+            {/* Resource Trends */}
+            <ResourceTrends />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Panel - Facilities & Species */}
+              <div className="lg:col-span-1 space-y-6">
+                <FacilityPanel />
+                <SpeciesPanel />
+              </div>
 
-            {/* Right Panel - Game Grid */}
-            <div className="lg:col-span-2">
-              <GameGrid />
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="bg-slate-900/80 border border-red-400/30 rounded-lg p-8 max-w-md mx-auto">
-              <h2 className="text-2xl font-bold text-red-400 mb-4 glow">
-                🚨 HORROR MODE
-              </h2>
-              <p className="text-slate-300 mb-6">
-                Horror survival mode is under development. A containment breach has occurred and you must survive!
-              </p>
-              <div className="space-y-4">
-                <div className="bg-red-900/30 border border-red-400/30 rounded p-4 text-left">
-                  <h3 className="text-red-400 font-semibold mb-2">Objectives:</h3>
-                  <ul className="space-y-1 text-sm text-slate-300">
-                    <li>• Restore power to main grid</li>
-                    <li>• Evacuate remaining civilians</li>
-                    <li>• Eliminate xenomorph threats</li>
-                  </ul>
-                </div>
-                <div className="bg-slate-800/50 border border-slate-600 rounded p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Health:</span>
-                    <span className="text-green-400">100%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Ammo:</span>
-                    <span className="text-yellow-400">95/95</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span>Weapon:</span>
-                    <span className="text-blue-400">M41A Pulse Rifle</span>
-                  </div>
-                </div>
+              {/* Right Panel - Game Grid */}
+              <div className="lg:col-span-2">
+                <GameGrid />
               </div>
             </div>
           </div>
+        ) : (
+          <HorrorMode />
         )}
 
         {/* Footer */}
         <footer className="mt-12 text-center text-slate-500 text-sm">
           <p>Xenomorph Park © 2025 - WebHatchery Project</p>
+          <p className="mt-1 text-xs">
+            Press <kbd className="px-1 py-0.5 bg-slate-700 rounded text-slate-300">H</kbd> for keyboard shortcuts
+          </p>
         </footer>
       </div>
+
+      {/* Global Components */}
+      <KeyboardShortcuts />
+      <NotificationSystem position="top-right" />
+      <SettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+      />
+      <ResearchTree
+        isOpen={showResearchTree}
+        onClose={() => setShowResearchTree(false)}
+      />
+      <AchievementSystem
+        isOpen={showAchievements}
+        onClose={() => setShowAchievements(false)}
+      />
+      <FacilityUpgrade
+        isOpen={!!selectedFacilityForUpgrade}
+        facility={selectedFacilityForUpgrade}
+        onClose={() => setSelectedFacilityForUpgrade(null)}
+      />
+      <CrisisModal
+        isOpen={!!activeCrisis}
+        onClose={() => {}}
+      />
     </div>
   );
 }

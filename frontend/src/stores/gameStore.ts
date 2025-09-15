@@ -3,6 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
 import { GAME_CONSTANTS } from '../constants/gameConstants';
 import { DEFAULT_OBJECTIVES } from '../data/gameData';
+import { saveManager } from '../utils/saveManager';
 
 const initialState: GameState = {
   mode: 'building',
@@ -164,10 +165,63 @@ export const useGameStore = create<GameStore>()(
             horror: { ...state.horror, ...horrorState },
           })),
 
-        // Status messages (placeholder for now)
+        // Status messages
         addStatusMessage: (message, type) => {
-          // This would typically integrate with a notification system
-          console.log(`${type.toUpperCase()}: ${message}`);
+          // Use global notification system if available
+          // @ts-ignore
+          if (window.addNotification) {
+            // @ts-ignore
+            window.addNotification(message, type);
+          } else {
+            console.log(`${type.toUpperCase()}: ${message}`);
+          }
+        },
+
+        // Save management
+        saveGame: (slotId: string, name?: string) => {
+          const state = get();
+          const success = saveManager.saveGame(state, slotId, name);
+          if (success) {
+            state.addStatusMessage(`Game saved successfully${name ? ` as "${name}"` : ''}`, 'success');
+          } else {
+            state.addStatusMessage('Failed to save game', 'error');
+          }
+          return success;
+        },
+
+        loadGame: (slotId: string) => {
+          const saveData = saveManager.loadGame(slotId);
+          if (saveData) {
+            set({ ...initialState, ...saveData.gameState });
+            get().addStatusMessage('Game loaded successfully', 'success');
+            return true;
+          } else {
+            get().addStatusMessage('Failed to load game', 'error');
+            return false;
+          }
+        },
+
+        quickSave: () => {
+          const state = get();
+          const success = saveManager.quickSave(state);
+          if (success) {
+            state.addStatusMessage('Quick save completed', 'success');
+          } else {
+            state.addStatusMessage('Quick save failed', 'error');
+          }
+          return success;
+        },
+
+        quickLoad: () => {
+          const saveData = saveManager.quickLoad();
+          if (saveData) {
+            set({ ...initialState, ...saveData.gameState });
+            get().addStatusMessage('Quick load completed', 'success');
+            return true;
+          } else {
+            get().addStatusMessage('No quick save found', 'warning');
+            return false;
+          }
         },
 
         // Reset game
