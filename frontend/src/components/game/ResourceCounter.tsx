@@ -12,7 +12,7 @@ export function ResourceCounter() {
 
   return (
     <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-4 mb-4">
-      <div className="grid grid-cols-5 gap-4 text-sm">
+      <div className="grid grid-cols-6 gap-4 text-sm">
         <div className="flex items-center space-x-2">
           <span className="text-green-400 text-lg">💰</span>
           <div>
@@ -53,7 +53,17 @@ export function ResourceCounter() {
           <span className="text-purple-400 text-lg">👥</span>
           <div>
             <div className="text-green-400 font-mono">Visitors</div>
-            <div className="text-white font-bold">{resources.visitors}</div>
+            <div className="text-white font-bold">{resources.visitors}/{resources.maxVisitors}</div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-cyan-400 text-lg">📊</span>
+          <div>
+            <div className="text-green-400 font-mono">Daily P&L</div>
+            <div className={`font-bold ${(resources.dailyRevenue - resources.dailyExpenses) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {formatNumber(resources.dailyRevenue - resources.dailyExpenses)}
+            </div>
           </div>
         </div>
       </div>

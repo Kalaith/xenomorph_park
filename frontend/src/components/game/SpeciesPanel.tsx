@@ -18,6 +18,10 @@ export function SpeciesPanel() {
     return research.completed.includes(species.name);
   };
 
+  const isAvailable = (species: XenomorphSpecies) => {
+    return research.available?.includes(species.name) || false;
+  };
+
   const getDangerLevelColor = (level: number) => {
     return DANGER_LEVEL_COLORS[level as keyof typeof DANGER_LEVEL_COLORS] || 'text-red-600';
   };
@@ -29,20 +33,22 @@ export function SpeciesPanel() {
         {XENOMORPH_SPECIES.map((species) => {
           const isSelected = selectedSpecies?.name === species.name;
           const researched = isResearched(species);
-          
+          const available = isAvailable(species);
+          const canPlace = researched || available;
+
           return (
             <button
               key={species.name}
               onClick={() => handleSpeciesSelect(species)}
               className={`
                 p-3 rounded-lg border-2 text-left transition-all duration-200
-                ${isSelected 
-                  ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/20' 
+                ${isSelected
+                  ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/20'
                   : 'border-slate-600 hover:border-slate-500'
                 }
-                ${!researched ? 'opacity-50' : 'hover:bg-slate-800/50'}
+                ${!canPlace ? 'opacity-30' : 'hover:bg-slate-800/50'}
               `}
-              disabled={!researched}
+              disabled={!canPlace}
             >
               <div className="flex justify-between items-start mb-2">
                 <span className="text-green-400 font-semibold">{species.name}</span>

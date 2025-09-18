@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { ResourceCounter } from './components/game/ResourceCounter';
+import { TimeDisplay } from './components/game/TimeDisplay';
 import { FacilityPanel } from './components/game/FacilityPanel';
 import { SpeciesPanel } from './components/game/SpeciesPanel';
 import { GameGrid } from './components/game/GameGrid';
@@ -8,14 +9,15 @@ import { GameControls } from './components/game/GameControls';
 import { NotificationSystem } from './components/ui/NotificationSystem';
 import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 import { SettingsModal } from './components/ui/SettingsModal';
-import { ResearchTree } from './components/game/ResearchTree';
+import { ResearchTreeView } from './components/game/ResearchTreeView';
 import { AchievementSystem } from './components/game/AchievementSystem';
 import { ResourceTrends } from './components/game/ResourceTrends';
 import { FacilityUpgrade } from './components/game/FacilityUpgrade';
 import { useCrisisManager } from './components/game/CrisisEventModal';
 import { HorrorMode } from './components/game/HorrorMode';
-import { SkipNavigation, ScreenReaderAnnouncement, useMobileViewport, useHighContrastMode, useReducedMotion } from './components/ui/AccessibilityFeatures';
+import { SkipNavigation, ScreenReaderAnnouncement, useHighContrastMode, useReducedMotion } from './components/ui/AccessibilityFeatures';
 import { AnimatedBackground } from './components/ui/AdvancedAnimations';
+import { useGameLoop } from './hooks/useGameLoop';
 
 function App() {
   const { mode } = useGameStore();
@@ -26,8 +28,8 @@ function App() {
   
   const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
   
-  // Accessibility and optimization hooks
-  useMobileViewport();
+  // Game loop and accessibility hooks
+  useGameLoop();
   const [highContrast] = useHighContrastMode();
   const reducedMotion = useReducedMotion();
 
@@ -83,7 +85,8 @@ function App() {
           </div>
         </header>
 
-        {/* Resource Dashboard */}
+        {/* Time and Resource Dashboard */}
+        <TimeDisplay />
         <ResourceCounter />
 
         {/* Game Controls */}
@@ -127,7 +130,7 @@ function App() {
         isOpen={showSettings} 
         onClose={() => setShowSettings(false)} 
       />
-      <ResearchTree
+      <ResearchTreeView
         isOpen={showResearchTree}
         onClose={() => setShowResearchTree(false)}
       />

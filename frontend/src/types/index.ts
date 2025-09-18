@@ -5,6 +5,8 @@ export interface GameState {
   mode: 'building' | 'horror';
   paused: boolean;
   day: number;
+  hour: number;
+  tick: number;
   resources: Resources;
   facilities: PlacedFacility[];
   xenomorphs: PlacedXenomorph[];
@@ -12,6 +14,7 @@ export interface GameState {
   selectedSpecies: XenomorphSpecies | null;
   research: ResearchState;
   horror: HorrorState;
+  economics: EconomicsState;
 }
 
 export interface Resources {
@@ -21,6 +24,9 @@ export interface Resources {
   research: number;
   security: SecurityLevel;
   visitors: number;
+  maxVisitors: number;
+  dailyRevenue: number;
+  dailyExpenses: number;
 }
 
 export type SecurityLevel = 'Low' | 'Medium' | 'High' | 'Maximum';
@@ -50,6 +56,15 @@ export interface ResearchState {
   completed: string[];
   inProgress: string | null;
   points: number;
+  available: string[];
+  researchTree: {
+    [nodeId: string]: {
+      completed: boolean;
+      inProgress: boolean;
+      progress: number;
+      startedAt?: number;
+    };
+  };
 }
 
 export interface HorrorState {
@@ -58,6 +73,15 @@ export interface HorrorState {
   maxAmmo: number;
   weapon: string;
   objectives: string[];
+}
+
+export interface EconomicsState {
+  totalRevenue: number;
+  totalExpenses: number;
+  profitMargin: number;
+  visitorSatisfaction: number;
+  attractionValue: number;
+  lastDayProfit: number;
 }
 
 // Game definition types
@@ -148,7 +172,17 @@ export interface GameStore extends GameState {
   completeResearch: (species: string) => void;
   updateHorrorState: (state: Partial<HorrorState>) => void;
   addStatusMessage: (message: string, type: StatusMessage['type']) => void;
-  
+
+  // Game mechanics actions
+  gameTick: () => void;
+  processEconomics: () => void;
+  updateTime: () => void;
+
+  // Research tree actions
+  startResearchNode: (nodeId: string) => void;
+  completeResearchNode: (nodeId: string) => void;
+  updateResearchProgress: () => void;
+
   // Save/Load actions
   saveGame: (slotId: string, name?: string) => boolean;
   loadGame: (slotId: string) => boolean;

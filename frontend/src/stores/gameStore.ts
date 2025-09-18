@@ -9,6 +9,8 @@ const initialState: GameState = {
   mode: 'building',
   paused: false,
   day: 1,
+  hour: 9,
+  tick: 0,
   resources: {
     credits: GAME_CONSTANTS.STARTING_CREDITS,
     power: GAME_CONSTANTS.STARTING_POWER,
@@ -16,15 +18,20 @@ const initialState: GameState = {
     research: GAME_CONSTANTS.STARTING_RESEARCH,
     security: GAME_CONSTANTS.STARTING_SECURITY,
     visitors: GAME_CONSTANTS.STARTING_VISITORS,
+    maxVisitors: 50,
+    dailyRevenue: 0,
+    dailyExpenses: 0,
   },
   facilities: [],
   xenomorphs: [],
   selectedFacility: null,
   selectedSpecies: null,
   research: {
-    completed: ['Drone'], // Drone is available from start
+    completed: [], // No research completed at start
     inProgress: null,
     points: 0,
+    available: ['Drone'], // Drone is available from start but not "researched"
+    researchTree: {}, // Research tree progress tracking
   },
   horror: {
     health: GAME_CONSTANTS.STARTING_HEALTH,
@@ -32,6 +39,14 @@ const initialState: GameState = {
     maxAmmo: GAME_CONSTANTS.MAX_AMMO,
     weapon: GAME_CONSTANTS.DEFAULT_WEAPON,
     objectives: [...DEFAULT_OBJECTIVES],
+  },
+  economics: {
+    totalRevenue: 0,
+    totalExpenses: 0,
+    profitMargin: 0,
+    visitorSatisfaction: 0.5,
+    attractionValue: 0,
+    lastDayProfit: 0,
   },
 };
 
@@ -100,8 +115,9 @@ export const useGameStore = create<GameStore>()(
         placeXenomorph: (species, position) => {
           const state = get();
 
-          // Check if species is researched
-          if (!state.research.completed.includes(species.name)) {
+          // Check if species is researched or available (handle undefined available array)
+          const available = state.research.available || [];
+          if (!state.research.completed.includes(species.name) && !available.includes(species.name)) {
             return;
           }
 
@@ -156,6 +172,7 @@ export const useGameStore = create<GameStore>()(
               ...state.research,
               completed: [...state.research.completed, species],
               inProgress: null,
+              available: state.research.available.filter(s => s !== species),
             },
           })),
 
@@ -224,18 +241,259 @@ export const useGameStore = create<GameStore>()(
           }
         },
 
+        // Game mechanics
+        updateTime: () => set((state) => {
+          let newTick = state.tick + 1;
+          let newHour = state.hour;
+          let newDay = state.day;
+
+          if (newTick >= GAME_CONSTANTS.TICKS_PER_HOUR) {
+            newTick = 0;
+            newHour++;
+
+            if (newHour >= GAME_CONSTANTS.HOURS_PER_DAY) {
+              newHour = 0;
+              newDay++;
+
+              // Reset daily counters
+              return {
+                ...state,
+                tick: newTick,
+                hour: newHour,
+                day: newDay,
+                resources: {
+                  ...state.resources,
+                  dailyRevenue: 0,
+                  dailyExpenses: 0,
+                },
+                economics: {
+                  ...state.economics,
+                  lastDayProfit: state.resources.dailyRevenue - state.resources.dailyExpenses,
+                },
+              };
+            }
+          }
+
+          return { ...state, tick: newTick, hour: newHour, day: newDay };
+        }),
+
+        processEconomics: () => set((state) => {
+          const visitorCenters = state.facilities.filter(f => f.name === 'Visitor Center').length;
+          const totalAttractionValue = state.xenomorphs.reduce((sum, x) => sum + x.species.dangerLevel, 0);
+
+          // Calculate visitor flow based on time of day
+          let flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_NIGHT;
+          if (state.hour >= 6 && state.hour < 12) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_MORNING;
+          else if (state.hour >= 12 && state.hour < 18) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_AFTERNOON;
+          else if (state.hour >= 18 && state.hour < 22) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_EVENING;
+
+          // Calculate new visitors
+          const maxNewVisitors = Math.floor(GAME_CONSTANTS.MAX_VISITORS_PER_TICK * flowMultiplier);
+          const baseVisitorCapacity = visitorCenters * GAME_CONSTANTS.VISITORS_PER_FACILITY + 10;
+          const attractionBonus = Math.floor(totalAttractionValue * 0.5);
+          const newVisitorCount = Math.min(
+            state.resources.visitors + Math.random() * maxNewVisitors,
+            baseVisitorCapacity + attractionBonus
+          );
+
+          // Calculate revenue
+          const admissionRevenue = (newVisitorCount - state.resources.visitors) * GAME_CONSTANTS.BASE_ADMISSION_PRICE;
+          const attractionRevenue = state.resources.visitors * totalAttractionValue * 0.1;
+          const totalRevenue = admissionRevenue + attractionRevenue;
+
+          // Calculate expenses
+          const facilityMaintenance = state.facilities.length * GAME_CONSTANTS.FACILITY_MAINTENANCE_COST;
+          const xenomorphFeeding = state.xenomorphs.length * GAME_CONSTANTS.XENOMORPH_FOOD_COST;
+          const totalExpenses = facilityMaintenance + xenomorphFeeding;
+
+          return {
+            ...state,
+            resources: {
+              ...state.resources,
+              visitors: Math.floor(newVisitorCount),
+              maxVisitors: baseVisitorCapacity + attractionBonus,
+              credits: state.resources.credits + totalRevenue - totalExpenses,
+              dailyRevenue: state.resources.dailyRevenue + totalRevenue,
+              dailyExpenses: state.resources.dailyExpenses + totalExpenses,
+            },
+            economics: {
+              ...state.economics,
+              totalRevenue: state.economics.totalRevenue + totalRevenue,
+              totalExpenses: state.economics.totalExpenses + totalExpenses,
+              attractionValue: totalAttractionValue,
+              profitMargin: state.economics.totalRevenue > 0 ?
+                ((state.economics.totalRevenue - state.economics.totalExpenses) / state.economics.totalRevenue) * 100 : 0,
+            },
+          };
+        }),
+
+        gameTick: () => {
+          const state = get();
+          if (!state.paused && state.mode === 'building') {
+            state.updateTime();
+            state.processEconomics();
+            state.updateResearchProgress();
+          }
+        },
+
+        // Research tree management
+        startResearchNode: (nodeId) => set((state) => {
+          // Import the research tree data to get costs
+          const RESEARCH_TREE = require('../data/researchTree').RESEARCH_TREE;
+          const nodeData = RESEARCH_TREE.find((n: any) => n.id === nodeId);
+
+          if (!nodeData) return state;
+
+          const currentNodeState = state.research.researchTree[nodeId] || {
+            completed: false,
+            inProgress: false,
+            progress: 0
+          };
+
+          // Check if we can afford it and it's available
+          const canAfford = state.resources.credits >= nodeData.cost.credits &&
+                           state.resources.research >= nodeData.cost.research;
+
+          if (!currentNodeState.completed && !currentNodeState.inProgress && canAfford) {
+            return {
+              ...state,
+              resources: {
+                ...state.resources,
+                credits: state.resources.credits - nodeData.cost.credits,
+                research: state.resources.research - nodeData.cost.research,
+              },
+              research: {
+                ...state.research,
+                researchTree: {
+                  ...state.research.researchTree,
+                  [nodeId]: {
+                    ...currentNodeState,
+                    inProgress: true,
+                    startedAt: Date.now(),
+                  },
+                },
+              },
+            };
+          }
+          return state;
+        }),
+
+        completeResearchNode: (nodeId) => set((state) => {
+          const node = state.research.researchTree[nodeId];
+          if (node && node.inProgress) {
+            return {
+              ...state,
+              research: {
+                ...state.research,
+                researchTree: {
+                  ...state.research.researchTree,
+                  [nodeId]: {
+                    ...node,
+                    completed: true,
+                    inProgress: false,
+                    progress: 100,
+                  },
+                },
+              },
+            };
+          }
+          return state;
+        }),
+
+        updateResearchProgress: () => set((state) => {
+          const RESEARCH_TREE = require('../data/researchTree').RESEARCH_TREE;
+          const updatedTree = { ...state.research.researchTree };
+          let hasChanges = false;
+          let newResearchPoints = state.research.points;
+
+          // Generate research points from research labs
+          const researchLabs = state.facilities.filter(f => f.name === 'Research Lab').length;
+          newResearchPoints += researchLabs * GAME_CONSTANTS.RESEARCH_POINTS_PER_TICK;
+
+          Object.entries(updatedTree).forEach(([nodeId, nodeData]) => {
+            if (nodeData.inProgress && nodeData.startedAt) {
+              const nodeConfig = RESEARCH_TREE.find((n: any) => n.id === nodeId);
+              if (!nodeConfig) return;
+
+              // Calculate progress based on time
+              const timeElapsed = Date.now() - nodeData.startedAt;
+              const hoursElapsed = timeElapsed / (1000 * 60 * 60); // Convert to hours
+              const expectedProgress = (hoursElapsed / nodeConfig.cost.time) * 100;
+              const newProgress = Math.min(100, expectedProgress);
+
+              if (newProgress !== nodeData.progress) {
+                updatedTree[nodeId] = { ...nodeData, progress: newProgress };
+                hasChanges = true;
+
+                // Auto-complete when reaching 100%
+                if (newProgress >= 100) {
+                  updatedTree[nodeId] = {
+                    ...updatedTree[nodeId],
+                    completed: true,
+                    inProgress: false,
+                  };
+
+                  // Apply unlocks
+                  if (nodeConfig.unlocks.species) {
+                    nodeConfig.unlocks.species.forEach((species: string) => {
+                      if (!state.research.completed.includes(species)) {
+                        state.research.completed.push(species);
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          });
+
+          if (hasChanges || newResearchPoints !== state.research.points) {
+            return {
+              ...state,
+              research: {
+                ...state.research,
+                points: newResearchPoints,
+                researchTree: updatedTree,
+              },
+            };
+          }
+
+          return state;
+        }),
+
         // Reset game
         reset: () => set(initialState),
       }),
       {
         name: 'xenomorph-park-game',
+        version: 1,
+        migrate: (persistedState: any, version) => {
+          // Handle migration for research.available field
+          if (persistedState && persistedState.research) {
+            if (!persistedState.research.available) {
+              persistedState.research.available = ['Drone'];
+            }
+            if (!persistedState.research.researchTree) {
+              persistedState.research.researchTree = {};
+            }
+          }
+          return persistedState;
+        },
         partialize: (state) => ({
           // Only persist certain parts of the state
           day: state.day,
+          hour: state.hour,
+          tick: state.tick,
           resources: state.resources,
           facilities: state.facilities,
           xenomorphs: state.xenomorphs,
-          research: state.research,
+          research: {
+            completed: state.research.completed,
+            inProgress: state.research.inProgress,
+            points: state.research.points,
+            available: state.research.available,
+            researchTree: state.research.researchTree,
+          },
+          economics: state.economics,
         }),
       }
     ),
