@@ -24,12 +24,24 @@ import { useParticles } from './components/ui/ParticleSystem';
 import { ParticleProvider } from './contexts/ParticleContext';
 import { WeatherSystem } from './components/game/WeatherSystem';
 import { useTutorial } from './components/game/TutorialMode';
+import { CampaignMode } from './components/game/CampaignMode';
+import { BiomeSystem } from './components/game/BiomeSystem';
+import { HistoricalScenarios } from './components/game/HistoricalScenarios';
+import { CampaignObjectiveTracker } from './components/game/CampaignObjectiveTracker';
+import { useCampaignEvents } from './components/game/CampaignEventModal';
+import { CampaignStatistics } from './components/game/CampaignStatistics';
+import { GeneticModification } from './components/game/GeneticModification';
+import { TouchControls, SwipeGesture } from './components/ui/MobileOptimization';
 
 function App() {
   const { mode } = useGameStore();
   const [showSettings, setShowSettings] = useState(false);
   const [showResearchTree, setShowResearchTree] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showCampaign, setShowCampaign] = useState(false);
+  const [showHistorical, setShowHistorical] = useState(false);
+  const [showCampaignStats, setShowCampaignStats] = useState(false);
+  const [showGeneticLab, setShowGeneticLab] = useState(false);
   const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState(null);
   
   const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
@@ -54,11 +66,41 @@ function App() {
   // Tutorial system
   const { startTutorial, TutorialComponent } = useTutorial();
 
+  // Campaign events system
+  const { CampaignEventModal } = useCampaignEvents();
+
+  // Check if campaign is active
+  const isCampaignActive = !!localStorage.getItem('current-campaign-scenario');
+
+  // Mobile detection
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Mobile interaction handlers
+  const handleMobileMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+    // Could be used for grid navigation or camera movement
+    console.log(`Mobile move: ${direction}`);
+  };
+
+  const handleMobileAction = () => {
+    // Primary action - could trigger building placement
+    console.log('Mobile primary action');
+  };
+
+  const handleMobileSecondaryAction = () => {
+    // Secondary action - could open context menu
+    console.log('Mobile secondary action');
+  };
+
   return (
     <ParticleProvider value={{ triggerContainmentBreach, triggerExplosion, triggerSparks, triggerSmoke }}>
       <FloatingTextProvider value={{ addResourceChange, addFloatingText }}>
-        <WeatherSystem>
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400">
+        <BiomeSystem>
+          <WeatherSystem>
+            <SwipeGesture
+              onSwipeLeft={() => isMobile && setShowSettings(false)}
+              onSwipeRight={() => isMobile && setShowSettings(true)}
+              className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400"
+            >
       {/* Accessibility Features */}
       <SkipNavigation />
       
@@ -84,7 +126,28 @@ function App() {
           </p>
           
           {/* Header Buttons */}
-          <div className="absolute top-0 right-0 flex gap-2">
+          <div className={`absolute top-0 right-0 ${isMobile ? 'flex flex-wrap gap-1 max-w-32' : 'flex gap-2'}`}>
+            <button
+              onClick={() => setShowCampaign(true)}
+              className="p-2 text-slate-400 hover:text-orange-400 transition-colors"
+              title="Campaign Mode"
+            >
+              🚀
+            </button>
+            <button
+              onClick={() => setShowCampaignStats(true)}
+              className="p-2 text-slate-400 hover:text-cyan-400 transition-colors"
+              title="Campaign Statistics"
+            >
+              📊
+            </button>
+            <button
+              onClick={() => setShowHistorical(true)}
+              className="p-2 text-slate-400 hover:text-amber-400 transition-colors"
+              title="Historical Scenarios"
+            >
+              📜
+            </button>
             <button
               onClick={startTutorial}
               className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
@@ -105,6 +168,13 @@ function App() {
               title="Research Tree"
             >
               🔬
+            </button>
+            <button
+              onClick={() => setShowGeneticLab(true)}
+              className="p-2 text-slate-400 hover:text-pink-400 transition-colors"
+              title="Genetic Laboratory"
+            >
+              🧬
             </button>
             <button
               onClick={() => setShowSettings(true)}
@@ -169,6 +239,22 @@ function App() {
         isOpen={showAchievements}
         onClose={() => setShowAchievements(false)}
       />
+      <CampaignMode
+        isOpen={showCampaign}
+        onClose={() => setShowCampaign(false)}
+      />
+      <HistoricalScenarios
+        isOpen={showHistorical}
+        onClose={() => setShowHistorical(false)}
+      />
+      <CampaignStatistics
+        isOpen={showCampaignStats}
+        onClose={() => setShowCampaignStats(false)}
+      />
+      <GeneticModification
+        isOpen={showGeneticLab}
+        onClose={() => setShowGeneticLab(false)}
+      />
       <FacilityUpgrade
         isOpen={!!selectedFacilityForUpgrade}
         facility={selectedFacilityForUpgrade}
@@ -187,8 +273,24 @@ function App() {
 
           {/* Tutorial System */}
           <TutorialComponent />
-          </div>
-        </WeatherSystem>
+
+          {/* Campaign Objective Tracker */}
+          <CampaignObjectiveTracker isActive={isCampaignActive} />
+
+          {/* Campaign Events */}
+          <CampaignEventModal />
+
+          {/* Mobile Touch Controls */}
+          {isMobile && (
+            <TouchControls
+              onMove={handleMobileMove}
+              onAction={handleMobileAction}
+              onSecondaryAction={handleMobileSecondaryAction}
+            />
+          )}
+            </SwipeGesture>
+          </WeatherSystem>
+        </BiomeSystem>
       </FloatingTextProvider>
     </ParticleProvider>
   );

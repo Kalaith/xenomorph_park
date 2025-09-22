@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -250,21 +250,42 @@ function AchievementToast({ achievement, isVisible, onClose }: AchievementToastP
 }
 
 export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
-  const { 
-    facilities, 
-    research, 
-    resources, 
-    xenomorphs, 
-    day 
+  const {
+    facilities,
+    research,
+    resources,
+    xenomorphs,
+    day
   } = useGameStore();
 
-  const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
+  const [achievements, setAchievements] = useState<Achievement[]>(() => {
+    // Load persisted achievements or use defaults
+    try {
+      const saved = localStorage.getItem('xenomorph-park-achievements');
+      if (saved) {
+        const parsedAchievements = JSON.parse(saved);
+        // Merge with ACHIEVEMENTS to handle any new achievements added
+        return ACHIEVEMENTS.map(defaultAchievement => {
+          const savedAchievement = parsedAchievements.find((a: Achievement) => a.id === defaultAchievement.id);
+          return savedAchievement ? { ...defaultAchievement, ...savedAchievement } : defaultAchievement;
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load achievements from localStorage:', error);
+    }
+    return ACHIEVEMENTS;
+  });
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const processingRef = useRef(false);
+  const initialLoadRef = useRef(true);
 
   // Achievement checking logic
   const checkAchievements = useCallback(() => {
+    if (processingRef.current) return;
+
+    processingRef.current = true;
     setAchievements(prev => prev.map(achievement => {
       if (achievement.unlocked) return achievement;
 
@@ -319,15 +340,17 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
 
       if (shouldUnlock && !achievement.unlocked) {
         // Trigger achievement unlock
-        setNewAchievement(achievement);
-        setShowToast(true);
-        
-        return {
+        const unlockedAchievement = {
           ...achievement,
           unlocked: true,
           unlockedAt: Date.now(),
           progress: typeof achievement.requirements.target === 'number' ? achievement.requirements.target : 100
         };
+
+        setNewAchievement(unlockedAchievement);
+        setShowToast(true);
+        
+        return unlockedAchievement;
       }
 
       return {
@@ -335,12 +358,56 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
         progress: currentProgress
       };
     }));
-  }, [facilities.length, research.completed, xenomorphs.length, resources.credits, resources.visitors, day]);
 
-  // Check achievements periodically
+    // Reset processing flag after a delay
+    setTimeout(() => {
+      processingRef.current = false;
+    }, 500);
+  }, [facilities, research, xenomorphs, resources, day]);
+
+  // Save achievements to localStorage whenever they change
   useEffect(() => {
-    checkAchievements();
-  }, [checkAchievements]);
+    try {
+      localStorage.setItem('xenomorph-park-achievements', JSON.stringify(achievements));
+    } catch (error) {
+      console.warn('Failed to save achievements to localStorage:', error);
+    }
+  }, [achievements]);
+
+  // Check achievements periodically with heavy throttling
+  useEffect(() => {
+    // Skip initial load to prevent triggering achievements on fresh start
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (!processingRef.current) {
+        checkAchievements();
+      }
+    }, 10000); // Only check every 10 seconds
+
+    return () => clearInterval(intervalId);
+  }, []); // Only run once after mount
+
+  // Also check when significant milestones are reached
+  useEffect(() => {
+    if (initialLoadRef.current) return;
+
+    const significantChanges =
+      facilities.length > 0 && facilities.length % 5 === 0 || // Every 5 facilities
+      research.completed.length > 0 && research.completed.length % 3 === 0 || // Every 3 research
+      day > 1 && day % 10 === 0; // Every 10 days
+
+    if (significantChanges) {
+      const timeoutId = setTimeout(() => {
+        checkAchievements();
+      }, 2000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [facilities.length, research.completed.length, day]);
 
   const categories = ['all', 'building', 'research', 'management', 'survival', 'special'];
 

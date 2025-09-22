@@ -3,6 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
 import { GAME_CONSTANTS } from '../constants/gameConstants';
 import { DEFAULT_OBJECTIVES } from '../data/gameData';
+import { RESEARCH_TREE } from '../data/researchTree';
 import { saveManager } from '../utils/saveManager';
 
 const initialState: GameState = {
@@ -496,7 +497,6 @@ export const useGameStore = create<GameStore>()(
         }),
 
         updateResearchProgress: () => set((state) => {
-          const RESEARCH_TREE = require('../data/researchTree').RESEARCH_TREE;
           const updatedTree = { ...state.research.researchTree };
           let hasChanges = false;
           let newResearchPoints = state.research.points;
