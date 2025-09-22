@@ -443,7 +443,7 @@ class CampaignEventManager {
 
       case 'resource':
         return Object.entries(trigger.condition).every(([resource, value]) => {
-          return gameState.resources[resource] >= value;
+          return gameState.resources[resource as keyof typeof gameState.resources] >= (value as number);
         });
 
       case 'facility':
@@ -493,7 +493,7 @@ class CampaignEventManager {
         case 'resource':
           const resourceUpdates: any = {};
           Object.entries(consequence.effect).forEach(([resource, value]) => {
-            const currentValue = gameStore.resources[resource] || 0;
+            const currentValue = (gameStore.resources[resource as keyof typeof gameStore.resources] as number) || 0;
             resourceUpdates[resource] = currentValue + (value as number);
           });
           gameStore.updateResources(resourceUpdates);
@@ -544,7 +544,7 @@ class CampaignEventManager {
       switch (req.type) {
         case 'resource':
           return Object.entries(req.condition).every(([resource, value]) => {
-            return gameState.resources[resource] >= value;
+            return gameState.resources[resource as keyof typeof gameState.resources] >= (value as number);
           });
 
         case 'facility':

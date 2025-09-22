@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { campaignRewardManager } from '../../utils/campaignRewards';
-import { campaignSaveManager } from '../../utils/campaignSaveManager';
 import { campaignEventManager } from '../../utils/campaignEvents';
 
 interface CampaignStatisticsProps {
@@ -72,7 +71,7 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
   };
 
   const getPerformanceRating = (): string => {
-    const { perfectRuns, scenariosCompleted, fastestCompletion } = statistics;
+    const { perfectRuns, scenariosCompleted } = statistics;
 
     if (perfectRuns >= 3) return 'Legendary';
     if (perfectRuns >= 2) return 'Master';
@@ -251,8 +250,8 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
               <h3 className="text-xl font-semibold text-slate-200">Scenario Progress</h3>
               <div className="grid gap-4">
                 {Object.entries(getScenarioNames()).map(([id, name]) => {
-                  const isCompleted = campaignRewardManager.getProgress().completedScenarios.includes(id);
-                  const bestTime = campaignRewardManager.getProgress().bestCompletionTimes[id];
+                  const isCompleted = campaignRewardManager.getCompletedScenarios().includes(id);
+                  const bestTime = campaignRewardManager.getBestCompletionTimes()[id];
 
                   return (
                     <div key={id} className={`p-4 rounded-lg border ${

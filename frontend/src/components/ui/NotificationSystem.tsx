@@ -195,14 +195,6 @@ export function NotificationSystem({
           );
         })}
       </div>
-      
-      {/* CSS for progress bar animation */}
-      <style jsx>{`
-        @keyframes shrink {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-      `}</style>
     </div>
   );
 }

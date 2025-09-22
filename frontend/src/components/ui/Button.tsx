@@ -11,6 +11,7 @@ interface ButtonProps {
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   as?: 'button' | 'span';
+  title?: string;
 }
 
 const variantClasses = {
@@ -37,6 +38,7 @@ export function Button({
   onClick,
   type = 'button',
   as = 'button',
+  title,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
 
@@ -51,6 +53,7 @@ export function Button({
       ${className}
     `,
     onClick: isDisabled ? undefined : onClick,
+    title,
   };
 
   const content = loading ? (

@@ -354,7 +354,7 @@ export function ResearchTreeView({ isOpen, onClose }: ResearchTreeViewProps) {
 
   // Render connection lines
   const renderConnections = () => {
-    const connections = [];
+    const connections: React.ReactElement[] = [];
 
     researchTree.forEach(node => {
       node.prerequisites.forEach(prereqId => {
