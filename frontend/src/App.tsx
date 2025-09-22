@@ -18,6 +18,12 @@ import { HorrorMode } from './components/game/HorrorMode';
 import { SkipNavigation, ScreenReaderAnnouncement, useHighContrastMode, useReducedMotion } from './components/ui/AccessibilityFeatures';
 import { AnimatedBackground } from './components/ui/AdvancedAnimations';
 import { useGameLoop } from './hooks/useGameLoop';
+import { useFloatingText } from './components/ui/FloatingText';
+import { FloatingTextProvider } from './contexts/FloatingTextContext';
+import { useParticles } from './components/ui/ParticleSystem';
+import { ParticleProvider } from './contexts/ParticleContext';
+import { WeatherSystem } from './components/game/WeatherSystem';
+import { useTutorial } from './components/game/TutorialMode';
 
 function App() {
   const { mode } = useGameStore();
@@ -33,8 +39,26 @@ function App() {
   const [highContrast] = useHighContrastMode();
   const reducedMotion = useReducedMotion();
 
+  // Floating text for visual feedback
+  const { FloatingTextComponent, addResourceChange, addFloatingText } = useFloatingText();
+
+  // Particle effects
+  const {
+    ParticleSystemComponent,
+    triggerContainmentBreach,
+    triggerExplosion,
+    triggerSparks,
+    triggerSmoke
+  } = useParticles();
+
+  // Tutorial system
+  const { startTutorial, TutorialComponent } = useTutorial();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400">
+    <ParticleProvider value={{ triggerContainmentBreach, triggerExplosion, triggerSparks, triggerSmoke }}>
+      <FloatingTextProvider value={{ addResourceChange, addFloatingText }}>
+        <WeatherSystem>
+          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400">
       {/* Accessibility Features */}
       <SkipNavigation />
       
@@ -61,6 +85,13 @@ function App() {
           
           {/* Header Buttons */}
           <div className="absolute top-0 right-0 flex gap-2">
+            <button
+              onClick={startTutorial}
+              className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
+              title="Tutorial"
+            >
+              📚
+            </button>
             <button
               onClick={() => setShowAchievements(true)}
               className="p-2 text-slate-400 hover:text-yellow-400 transition-colors"
@@ -147,7 +178,19 @@ function App() {
         isOpen={!!activeCrisis}
         onClose={() => {}}
       />
-    </div>
+
+        {/* Floating Text for Visual Feedback */}
+        <FloatingTextComponent />
+
+          {/* Particle Effects */}
+          <ParticleSystemComponent />
+
+          {/* Tutorial System */}
+          <TutorialComponent />
+          </div>
+        </WeatherSystem>
+      </FloatingTextProvider>
+    </ParticleProvider>
   );
 }
 

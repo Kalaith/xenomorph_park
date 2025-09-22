@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { XENOMORPH_SPECIES } from '../../data/gameData';
 import { DANGER_LEVEL_COLORS } from '../../constants/gameConstants';
 import { XenomorphSpecies } from '../../types';
+import { GeneticModification } from './GeneticModification';
+import { Button } from '../ui/Button';
 
 export function SpeciesPanel() {
   const { selectedSpecies, selectSpecies, research } = useGameStore();
+  const [isGeneticModificationOpen, setIsGeneticModificationOpen] = useState(false);
 
   const handleSpeciesSelect = (species: XenomorphSpecies) => {
     if (selectedSpecies?.name === species.name) {
@@ -28,7 +32,17 @@ export function SpeciesPanel() {
 
   return (
     <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-4">
-      <h3 className="text-green-400 font-bold text-lg mb-4 glow">Xenomorph Species</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-green-400 font-bold text-lg glow">Xenomorph Species</h3>
+        <Button
+          variant="outline"
+          onClick={() => setIsGeneticModificationOpen(true)}
+          className="text-sm"
+          title="Open Genetic Modification Laboratory"
+        >
+          🧬 Gene Lab
+        </Button>
+      </div>
       <div className="grid grid-cols-1 gap-2">
         {XENOMORPH_SPECIES.map((species) => {
           const isSelected = selectedSpecies?.name === species.name;
@@ -81,6 +95,12 @@ export function SpeciesPanel() {
           );
         })}
       </div>
+
+      {/* Genetic Modification Modal */}
+      <GeneticModification
+        isOpen={isGeneticModificationOpen}
+        onClose={() => setIsGeneticModificationOpen(false)}
+      />
     </div>
   );
 }

@@ -48,6 +48,11 @@ const initialState: GameState = {
     attractionValue: 0,
     lastDayProfit: 0,
   },
+  undoRedo: {
+    history: [],
+    currentIndex: -1,
+    maxHistorySize: 50,
+  },
 };
 
 export const useGameStore = create<GameStore>()(
@@ -99,13 +104,31 @@ export const useGameStore = create<GameStore>()(
           // Calculate new max power if it's a power generator
           const powerIncrease = facility.name === 'Power Generator' ? 10 : 0;
 
+          // Store previous state for undo
+          const previousState = {
+            facilities: state.facilities,
+            resources: state.resources,
+          };
+
+          const resourceChanges = {
+            credits: state.resources.credits - facility.cost,
+            power: state.resources.power - facility.powerRequirement,
+            maxPower: state.resources.maxPower + powerIncrease,
+          };
+
+          // Add to history
+          get().addToHistory({
+            type: 'PLACE_FACILITY',
+            timestamp: Date.now(),
+            data: { facility: newFacility, resourceChanges },
+            previousState,
+          });
+
           set((state) => ({
             facilities: [...state.facilities, newFacility],
             resources: {
               ...state.resources,
-              credits: state.resources.credits - facility.cost,
-              power: state.resources.power - facility.powerRequirement,
-              maxPower: state.resources.maxPower + powerIncrease,
+              ...resourceChanges,
             },
             selectedFacility: null,
           }));
@@ -139,9 +162,81 @@ export const useGameStore = create<GameStore>()(
             containmentLevel: species.containmentDifficulty,
           };
 
+          // Store previous state for undo
+          const previousState = {
+            xenomorphs: state.xenomorphs,
+          };
+
+          // Add to history
+          get().addToHistory({
+            type: 'PLACE_XENOMORPH',
+            timestamp: Date.now(),
+            data: { xenomorph: newXenomorph },
+            previousState,
+          });
+
           set((state) => ({
             xenomorphs: [...state.xenomorphs, newXenomorph],
             selectedSpecies: null,
+          }));
+        },
+
+        // Remove facilities and xenomorphs
+        removeFacility: (facilityId) => {
+          const state = get();
+          const facility = state.facilities.find(f => f.id === facilityId);
+          if (!facility) return;
+
+          // Store previous state for undo
+          const previousState = {
+            facilities: state.facilities,
+            resources: state.resources,
+          };
+
+          // Calculate resource refund (partial)
+          const refundAmount = Math.floor(facility.cost * 0.5); // 50% refund
+          const powerReturn = facility.powerRequirement;
+          const maxPowerDecrease = facility.name === 'Power Generator' ? 10 : 0;
+
+          // Add to history
+          get().addToHistory({
+            type: 'REMOVE_FACILITY',
+            timestamp: Date.now(),
+            data: { facility, refund: refundAmount, powerReturn, maxPowerDecrease },
+            previousState,
+          });
+
+          set((state) => ({
+            facilities: state.facilities.filter(f => f.id !== facilityId),
+            resources: {
+              ...state.resources,
+              credits: state.resources.credits + refundAmount,
+              power: state.resources.power + powerReturn,
+              maxPower: state.resources.maxPower - maxPowerDecrease,
+            },
+          }));
+        },
+
+        removeXenomorph: (xenomorphId) => {
+          const state = get();
+          const xenomorph = state.xenomorphs.find(x => x.id === xenomorphId);
+          if (!xenomorph) return;
+
+          // Store previous state for undo
+          const previousState = {
+            xenomorphs: state.xenomorphs,
+          };
+
+          // Add to history
+          get().addToHistory({
+            type: 'REMOVE_XENOMORPH',
+            timestamp: Date.now(),
+            data: { xenomorph },
+            previousState,
+          });
+
+          set((state) => ({
+            xenomorphs: state.xenomorphs.filter(x => x.id !== xenomorphId),
           }));
         },
 
@@ -459,6 +554,96 @@ export const useGameStore = create<GameStore>()(
 
           return state;
         }),
+
+        // Undo/Redo functionality
+        addToHistory: (action) => set((state) => {
+          const newHistory = [...state.undoRedo.history];
+
+          // Remove any actions after current index (when user made new action after undo)
+          if (state.undoRedo.currentIndex < newHistory.length - 1) {
+            newHistory.splice(state.undoRedo.currentIndex + 1);
+          }
+
+          // Add new action
+          newHistory.push(action);
+
+          // Limit history size
+          if (newHistory.length > state.undoRedo.maxHistorySize) {
+            newHistory.shift();
+          }
+
+          return {
+            ...state,
+            undoRedo: {
+              ...state.undoRedo,
+              history: newHistory,
+              currentIndex: newHistory.length - 1,
+            },
+          };
+        }),
+
+        undo: () => set((state) => {
+          if (state.undoRedo.currentIndex < 0) return state;
+
+          const currentAction = state.undoRedo.history[state.undoRedo.currentIndex];
+          if (!currentAction.previousState) return state;
+
+          // Apply previous state
+          const newState = {
+            ...state,
+            ...currentAction.previousState,
+            undoRedo: {
+              ...state.undoRedo,
+              currentIndex: state.undoRedo.currentIndex - 1,
+            },
+          };
+
+          return newState;
+        }),
+
+        redo: () => set((state) => {
+          if (state.undoRedo.currentIndex >= state.undoRedo.history.length - 1) return state;
+
+          const nextIndex = state.undoRedo.currentIndex + 1;
+          const nextAction = state.undoRedo.history[nextIndex];
+
+          // Reapply the action
+          let newState = { ...state };
+
+          if (nextAction.type === 'PLACE_FACILITY') {
+            newState.facilities = [...state.facilities, nextAction.data.facility];
+            newState.resources = { ...state.resources, ...nextAction.data.resourceChanges };
+          } else if (nextAction.type === 'PLACE_XENOMORPH') {
+            newState.xenomorphs = [...state.xenomorphs, nextAction.data.xenomorph];
+          } else if (nextAction.type === 'REMOVE_FACILITY') {
+            newState.facilities = state.facilities.filter(f => f.id !== nextAction.data.facility.id);
+            newState.resources = {
+              ...state.resources,
+              credits: state.resources.credits + nextAction.data.refund,
+              power: state.resources.power + nextAction.data.powerReturn,
+              maxPower: state.resources.maxPower - nextAction.data.maxPowerDecrease,
+            };
+          } else if (nextAction.type === 'REMOVE_XENOMORPH') {
+            newState.xenomorphs = state.xenomorphs.filter(x => x.id !== nextAction.data.xenomorph.id);
+          }
+
+          newState.undoRedo = {
+            ...state.undoRedo,
+            currentIndex: nextIndex,
+          };
+
+          return newState;
+        }),
+
+        canUndo: () => {
+          const state = get();
+          return state.undoRedo.currentIndex >= 0;
+        },
+
+        canRedo: () => {
+          const state = get();
+          return state.undoRedo.currentIndex < state.undoRedo.history.length - 1;
+        },
 
         // Reset game
         reset: () => set(initialState),

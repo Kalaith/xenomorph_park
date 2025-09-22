@@ -12,19 +12,23 @@ interface KeyboardShortcut {
 }
 
 export function KeyboardShortcuts() {
-  const { 
-    mode, 
-    paused, 
-    togglePause, 
-    setMode, 
-    reset, 
-    quickSave, 
+  const {
+    mode,
+    paused,
+    togglePause,
+    setMode,
+    reset,
+    quickSave,
     quickLoad,
     selectedFacility,
     selectedSpecies,
     selectFacility,
     selectSpecies,
-    addStatusMessage
+    addStatusMessage,
+    undo,
+    redo,
+    canUndo,
+    canRedo
   } = useGameStore();
 
   const shortcuts: KeyboardShortcut[] = [
@@ -68,7 +72,33 @@ export function KeyboardShortcuts() {
       description: 'Quick Load',
       category: 'game'
     },
-    
+
+    // Undo/Redo
+    {
+      key: 'z',
+      ctrlKey: true,
+      action: () => {
+        if (canUndo()) {
+          undo();
+          addStatusMessage('Action undone', 'info');
+        }
+      },
+      description: 'Undo',
+      category: 'building'
+    },
+    {
+      key: 'y',
+      ctrlKey: true,
+      action: () => {
+        if (canRedo()) {
+          redo();
+          addStatusMessage('Action redone', 'info');
+        }
+      },
+      description: 'Redo',
+      category: 'building'
+    },
+
     // Building Mode
     {
       key: 'Escape',
