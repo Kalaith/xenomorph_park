@@ -130,7 +130,7 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
     let dangerLevel = selectedBaseSpecies.dangerLevel;
     let containmentDifficulty = selectedBaseSpecies.containmentDifficulty;
     let foodRequirement = selectedBaseSpecies.foodRequirement;
-    let specialAbilities = [...selectedBaseSpecies.specialAbilities];
+    const specialAbilities = [...selectedBaseSpecies.specialAbilities];
 
     // Apply trait effects
     selectedTraits.forEach(trait => {

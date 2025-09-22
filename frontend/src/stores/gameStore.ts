@@ -378,7 +378,7 @@ export const useGameStore = create<GameStore>()(
           const totalAttractionValue = state.xenomorphs.reduce((sum, x) => sum + x.species.dangerLevel, 0);
 
           // Calculate visitor flow based on time of day
-          let flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_NIGHT;
+          let flowMultiplier: number = GAME_CONSTANTS.VISITOR_FLOW_NIGHT;
           if (state.hour >= 6 && state.hour < 12) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_MORNING;
           else if (state.hour >= 12 && state.hour < 18) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_AFTERNOON;
           else if (state.hour >= 18 && state.hour < 22) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_EVENING;
@@ -434,8 +434,7 @@ export const useGameStore = create<GameStore>()(
 
         // Research tree management
         startResearchNode: (nodeId) => set((state) => {
-          // Import the research tree data to get costs
-          const RESEARCH_TREE = require('../data/researchTree').RESEARCH_TREE;
+          // Use the imported research tree data to get costs
           const nodeData = RESEARCH_TREE.find((n: any) => n.id === nodeId);
 
           if (!nodeData) return state;
@@ -608,7 +607,7 @@ export const useGameStore = create<GameStore>()(
           const nextAction = state.undoRedo.history[nextIndex];
 
           // Reapply the action
-          let newState = { ...state };
+          const newState = { ...state };
 
           if (nextAction.type === 'PLACE_FACILITY') {
             newState.facilities = [...state.facilities, nextAction.data.facility];
