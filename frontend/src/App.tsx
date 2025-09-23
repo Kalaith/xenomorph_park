@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { ResourceCounter } from './components/game/ResourceCounter';
+import { SmartResourceDisplay } from './components/ui/SmartResourceDisplay';
 import { TimeDisplay } from './components/game/TimeDisplay';
 import { FacilityPanel } from './components/game/FacilityPanel';
+import { GroupedFacilityPanel } from './components/game/GroupedFacilityPanel';
 import { SpeciesPanel } from './components/game/SpeciesPanel';
+import { GroupedSpeciesPanel } from './components/game/GroupedSpeciesPanel';
 import { GameGrid } from './components/game/GameGrid';
 import { GameControls } from './components/game/GameControls';
+import { SmartToolbar, useMainToolbar } from './components/ui/SmartToolbar';
 import { NotificationSystem } from './components/ui/NotificationSystem';
 import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 import { SettingsModal } from './components/ui/SettingsModal';
@@ -35,14 +39,14 @@ import { TouchControls, SwipeGesture } from './components/ui/MobileOptimization'
 
 function App() {
   const { mode } = useGameStore();
-  const [showSettings, setShowSettings] = useState(false);
-  const [showResearchTree, setShowResearchTree] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
-  const [showCampaign, setShowCampaign] = useState(false);
-  const [showHistorical, setShowHistorical] = useState(false);
-  const [showCampaignStats, setShowCampaignStats] = useState(false);
-  const [showGeneticLab, setShowGeneticLab] = useState(false);
   const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState(null);
+  const [useSmartUI, setUseSmartUI] = useState(true); // Toggle for new UI
+
+  // Tutorial system
+  const { startTutorial, TutorialComponent } = useTutorial();
+
+  // Use the smart toolbar hook
+  const { groups: toolbarGroups, modals } = useMainToolbar(startTutorial);
   
   const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
   
@@ -62,9 +66,6 @@ function App() {
     triggerSparks,
     triggerSmoke
   } = useParticles();
-
-  // Tutorial system
-  const { startTutorial, TutorialComponent } = useTutorial();
 
   // Campaign events system
   const { CampaignEventModal } = useCampaignEvents();
@@ -117,78 +118,40 @@ function App() {
       
       <div id="main-content" className="container mx-auto px-4 py-6 relative z-10">
         {/* Header */}
-        <header className="text-center mb-8 relative">
+        <header className="text-center mb-6 relative">
           <h1 className="text-4xl font-bold text-green-400 glow mb-2">
             XENOMORPH PARK
           </h1>
           <p className="text-slate-400 text-lg">
             Building & Survival Simulation
           </p>
-          
-          {/* Header Buttons */}
-          <div className={`absolute top-0 right-0 ${isMobile ? 'flex flex-wrap gap-1 max-w-32' : 'flex gap-2'}`}>
+
+          {/* UI Mode Toggle */}
+          <div className="absolute top-0 left-0">
             <button
-              onClick={() => setShowCampaign(true)}
-              className="p-2 text-slate-400 hover:text-orange-400 transition-colors"
-              title="Campaign Mode"
+              onClick={() => setUseSmartUI(!useSmartUI)}
+              className="p-2 text-slate-400 hover:text-green-400 transition-colors text-xs"
+              title="Toggle Smart UI"
             >
-              🚀
-            </button>
-            <button
-              onClick={() => setShowCampaignStats(true)}
-              className="p-2 text-slate-400 hover:text-cyan-400 transition-colors"
-              title="Campaign Statistics"
-            >
-              📊
-            </button>
-            <button
-              onClick={() => setShowHistorical(true)}
-              className="p-2 text-slate-400 hover:text-amber-400 transition-colors"
-              title="Historical Scenarios"
-            >
-              📜
-            </button>
-            <button
-              onClick={startTutorial}
-              className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
-              title="Tutorial"
-            >
-              📚
-            </button>
-            <button
-              onClick={() => setShowAchievements(true)}
-              className="p-2 text-slate-400 hover:text-yellow-400 transition-colors"
-              title="Achievements"
-            >
-              🏆
-            </button>
-            <button
-              onClick={() => setShowResearchTree(true)}
-              className="p-2 text-slate-400 hover:text-purple-400 transition-colors"
-              title="Research Tree"
-            >
-              🔬
-            </button>
-            <button
-              onClick={() => setShowGeneticLab(true)}
-              className="p-2 text-slate-400 hover:text-pink-400 transition-colors"
-              title="Genetic Laboratory"
-            >
-              🧬
-            </button>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-2 text-slate-400 hover:text-green-400 transition-colors"
-              title="Settings (H for help)"
-            >
-              ⚙️
+              {useSmartUI ? '📋' : '🔧'} {useSmartUI ? 'Classic' : 'Smart'}
             </button>
           </div>
         </header>
 
+        {/* Smart Toolbar (replaces scattered header buttons) */}
+        {useSmartUI && (
+          <SmartToolbar groups={toolbarGroups} className="mb-4" />
+        )}
+
         {/* Time and Resource Dashboard */}
-        <TimeDisplay />
-        <ResourceCounter />
+        <div className="flex flex-col lg:flex-row gap-4 mb-4">
+          <TimeDisplay />
+          {useSmartUI ? (
+            <SmartResourceDisplay />
+          ) : (
+            <ResourceCounter />
+          )}
+        </div>
 
         {/* Game Controls */}
         <GameControls />
@@ -197,12 +160,21 @@ function App() {
           <div className="space-y-6">
             {/* Resource Trends */}
             <ResourceTrends />
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Panel - Facilities & Species */}
-              <div className="lg:col-span-1 space-y-6">
-                <FacilityPanel />
-                <SpeciesPanel />
+              <div className="lg:col-span-1 space-y-4">
+                {useSmartUI ? (
+                  <>
+                    <GroupedFacilityPanel />
+                    <GroupedSpeciesPanel />
+                  </>
+                ) : (
+                  <>
+                    <FacilityPanel />
+                    <SpeciesPanel />
+                  </>
+                )}
               </div>
 
               {/* Right Panel - Game Grid */}
@@ -227,33 +199,33 @@ function App() {
       {/* Global Components */}
       <KeyboardShortcuts />
       <NotificationSystem position="top-right" />
-      <SettingsModal 
-        isOpen={showSettings} 
-        onClose={() => setShowSettings(false)} 
+      <SettingsModal
+        isOpen={modals.showSettings}
+        onClose={() => modals.setShowSettings(false)}
       />
       <ResearchTreeView
-        isOpen={showResearchTree}
-        onClose={() => setShowResearchTree(false)}
+        isOpen={modals.showResearchTree}
+        onClose={() => modals.setShowResearchTree(false)}
       />
       <AchievementSystem
-        isOpen={showAchievements}
-        onClose={() => setShowAchievements(false)}
+        isOpen={modals.showAchievements}
+        onClose={() => modals.setShowAchievements(false)}
       />
       <CampaignMode
-        isOpen={showCampaign}
-        onClose={() => setShowCampaign(false)}
+        isOpen={modals.showCampaign}
+        onClose={() => modals.setShowCampaign(false)}
       />
       <HistoricalScenarios
-        isOpen={showHistorical}
-        onClose={() => setShowHistorical(false)}
+        isOpen={modals.showHistorical}
+        onClose={() => modals.setShowHistorical(false)}
       />
       <CampaignStatistics
-        isOpen={showCampaignStats}
-        onClose={() => setShowCampaignStats(false)}
+        isOpen={modals.showCampaignStats}
+        onClose={() => modals.setShowCampaignStats(false)}
       />
       <GeneticModification
-        isOpen={showGeneticLab}
-        onClose={() => setShowGeneticLab(false)}
+        isOpen={modals.showGeneticLab}
+        onClose={() => modals.setShowGeneticLab(false)}
       />
       <FacilityUpgrade
         isOpen={!!selectedFacilityForUpgrade}
