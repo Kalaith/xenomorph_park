@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -157,7 +157,7 @@ interface CampaignModeProps {
 
 export function CampaignMode({ isOpen, onClose }: CampaignModeProps) {
   const [selectedScenario, setSelectedScenario] = useState<CampaignScenario | null>(null);
-  const [completedScenarios, setCompletedScenarios] = useState<string[]>(() => {
+  const [completedScenarios] = useState<string[]>(() => {
     const saved = localStorage.getItem('xenomorph-park-campaign-progress');
     return saved ? JSON.parse(saved) : [];
   });

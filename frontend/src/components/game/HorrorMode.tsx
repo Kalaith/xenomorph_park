@@ -87,7 +87,7 @@ export function HorrorMode() {
   const [lastDamageTime, setLastDamageTime] = useState(0);
   const [isShaking, setIsShaking] = useState(false);
 
-  const gameLoopRef = useRef<NodeJS.Timeout>();
+  const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
   const { addFloatingNumber, FloatingNumbersRenderer } = useFloatingNumbers();
 
   // Initialize AI xenomorphs from placed xenomorphs
@@ -137,7 +137,7 @@ export function HorrorMode() {
     const distanceToPlayer = Math.abs(xenomorph.position.row - player.position.row) + 
                              Math.abs(xenomorph.position.col - player.position.col);
     
-    let newXenomorph = { ...xenomorph };
+    const newXenomorph = { ...xenomorph };
     
     // Detection logic
     if (distanceToPlayer <= xenomorph.detectionRange && !xenomorph.isHunting) {

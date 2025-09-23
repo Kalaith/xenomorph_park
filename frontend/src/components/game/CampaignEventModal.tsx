@@ -191,6 +191,8 @@ export function CampaignEventModal({ isOpen, event, onClose, onChoiceSelected }:
 // Hook to manage campaign events
 export function useCampaignEvents() {
   const [currentEvent, setCurrentEvent] = useState<CampaignEvent | null>(null);
+  // Note: eventQueue is not used yet but kept for future campaign event queuing feature
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [eventQueue, setEventQueue] = useState<CampaignEvent[]>([]);
   const gameState = useGameStore();
 
@@ -211,7 +213,7 @@ export function useCampaignEvents() {
     return () => clearInterval(checkInterval);
   }, [gameState, currentEvent]);
 
-  const handleEventChoice = (choice: EventChoice) => {
+  const handleEventChoice = (_choice: EventChoice) => {
     // This will be handled by the modal component
   };
 

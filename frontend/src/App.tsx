@@ -48,11 +48,11 @@ function App() {
   // Use the smart toolbar hook
   const { groups: toolbarGroups, modals } = useMainToolbar(startTutorial);
   
-  const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
+  const { activeCrisis, CrisisModal } = useCrisisManager();
   
   // Game loop and accessibility hooks
   useGameLoop();
-  const [highContrast] = useHighContrastMode();
+  useHighContrastMode(); // This sets up high contrast but doesn't need to store the value
   const reducedMotion = useReducedMotion();
 
   // Floating text for visual feedback

@@ -307,6 +307,14 @@ class CampaignRewardManager {
     return (progress.completedScenarios.length / totalScenarios) * 100;
   }
 
+  public getCompletedScenarios(): string[] {
+    return this.getProgress().completedScenarios;
+  }
+
+  public getBestCompletionTimes(): Record<string, number> {
+    return this.getProgress().bestCompletionTimes;
+  }
+
   public startScenario(scenarioId: string): void {
     const progress = this.getProgress();
     progress.statistics.scenariosAttempted++;

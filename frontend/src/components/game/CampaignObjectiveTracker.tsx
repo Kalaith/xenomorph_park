@@ -17,7 +17,6 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
     facilities,
     xenomorphs,
     day,
-    hour,
     research,
     addStatusMessage
   } = useGameStore();

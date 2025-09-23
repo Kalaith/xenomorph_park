@@ -222,7 +222,7 @@ export function AccessibleField({
           'aria-describedby': [errorId, hintId].filter(Boolean).join(' ') || undefined,
           'aria-invalid': error ? 'true' : undefined,
           'aria-required': required,
-        })}
+        } as any)}
       </div>
 
       {hint && (

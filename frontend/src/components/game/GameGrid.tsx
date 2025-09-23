@@ -268,7 +268,7 @@ export function GameGrid() {
       isOpen: true,
       position: { x: e.clientX, y: e.clientY },
       target: {
-        type: cellContent.type,
+        type: cellContent.type as 'facility' | 'xenomorph',
         data: cellContent.content,
       },
     });
