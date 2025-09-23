@@ -1,10 +1,26 @@
 import { ReactNode } from 'react';
 
+// Undo/Redo types
+export interface GameAction {
+  type: 'PLACE_FACILITY' | 'PLACE_XENOMORPH' | 'REMOVE_FACILITY' | 'REMOVE_XENOMORPH' | 'MODIFY_RESOURCES';
+  timestamp: number;
+  data: any;
+  previousState?: Partial<GameState>;
+}
+
+export interface UndoRedoState {
+  history: GameAction[];
+  currentIndex: number;
+  maxHistorySize: number;
+}
+
 // Core game types
 export interface GameState {
   mode: 'building' | 'horror';
   paused: boolean;
   day: number;
+  hour: number;
+  tick: number;
   resources: Resources;
   facilities: PlacedFacility[];
   xenomorphs: PlacedXenomorph[];
@@ -12,6 +28,8 @@ export interface GameState {
   selectedSpecies: XenomorphSpecies | null;
   research: ResearchState;
   horror: HorrorState;
+  economics: EconomicsState;
+  undoRedo: UndoRedoState;
 }
 
 export interface Resources {
@@ -21,6 +39,9 @@ export interface Resources {
   research: number;
   security: SecurityLevel;
   visitors: number;
+  maxVisitors: number;
+  dailyRevenue: number;
+  dailyExpenses: number;
 }
 
 export type SecurityLevel = 'Low' | 'Medium' | 'High' | 'Maximum';
@@ -50,6 +71,15 @@ export interface ResearchState {
   completed: string[];
   inProgress: string | null;
   points: number;
+  available: string[];
+  researchTree: {
+    [nodeId: string]: {
+      completed: boolean;
+      inProgress: boolean;
+      progress: number;
+      startedAt?: number;
+    };
+  };
 }
 
 export interface HorrorState {
@@ -58,6 +88,15 @@ export interface HorrorState {
   maxAmmo: number;
   weapon: string;
   objectives: string[];
+}
+
+export interface EconomicsState {
+  totalRevenue: number;
+  totalExpenses: number;
+  profitMargin: number;
+  visitorSatisfaction: number;
+  attractionValue: number;
+  lastDayProfit: number;
 }
 
 // Game definition types
@@ -142,11 +181,37 @@ export interface GameStore extends GameState {
   updateResources: (resources: Partial<Resources>) => void;
   placeFacility: (facility: FacilityDefinition, position: GridPosition) => void;
   placeXenomorph: (species: XenomorphSpecies, position: GridPosition) => void;
+  removeFacility: (facilityId: string) => void;
+  removeXenomorph: (xenomorphId: string) => void;
   selectFacility: (facility: FacilityDefinition | null) => void;
   selectSpecies: (species: XenomorphSpecies | null) => void;
   startResearch: (species: string) => void;
   completeResearch: (species: string) => void;
   updateHorrorState: (state: Partial<HorrorState>) => void;
   addStatusMessage: (message: string, type: StatusMessage['type']) => void;
+
+  // Game mechanics actions
+  gameTick: () => void;
+  processEconomics: () => void;
+  updateTime: () => void;
+
+  // Research tree actions
+  startResearchNode: (nodeId: string) => void;
+  completeResearchNode: (nodeId: string) => void;
+  updateResearchProgress: () => void;
+
+  // Undo/Redo actions
+  addToHistory: (action: GameAction) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+
+  // Save/Load actions
+  saveGame: (slotId: string, name?: string) => boolean;
+  loadGame: (slotId: string) => boolean;
+  quickSave: () => boolean;
+  quickLoad: () => boolean;
+  
   reset: () => void;
 }

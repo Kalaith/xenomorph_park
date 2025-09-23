@@ -1,11 +1,23 @@
 import { useGameStore } from '../../stores/gameStore';
 import { Button } from '../ui/Button';
+import { useParticleContext } from '../../contexts/ParticleContext';
 
 export function GameControls() {
-  const { mode, paused, togglePause, setMode, reset } = useGameStore();
+  const { mode, paused, togglePause, setMode, reset, undo, redo, canUndo, canRedo } = useGameStore();
+  const { triggerContainmentBreach, triggerExplosion, triggerSparks } = useParticleContext();
 
   const handleModeSwitch = () => {
     setMode(mode === 'building' ? 'horror' : 'building');
+  };
+
+  const handleParticleDemo = () => {
+    // Trigger particles at center of screen
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    triggerContainmentBreach({ x: centerX - 100, y: centerY });
+    setTimeout(() => triggerExplosion({ x: centerX, y: centerY }), 1000);
+    setTimeout(() => triggerSparks({ x: centerX + 100, y: centerY }), 2000);
   };
 
   return (
@@ -44,6 +56,39 @@ export function GameControls() {
           )}
         </Button>
         
+        {mode === 'building' && (
+          <>
+            <Button
+              variant="outline"
+              onClick={undo}
+              disabled={!canUndo()}
+              className="flex items-center gap-2"
+              title="Undo last action (Ctrl+Z)"
+            >
+              ↶ Undo
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={redo}
+              disabled={!canRedo()}
+              className="flex items-center gap-2"
+              title="Redo last action (Ctrl+Y)"
+            >
+              ↷ Redo
+            </Button>
+          </>
+        )}
+
+        <Button
+          variant="outline"
+          onClick={handleParticleDemo}
+          className="flex items-center gap-2"
+          title="Trigger particle effects demo"
+        >
+          💥 Effects Demo
+        </Button>
+
         <Button
           variant="outline"
           onClick={() => {
