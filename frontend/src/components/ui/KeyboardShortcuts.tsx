@@ -13,10 +13,8 @@ interface KeyboardShortcut {
 
 export function KeyboardShortcuts() {
   const {
-    mode,
     paused,
     togglePause,
-    setMode,
     reset,
     quickSave,
     quickLoad,
@@ -37,12 +35,6 @@ export function KeyboardShortcuts() {
       key: ' ',
       action: () => togglePause(),
       description: 'Toggle Pause',
-      category: 'game'
-    },
-    {
-      key: 'm',
-      action: () => setMode(mode === 'building' ? 'horror' : 'building'),
-      description: 'Switch Game Mode',
       category: 'game'
     },
     {
@@ -117,10 +109,8 @@ export function KeyboardShortcuts() {
     {
       key: '1',
       action: () => {
-        if (mode === 'building') {
-          // Will be implemented with facility quick select
-          addStatusMessage('Quick select: Research Lab (Not implemented)', 'info');
-        }
+        // Will be implemented with facility quick select
+        addStatusMessage('Quick select: Research Lab (Not implemented)', 'info');
       },
       description: 'Quick Select Research Lab',
       category: 'building'
@@ -128,9 +118,7 @@ export function KeyboardShortcuts() {
     {
       key: '2',
       action: () => {
-        if (mode === 'building') {
-          addStatusMessage('Quick select: Hatchery (Not implemented)', 'info');
-        }
+        addStatusMessage('Quick select: Hatchery (Not implemented)', 'info');
       },
       description: 'Quick Select Hatchery',
       category: 'building'
@@ -138,9 +126,7 @@ export function KeyboardShortcuts() {
     {
       key: '3',
       action: () => {
-        if (mode === 'building') {
-          addStatusMessage('Quick select: Containment Unit (Not implemented)', 'info');
-        }
+        addStatusMessage('Quick select: Containment Unit (Not implemented)', 'info');
       },
       description: 'Quick Select Containment Unit',
       category: 'building'

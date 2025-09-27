@@ -333,6 +333,31 @@ interface BiomeSystemProps {
   children: React.ReactNode;
 }
 
+// Compact biome display for header
+export function BiomeDisplay() {
+  const [currentBiome] = useState<Biome>(BIOMES.earth_colony);
+
+  return (
+    <div className="bg-slate-800/50 border border-slate-600/50 rounded px-3 py-2 text-xs">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-green-400 font-semibold">🌍 {currentBiome.name}</span>
+      </div>
+      <div className="flex items-center gap-2 text-slate-400">
+        <span>🌡️ {currentBiome.environment.temperature}</span>
+        <span>🌫️ {currentBiome.environment.atmosphere}</span>
+        <span>⚖️ {currentBiome.environment.gravity}G</span>
+        <span>☢️ {currentBiome.environment.radiation}</span>
+      </div>
+      {currentBiome.nativeSpecies.length > 0 && (
+        <div className="border-t border-slate-600/50 pt-1 mt-1">
+          <span className="text-slate-400">Species: </span>
+          <span className="text-green-400">{currentBiome.nativeSpecies.join(', ')}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function BiomeSystem({ children }: BiomeSystemProps) {
   const [currentBiome, setCurrentBiome] = useState<Biome>(BIOMES.earth_colony);
   const { day, hour } = useGameStore();
@@ -410,8 +435,8 @@ export function BiomeSystem({ children }: BiomeSystemProps) {
 
   return (
     <div className="relative">
-      {/* Biome Information Display */}
-      <div className="fixed top-20 right-4 z-50 bg-slate-900/90 border border-slate-600 rounded-lg p-3 text-sm max-w-sm">
+      {/* Biome Information Display - Moved to header */}
+      {/* <div className="fixed top-20 right-4 z-50 bg-slate-900/90 border border-slate-600 rounded-lg p-3 text-sm max-w-sm">
         <div className="text-green-400 font-semibold mb-1 flex items-center gap-2">
           🌍 {currentBiome.name}
         </div>
@@ -446,7 +471,7 @@ export function BiomeSystem({ children }: BiomeSystemProps) {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Biome Particles */}
       {currentBiome.visualTheme.particles && (

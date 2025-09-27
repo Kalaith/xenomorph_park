@@ -121,63 +121,6 @@ export function useMainToolbar(startTutorial?: () => void) {
 
   const groups: ToolbarGroup[] = [
     {
-      id: 'campaign',
-      label: 'Campaign',
-      icon: '🚀',
-      items: [
-        {
-          id: 'campaign-mode',
-          label: 'Campaign Mode',
-          icon: '🚀',
-          onClick: () => setShowCampaign(true)
-        },
-        {
-          id: 'campaign-stats',
-          label: 'Statistics',
-          icon: '📊',
-          onClick: () => setShowCampaignStats(true)
-        },
-        {
-          id: 'historical',
-          label: 'Historical Scenarios',
-          icon: '📜',
-          onClick: () => setShowHistorical(true)
-        }
-      ]
-    },
-    {
-      id: 'research',
-      label: 'Research',
-      icon: '🔬',
-      items: [
-        {
-          id: 'research-tree',
-          label: 'Research Tree',
-          icon: '🔬',
-          onClick: () => setShowResearchTree(true)
-        },
-        {
-          id: 'genetic-lab',
-          label: 'Genetic Lab',
-          icon: '🧬',
-          onClick: () => setShowGeneticLab(true)
-        }
-      ]
-    },
-    {
-      id: 'progress',
-      label: 'Progress',
-      icon: '🏆',
-      items: [
-        {
-          id: 'achievements',
-          label: 'Achievements',
-          icon: '🏆',
-          onClick: () => setShowAchievements(true)
-        }
-      ]
-    },
-    {
       id: 'help',
       label: 'Help',
       icon: '❓',

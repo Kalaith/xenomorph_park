@@ -18,7 +18,6 @@ import { AchievementSystem } from './components/game/AchievementSystem';
 import { ResourceTrends } from './components/game/ResourceTrends';
 import { FacilityUpgrade } from './components/game/FacilityUpgrade';
 import { useCrisisManager } from './components/game/CrisisEventModal';
-import { HorrorMode } from './components/game/HorrorMode';
 import { SkipNavigation, ScreenReaderAnnouncement, useHighContrastMode, useReducedMotion } from './components/ui/AccessibilityFeatures';
 import { AnimatedBackground } from './components/ui/AdvancedAnimations';
 import { useGameLoop } from './hooks/useGameLoop';
@@ -29,7 +28,7 @@ import { ParticleProvider } from './contexts/ParticleContext';
 import { WeatherSystem } from './components/game/WeatherSystem';
 import { useTutorial } from './components/game/TutorialMode';
 import { CampaignMode } from './components/game/CampaignMode';
-import { BiomeSystem } from './components/game/BiomeSystem';
+import { BiomeSystem, BiomeDisplay } from './components/game/BiomeSystem';
 import { HistoricalScenarios } from './components/game/HistoricalScenarios';
 import { CampaignObjectiveTracker } from './components/game/CampaignObjectiveTracker';
 import { useCampaignEvents } from './components/game/CampaignEventModal';
@@ -38,7 +37,6 @@ import { GeneticModification } from './components/game/GeneticModification';
 import { TouchControls, SwipeGesture } from './components/ui/MobileOptimization';
 
 function App() {
-  const { mode } = useGameStore();
   const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState(null);
   const [useSmartUI, setUseSmartUI] = useState(true); // Toggle for new UI
 
@@ -116,76 +114,152 @@ function App() {
         />
       )}
       
-      <div id="main-content" className="container mx-auto px-4 py-6 relative z-10">
-        {/* Header */}
-        <header className="text-center mb-6 relative">
-          <h1 className="text-4xl font-bold text-green-400 glow mb-2">
-            XENOMORPH PARK
-          </h1>
-          <p className="text-slate-400 text-lg">
-            Building & Survival Simulation
-          </p>
+      {/* Unified Header Bar */}
+      <header className="bg-slate-900/98 border-b border-green-400/30 sticky top-0 z-30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
 
-          {/* UI Mode Toggle */}
-          <div className="absolute top-0 left-0">
-            <button
-              onClick={() => setUseSmartUI(!useSmartUI)}
-              className="p-2 text-slate-400 hover:text-green-400 transition-colors text-xs"
-              title="Toggle Smart UI"
-            >
-              {useSmartUI ? '📋' : '🔧'} {useSmartUI ? 'Classic' : 'Smart'}
-            </button>
-          </div>
-        </header>
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex items-center gap-12">
 
-        {/* Smart Toolbar (replaces scattered header buttons) */}
-        {useSmartUI && (
-          <SmartToolbar groups={toolbarGroups} className="mb-4" />
-        )}
+            {/* Primary: Game Identity - Prominent left section */}
+            <div className="flex items-center gap-4 bg-slate-800/30 rounded-lg px-4 py-2.5 border border-slate-700/50 shadow-sm">
+              <h1 className="text-xl font-bold text-green-400 glow tracking-wide">
+                XENOMORPH PARK
+              </h1>
+              <div className="px-3 py-1.5 bg-green-400/20 text-green-400 rounded-md text-sm font-medium border border-green-400/40 shadow-sm">
+                🏗️ Building Mode
+              </div>
+            </div>
 
-        {/* Time and Resource Dashboard */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-4">
-          <TimeDisplay />
-          {useSmartUI ? (
-            <SmartResourceDisplay />
-          ) : (
-            <ResourceCounter />
-          )}
-        </div>
+            {/* Secondary Information - Central grouped section */}
+            <div className="flex items-center gap-8 flex-1 justify-center">
 
-        {/* Game Controls */}
-        <GameControls />
+              {/* Game Status */}
+              <div className="bg-slate-800/20 rounded-lg px-4 py-2 border border-slate-700/30">
+                <TimeDisplay />
+              </div>
 
-        {mode === 'building' ? (
-          <div className="space-y-6">
-            {/* Resource Trends */}
-            <ResourceTrends />
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Panel - Facilities & Species */}
-              <div className="lg:col-span-1 space-y-4">
+              {/* Resources */}
+              <div className="bg-slate-800/20 rounded-lg px-4 py-2 border border-slate-700/30">
                 {useSmartUI ? (
-                  <>
-                    <GroupedFacilityPanel />
-                    <GroupedSpeciesPanel />
-                  </>
+                  <SmartResourceDisplay />
                 ) : (
-                  <>
-                    <FacilityPanel />
-                    <SpeciesPanel />
-                  </>
+                  <ResourceCounter />
                 )}
               </div>
 
-              {/* Right Panel - Game Grid */}
-              <div className="lg:col-span-2">
-                <GameGrid />
+              {/* Environment */}
+              <div className="bg-slate-800/20 rounded-lg px-3 py-2 border border-slate-700/30">
+                <BiomeDisplay />
+              </div>
+
+            </div>
+
+            {/* Tertiary: Actions - De-emphasized right section */}
+            <div className="flex items-center gap-2 bg-slate-800/15 rounded-lg px-3 py-2 border border-slate-700/20">
+              <GameControls />
+
+              <div className="w-px h-4 bg-slate-600/40 mx-2"></div>
+
+              <button
+                onClick={() => setUseSmartUI(!useSmartUI)}
+                className="p-2 text-slate-400 hover:text-green-400 transition-all duration-200 text-xs rounded hover:bg-slate-700/50 hover:scale-105"
+                title="Toggle UI Mode"
+              >
+                {useSmartUI ? '📋' : '🔧'}
+              </button>
+            </div>
+
+          </div>
+
+          {/* Mobile/Tablet Layout */}
+          <div className="lg:hidden space-y-3">
+
+            {/* Top Row: Identity + Controls */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 bg-slate-800/30 rounded-lg px-3 py-2 border border-slate-700/50">
+                <h1 className="text-lg font-bold text-green-400 glow">
+                  XENOMORPH PARK
+                </h1>
+                <div className="px-2 py-1 bg-green-400/20 text-green-400 rounded text-xs font-medium border border-green-400/40">
+                  🏗️
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 bg-slate-800/15 rounded-lg px-2 py-2 border border-slate-700/20">
+                <GameControls />
+
+                <div className="w-px h-3 bg-slate-600/40 mx-1"></div>
+
+                <button
+                  onClick={() => setUseSmartUI(!useSmartUI)}
+                  className="p-1.5 text-slate-400 hover:text-green-400 transition-colors text-xs rounded hover:bg-slate-700/50"
+                  title="Toggle UI Mode"
+                >
+                  {useSmartUI ? '📋' : '🔧'}
+                </button>
               </div>
             </div>
+
+            {/* Bottom Row: Information */}
+            <div className="flex items-center gap-3 text-sm">
+              <div className="bg-slate-800/20 rounded-lg px-3 py-1.5 border border-slate-700/30 flex-shrink-0">
+                <TimeDisplay />
+              </div>
+
+              <div className="bg-slate-800/20 rounded-lg px-3 py-1.5 border border-slate-700/30 flex-1 min-w-0">
+                {useSmartUI ? (
+                  <SmartResourceDisplay />
+                ) : (
+                  <ResourceCounter />
+                )}
+              </div>
+
+              <div className="bg-slate-800/20 rounded-lg px-2 py-1.5 border border-slate-700/30 flex-shrink-0">
+                <BiomeDisplay />
+              </div>
+            </div>
+
           </div>
-        ) : (
-          <HorrorMode />
+
+        </div>
+      </header>
+
+      <div id="main-content" className="max-w-7xl mx-auto px-4 py-6 relative z-10">
+
+        {/* Smart Toolbar (if enabled) */}
+        {useSmartUI && (
+          <div className="mb-6">
+            <SmartToolbar groups={toolbarGroups} />
+          </div>
         )}
+
+        <div className="space-y-6">
+          {/* Resource Trends */}
+          <ResourceTrends />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Panel - Facilities & Species */}
+            <div className="lg:col-span-1 space-y-4">
+              {useSmartUI ? (
+                <>
+                  <GroupedFacilityPanel />
+                  <GroupedSpeciesPanel />
+                </>
+              ) : (
+                <>
+                  <FacilityPanel />
+                  <SpeciesPanel />
+                </>
+              )}
+            </div>
+
+            {/* Right Panel - Game Grid */}
+            <div className="lg:col-span-2">
+              <GameGrid />
+            </div>
+          </div>
+        </div>
 
         {/* Footer */}
         <footer className="mt-12 text-center text-slate-500 text-sm">

@@ -45,7 +45,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'game_controls',
     title: 'Game Controls',
-    content: 'Use these controls to switch between Building Mode and Horror Survival Mode, pause the game, and access undo/redo functions.',
+    content: 'Use these controls to pause the game and access undo/redo functions.',
     target: '.game-controls',
     position: 'bottom',
     skippable: true
@@ -133,13 +133,6 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     id: 'visitor_management',
     title: 'Visitor Management',
     content: 'Build Visitor Centers to accommodate more guests. More dangerous xenomorphs attract more visitors but are harder to contain.',
-    position: 'center',
-    skippable: true
-  },
-  {
-    id: 'horror_mode',
-    title: 'Horror Survival Mode',
-    content: 'When things go wrong, switch to Horror Mode to fight escaped xenomorphs and complete survival objectives!',
     position: 'center',
     skippable: true
   },

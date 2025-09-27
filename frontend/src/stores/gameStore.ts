@@ -7,7 +7,6 @@ import { RESEARCH_TREE } from '../data/researchTree';
 import { saveManager } from '../utils/saveManager';
 
 const initialState: GameState = {
-  mode: 'building',
   paused: false,
   day: 1,
   hour: 9,
@@ -34,13 +33,6 @@ const initialState: GameState = {
     available: ['Drone'], // Drone is available from start but not "researched"
     researchTree: {}, // Research tree progress tracking
   },
-  horror: {
-    health: GAME_CONSTANTS.STARTING_HEALTH,
-    ammo: GAME_CONSTANTS.STARTING_AMMO,
-    maxAmmo: GAME_CONSTANTS.MAX_AMMO,
-    weapon: GAME_CONSTANTS.DEFAULT_WEAPON,
-    objectives: [...DEFAULT_OBJECTIVES],
-  },
   economics: {
     totalRevenue: 0,
     totalExpenses: 0,
@@ -62,8 +54,7 @@ export const useGameStore = create<GameStore>()(
       (set, get) => ({
         ...initialState,
 
-        // Mode management
-        setMode: (mode) => set({ mode }),
+        // Game management
         togglePause: () => set((state) => ({ paused: !state.paused })),
 
         // Resource management
@@ -272,11 +263,6 @@ export const useGameStore = create<GameStore>()(
             },
           })),
 
-        // Horror mode management
-        updateHorrorState: (horrorState) =>
-          set((state) => ({
-            horror: { ...state.horror, ...horrorState },
-          })),
 
         // Status messages
         addStatusMessage: (message, type) => {
@@ -425,7 +411,7 @@ export const useGameStore = create<GameStore>()(
 
         gameTick: () => {
           const state = get();
-          if (!state.paused && state.mode === 'building') {
+          if (!state.paused) {
             state.updateTime();
             state.processEconomics();
             state.updateResearchProgress();

@@ -11,11 +11,6 @@ export const GAME_CONSTANTS = {
   STARTING_SECURITY: 'High' as const,
   STARTING_VISITORS: 0,
   
-  // Horror mode starting stats
-  STARTING_HEALTH: 100,
-  STARTING_AMMO: 95,
-  MAX_AMMO: 95,
-  DEFAULT_WEAPON: 'M41A Pulse Rifle',
   
   // Game mechanics
   RESEARCH_POINTS_PER_TICK: 1,

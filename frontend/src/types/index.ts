@@ -16,7 +16,6 @@ export interface UndoRedoState {
 
 // Core game types
 export interface GameState {
-  mode: 'building' | 'horror';
   paused: boolean;
   day: number;
   hour: number;
@@ -27,7 +26,6 @@ export interface GameState {
   selectedFacility: FacilityDefinition | null;
   selectedSpecies: XenomorphSpecies | null;
   research: ResearchState;
-  horror: HorrorState;
   economics: EconomicsState;
   undoRedo: UndoRedoState;
 }
@@ -82,13 +80,6 @@ export interface ResearchState {
   };
 }
 
-export interface HorrorState {
-  health: number;
-  ammo: number;
-  maxAmmo: number;
-  weapon: string;
-  objectives: string[];
-}
 
 export interface EconomicsState {
   totalRevenue: number;
@@ -176,7 +167,6 @@ export interface StatusMessage {
 // Store types
 export interface GameStore extends GameState {
   // Actions
-  setMode: (mode: 'building' | 'horror') => void;
   togglePause: () => void;
   updateResources: (resources: Partial<Resources>) => void;
   placeFacility: (facility: FacilityDefinition, position: GridPosition) => void;
@@ -187,7 +177,6 @@ export interface GameStore extends GameState {
   selectSpecies: (species: XenomorphSpecies | null) => void;
   startResearch: (species: string) => void;
   completeResearch: (species: string) => void;
-  updateHorrorState: (state: Partial<HorrorState>) => void;
   addStatusMessage: (message: string, type: StatusMessage['type']) => void;
 
   // Game mechanics actions
@@ -212,6 +201,6 @@ export interface GameStore extends GameState {
   loadGame: (slotId: string) => boolean;
   quickSave: () => boolean;
   quickLoad: () => boolean;
-  
+
   reset: () => void;
 }

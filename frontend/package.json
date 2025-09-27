@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build", 
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -13,13 +13,14 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "test": "vitest",
-    "test:run": "vitest run", 
+    "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "ci": "npm run lint && npm run type-check && npm run format:check && npm run test:run && npm run build",
     "ci:quick": "npm run lint && npm run type-check && npm run format:check"
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.4.0",
     "@tailwindcss/vite": "^4.1.10",
     "autoprefixer": "^10.4.21",
     "framer-motion": "^12.18.1",

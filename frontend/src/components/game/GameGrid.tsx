@@ -69,15 +69,36 @@ export function GameGrid() {
     setPanOffset({ x: 0, y: 0 });
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoomLevel(prev => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev + delta)));
+  const handleZoomToFit = () => {
+    if (!gridRef.current) return;
+
+    const container = gridRef.current.parentElement;
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+
+    // Calculate optimal zoom to fit the grid within the container
+    const cellSize = 48; // w-12 h-12 = 48px
+    const gapSize = 2; // gap-0.5 = 2px
+    const padding = 16; // p-2 = 8px on each side = 16px total
+
+    const gridTotalWidth = (gridWidth * cellSize) + ((gridWidth - 1) * gapSize) + padding;
+    const gridTotalHeight = (gridHeight * cellSize) + ((gridHeight - 1) * gapSize) + padding;
+
+    const scaleX = (containerRect.width * 0.9) / gridTotalWidth;
+    const scaleY = (containerRect.height * 0.9) / gridTotalHeight;
+    const optimalZoom = Math.min(scaleX, scaleY, MAX_ZOOM);
+
+    setZoomLevel(Math.max(MIN_ZOOM, optimalZoom));
+    setPanOffset({ x: 0, y: 0 });
   };
+
+  // Wheel zoom disabled - use manual zoom controls only
 
   const handlePanStart = (e: React.MouseEvent) => {
     if (e.button === 1 || (e.button === 0 && e.ctrlKey)) { // Middle mouse or Ctrl+Left click
       e.preventDefault();
+      e.stopPropagation();
       setIsPanning(true);
       setLastPanPoint({ x: e.clientX, y: e.clientY });
     }
@@ -86,6 +107,7 @@ export function GameGrid() {
   const handlePanMove = (e: React.MouseEvent) => {
     if (isPanning) {
       e.preventDefault();
+      e.stopPropagation();
       const deltaX = e.clientX - lastPanPoint.x;
       const deltaY = e.clientY - lastPanPoint.y;
 
@@ -108,16 +130,21 @@ export function GameGrid() {
 
     const rect = gridRef.current.getBoundingClientRect();
 
-    // Account for zoom and pan
-    const x = (clientX - rect.left - panOffset.x) / zoomLevel;
-    const y = (clientY - rect.top - panOffset.y) / zoomLevel;
+    // Account for zoom and pan - transform coordinates back to grid space
+    const container = gridRef.current.parentElement;
+    if (!container) return null;
 
-    // Calculate cell size (assuming equal spacing)
-    const cellWidth = (rect.width / zoomLevel) / gridWidth;
-    const cellHeight = (rect.height / zoomLevel) / gridHeight;
+    const containerRect = container.getBoundingClientRect();
+    const x = (clientX - containerRect.left - panOffset.x) / zoomLevel;
+    const y = (clientY - containerRect.top - panOffset.y) / zoomLevel;
 
-    const col = Math.floor(x / cellWidth);
-    const row = Math.floor(y / cellHeight);
+    // Cell size is fixed at 48px (12 * 4 from w-12 h-12) plus 2px gap
+    const cellSize = 48;
+    const gapSize = 2;
+    const gridPadding = 8; // p-2 = 8px padding
+
+    const col = Math.floor((x - gridPadding) / (cellSize + gapSize));
+    const row = Math.floor((y - gridPadding) / (cellSize + gapSize));
 
     if (row >= 0 && row < gridHeight && col >= 0 && col < gridWidth) {
       return { row, col };
@@ -216,42 +243,25 @@ export function GameGrid() {
     if (selectedFacility) {
       placeFacility(selectedFacility, position);
 
-      // Show floating text for cost
-      if (gridRef.current) {
-        const gridRect = gridRef.current.getBoundingClientRect();
-        const cellWidth = gridRect.width / gridWidth;
-        const cellHeight = gridRect.height / gridHeight;
-        const cellX = gridRect.left + (col * cellWidth) + (cellWidth / 2);
-        const cellY = gridRect.top + (row * cellHeight) + (cellHeight / 2);
-
-        addResourceChange('credits', -selectedFacility.cost);
-        addFloatingText(
-          `${selectedFacility.name} Built!`,
-          { x: cellX, y: cellY },
-          'text-green-400',
-          2000,
-          'md'
-        );
-      }
+      // Show simple floating text
+      addFloatingText(
+        `${selectedFacility.name} Built! (-$${selectedFacility.cost})`,
+        { x: window.innerWidth / 2, y: 100 },
+        'text-green-400',
+        1500,
+        'sm'
+      );
     } else if (selectedSpecies) {
       placeXenomorph(selectedSpecies, position);
 
-      // Show floating text for xenomorph placement
-      if (gridRef.current) {
-        const gridRect = gridRef.current.getBoundingClientRect();
-        const cellWidth = gridRect.width / gridWidth;
-        const cellHeight = gridRect.height / gridHeight;
-        const cellX = gridRect.left + (col * cellWidth) + (cellWidth / 2);
-        const cellY = gridRect.top + (row * cellHeight) + (cellHeight / 2);
-
-        addFloatingText(
-          `${selectedSpecies.name} Placed!`,
-          { x: cellX, y: cellY },
-          'text-red-400',
-          2000,
-          'md'
-        );
-      }
+      // Show simple floating text
+      addFloatingText(
+        `${selectedSpecies.name} Placed!`,
+        { x: window.innerWidth / 2, y: 100 },
+        'text-red-400',
+        1500,
+        'sm'
+      );
     }
   };
 
@@ -268,7 +278,7 @@ export function GameGrid() {
       isOpen: true,
       position: { x: e.clientX, y: e.clientY },
       target: {
-        type: cellContent.type,
+        type: cellContent.type as 'facility' | 'xenomorph',
         data: cellContent.content,
       },
     });
@@ -317,13 +327,12 @@ export function GameGrid() {
               addStatusMessage(`${data.name} removed`, 'success');
 
               // Show floating text for refund
-              addResourceChange('credits', refund);
               addFloatingText(
-                `${data.name} Removed`,
-                { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+                `${data.name} Removed (+$${refund})`,
+                { x: window.innerWidth / 2, y: 100 },
                 'text-orange-400',
-                2000,
-                'md'
+                1500,
+                'sm'
               );
             }
           },
@@ -490,7 +499,7 @@ export function GameGrid() {
             onMouseEnter={() => setHoveredCell({ row, col })}
             onMouseLeave={() => setHoveredCell(null)}
             className={`
-              w-8 h-8 border border-slate-600 transition-all duration-200 text-xs relative
+              w-12 h-12 border border-slate-600 transition-all duration-200 text-base relative
               ${isOccupied
                 ? 'bg-slate-700 cursor-default'
                 : 'bg-slate-800 hover:bg-slate-700 hover:border-green-400/50'
@@ -574,8 +583,8 @@ export function GameGrid() {
   };
 
   return (
-    <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-4">
-      <div className="flex justify-between items-center mb-4">
+    <div className="h-full flex flex-col">
+      <div className="flex justify-between items-center p-4 border-b border-green-400/20">
         <h3 className="text-green-400 font-bold text-lg glow">Park Layout</h3>
         <div className="flex items-center gap-2">
           {/* Camera Controls */}
@@ -584,7 +593,7 @@ export function GameGrid() {
               onClick={handleZoomOut}
               disabled={zoomLevel <= MIN_ZOOM}
               className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Zoom Out"
+              title="Zoom Out (Use zoom buttons - scroll wheel disabled)"
             >
               🔍➖
             </button>
@@ -595,7 +604,7 @@ export function GameGrid() {
               onClick={handleZoomIn}
               disabled={zoomLevel >= MAX_ZOOM}
               className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Zoom In"
+              title="Zoom In (Use zoom buttons - scroll wheel disabled)"
             >
               🔍➕
             </button>
@@ -605,6 +614,13 @@ export function GameGrid() {
               title="Reset Camera (100% zoom, center view)"
             >
               🎯
+            </button>
+            <button
+              onClick={handleZoomToFit}
+              className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700"
+              title="Fit grid to screen"
+            >
+              📐
             </button>
           </div>
 
@@ -622,13 +638,29 @@ export function GameGrid() {
         </div>
       </div>
       <div
-        className="overflow-hidden border border-slate-600 rounded bg-slate-800"
-        style={{ height: '400px', cursor: isPanning ? 'grabbing' : 'grab' }}
-        onWheel={handleWheel}
-        onMouseDown={handlePanStart}
-        onMouseMove={handlePanMove}
-        onMouseUp={handlePanEnd}
-        onMouseLeave={handlePanEnd}
+        className="flex-1 overflow-hidden bg-slate-800 relative"
+        style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+        onWheel={(e) => {
+          // Prevent wheel events from affecting zoom or page scroll
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          handlePanStart(e);
+        }}
+        onMouseMove={(e) => {
+          e.stopPropagation();
+          handlePanMove(e);
+        }}
+        onMouseUp={(e) => {
+          e.stopPropagation();
+          handlePanEnd();
+        }}
+        onMouseLeave={(e) => {
+          e.stopPropagation();
+          handlePanEnd();
+        }}
       >
         <div
           ref={gridRef}
@@ -638,8 +670,8 @@ export function GameGrid() {
           style={{
             gridTemplateColumns: `repeat(${gridWidth}, 1fr)`,
             gridTemplateRows: `repeat(${gridHeight}, 1fr)`,
-            transform: `scale(${zoomLevel}) translate(${panOffset.x / zoomLevel}px, ${panOffset.y / zoomLevel}px)`,
-            transformOrigin: 'top left',
+            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
+            transformOrigin: '0 0',
             margin: 'auto'
           }}
           onDragOver={handleDragOver}
@@ -649,36 +681,24 @@ export function GameGrid() {
           {renderGrid()}
         </div>
       </div>
-      <div className="mt-4 text-sm text-slate-400 space-y-1">
+      <div className="px-4 py-2 border-t border-green-400/20 bg-slate-900/50">
         {selectedFacility && (
-          <p className="text-green-400">
+          <p className="text-green-400 text-sm">
             📍 Click on the grid to place: {selectedFacility.name}
           </p>
         )}
         {selectedSpecies && (
-          <p className="text-green-400">
+          <p className="text-green-400 text-sm">
             📍 Click on the grid to place: {selectedSpecies.name}
           </p>
         )}
-        {!selectedFacility && !selectedSpecies && (
-          <div>
-            <p>Select a facility or species to place on the grid</p>
-            <p className="text-xs text-slate-500 mt-1">
-              💡 Tips: Drag existing items to move them around the grid
-            </p>
-            <p className="text-xs text-slate-500">
-              🖱️ Right-click on placed items for more options
-            </p>
-            <p className="text-xs text-slate-500">
-              📐 Enable Grid Helpers for alignment guides
-            </p>
-            <p className="text-xs text-slate-500">
-              🎮 Camera: Mouse wheel to zoom, Ctrl+drag or middle-click drag to pan
-            </p>
-          </div>
+        {!selectedFacility && !selectedSpecies && !isDragging && (
+          <p className="text-slate-400 text-sm">
+            Select a facility or species from the tabs below to place on the grid
+          </p>
         )}
         {isDragging && (
-          <p className="text-blue-400 animate-pulse">
+          <p className="text-blue-400 animate-pulse text-sm">
             🚀 Dragging... Drop on a free cell to place
           </p>
         )}
