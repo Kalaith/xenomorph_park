@@ -40,4 +40,7 @@ Xenomorph Park is a sci-fi park management and survival game built with React. M
 - For static hosting, ensure the `base` option in `vite.config.ts` is set to `'./'`.
 
 ## License
-This project is part of the WebHatchery suite. For licensing and usage, see the main repository.
+
+This project is licensed under the MIT License - see the individual component README files for details.
+
+Part of the WebHatchery game collection.
