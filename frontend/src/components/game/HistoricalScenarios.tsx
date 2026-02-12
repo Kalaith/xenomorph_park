@@ -55,7 +55,7 @@ export interface HistoricalObjective {
   storyContext: string;
 }
 
-export const HISTORICAL_SCENARIOS: HistoricalScenario[] = [
+const HISTORICAL_SCENARIOS: HistoricalScenario[] = [
   {
     id: 'nostromo_encounter',
     name: 'The Nostromo Incident',
@@ -470,7 +470,7 @@ interface HistoricalScenariosProps {
 
 export function HistoricalScenarios({ isOpen, onClose }: HistoricalScenariosProps) {
   const [selectedScenario, setSelectedScenario] = useState<HistoricalScenario | null>(null);
-  const [completedScenarios, setCompletedScenarios] = useState<string[]>(() => {
+  const [completedScenarios] = useState<string[]>(() => {
     const saved = localStorage.getItem('xenomorph-park-historical-progress');
     return saved ? JSON.parse(saved) : [];
   });

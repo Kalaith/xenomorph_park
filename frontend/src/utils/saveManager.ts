@@ -15,7 +15,6 @@ export interface SaveSlot {
 }
 
 const SAVE_KEY_PREFIX = 'xenomorph-park-save';
-const SETTINGS_KEY = 'xenomorph-park-settings';
 const CURRENT_VERSION = '1.0.0';
 const MAX_SAVE_SLOTS = 5;
 const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
@@ -199,7 +198,7 @@ export class SaveManager {
       const percentage = (used / available) * 100;
 
       return { used, available, percentage };
-    } catch (error) {
+    } catch {
       return { used: 0, available: 0, percentage: 0 };
     }
   }

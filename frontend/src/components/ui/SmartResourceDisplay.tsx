@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { SECURITY_COLORS } from '../../constants/gameConstants';
-import { Tooltip, TooltipContent } from './Tooltip';
+import { Tooltip } from './Tooltip';
 import { Button } from './Button';
 
 type ViewMode = 'compact' | 'detailed' | 'trends';
@@ -15,10 +15,6 @@ export function SmartResourceDisplay() {
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
   };
-
-  const netIncome = resources.dailyRevenue - resources.dailyExpenses;
-  const powerUtilization = Math.round((resources.power / resources.maxPower) * 100);
-  const visitorCapacity = Math.round((resources.visitors / resources.maxVisitors) * 100);
 
   return (
     <div className="bg-slate-900/95 border border-green-400/30 rounded-lg">
@@ -56,8 +52,8 @@ export function SmartResourceDisplay() {
       {/* Content based on view mode */}
       <div className="p-3">
         {viewMode === 'compact' && <CompactView resources={resources} formatNumber={formatNumber} />}
-        {viewMode === 'detailed' && <DetailedView resources={resources} formatNumber={formatNumber} />}
-        {viewMode === 'trends' && <TrendsView resources={resources} formatNumber={formatNumber} />}
+        {viewMode === 'detailed' && <DetailedView resources={resources} />}
+        {viewMode === 'trends' && <TrendsView resources={resources} />}
       </div>
     </div>
   );
@@ -109,7 +105,7 @@ function CompactView({ resources, formatNumber }: any) {
   );
 }
 
-function DetailedView({ resources, formatNumber }: any) {
+function DetailedView({ resources }: any) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
 
   return (
@@ -171,7 +167,7 @@ function DetailedView({ resources, formatNumber }: any) {
   );
 }
 
-function TrendsView({ resources, formatNumber }: any) {
+function TrendsView({ resources }: any) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
   const powerUtilization = Math.round((resources.power / resources.maxPower) * 100);
   const visitorCapacity = Math.round((resources.visitors / resources.maxVisitors) * 100);

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 
 interface TutorialStep {
@@ -202,6 +201,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
 
     const interval = setInterval(checkCondition, 500);
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStepIndex, isOpen]);
 
   const nextStep = () => {

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 
 interface KeyboardShortcut {
@@ -13,7 +13,6 @@ interface KeyboardShortcut {
 
 export function KeyboardShortcuts() {
   const {
-    paused,
     togglePause,
     reset,
     quickSave,
@@ -29,7 +28,39 @@ export function KeyboardShortcuts() {
     canRedo
   } = useGameStore();
 
-  const shortcuts: KeyboardShortcut[] = [
+  const showHelpDialog = useCallback((shortcutsToShow: KeyboardShortcut[]) => {
+    const helpContent = shortcutsToShow
+      .reduce((acc, shortcut) => {
+        if (!acc[shortcut.category]) {
+          acc[shortcut.category] = [];
+        }
+        acc[shortcut.category].push(shortcut);
+        return acc;
+      }, {} as Record<string, KeyboardShortcut[]>);
+
+    const formatKey = (shortcut: KeyboardShortcut) => {
+      const parts = [];
+      if (shortcut.ctrlKey) parts.push('Ctrl');
+      if (shortcut.shiftKey) parts.push('Shift');
+      if (shortcut.altKey) parts.push('Alt');
+      parts.push(shortcut.key === ' ' ? 'Space' : shortcut.key.toUpperCase());
+      return parts.join(' + ');
+    };
+
+    const helpText = Object.entries(helpContent)
+      .map(([category, shortcuts]) => {
+        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+        const shortcutList = shortcuts
+          .map(s => `  ${formatKey(s)} - ${s.description}`)
+          .join('\n');
+        return `${categoryName}:\n${shortcutList}`;
+      })
+      .join('\n\n');
+
+    alert(`Keyboard Shortcuts:\n\n${helpText}`);
+  }, []);
+
+  const shortcuts: KeyboardShortcut[] = useMemo(() => [
     // Game Controls
     {
       key: ' ',
@@ -135,50 +166,33 @@ export function KeyboardShortcuts() {
     // Help
     {
       key: 'h',
-      action: () => showHelpDialog(),
+      action: () => showHelpDialog(shortcuts),
       description: 'Show Help',
       category: 'navigation'
     },
     {
       key: '?',
       shiftKey: true,
-      action: () => showHelpDialog(),
+      action: () => showHelpDialog(shortcuts),
       description: 'Show Help',
       category: 'navigation'
     }
-  ];
-
-  const showHelpDialog = useCallback(() => {
-    const helpContent = shortcuts
-      .reduce((acc, shortcut) => {
-        if (!acc[shortcut.category]) {
-          acc[shortcut.category] = [];
-        }
-        acc[shortcut.category].push(shortcut);
-        return acc;
-      }, {} as Record<string, KeyboardShortcut[]>);
-
-    const formatKey = (shortcut: KeyboardShortcut) => {
-      const parts = [];
-      if (shortcut.ctrlKey) parts.push('Ctrl');
-      if (shortcut.shiftKey) parts.push('Shift');
-      if (shortcut.altKey) parts.push('Alt');
-      parts.push(shortcut.key === ' ' ? 'Space' : shortcut.key.toUpperCase());
-      return parts.join(' + ');
-    };
-
-    const helpText = Object.entries(helpContent)
-      .map(([category, shortcuts]) => {
-        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
-        const shortcutList = shortcuts
-          .map(s => `  ${formatKey(s)} - ${s.description}`)
-          .join('\n');
-        return `${categoryName}:\n${shortcutList}`;
-      })
-      .join('\n\n');
-
-    alert(`Keyboard Shortcuts:\n\n${helpText}`);
-  }, [shortcuts]);
+  ], [
+    addStatusMessage,
+    canRedo,
+    canUndo,
+    quickLoad,
+    quickSave,
+    redo,
+    reset,
+    selectFacility,
+    selectSpecies,
+    selectedFacility,
+    selectedSpecies,
+    showHelpDialog,
+    togglePause,
+    undo
+  ]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // Don't trigger shortcuts when typing in inputs

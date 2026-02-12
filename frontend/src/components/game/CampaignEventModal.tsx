@@ -191,7 +191,6 @@ export function CampaignEventModal({ isOpen, event, onClose, onChoiceSelected }:
 // Hook to manage campaign events
 export function useCampaignEvents() {
   const [currentEvent, setCurrentEvent] = useState<CampaignEvent | null>(null);
-  const [eventQueue, setEventQueue] = useState<CampaignEvent[]>([]);
   const gameState = useGameStore();
 
   useEffect(() => {
@@ -212,6 +211,7 @@ export function useCampaignEvents() {
   }, [gameState, currentEvent]);
 
   const handleEventChoice = (choice: EventChoice) => {
+    void choice;
     // This will be handled by the modal component
   };
 

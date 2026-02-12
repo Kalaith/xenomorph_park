@@ -17,7 +17,6 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
     facilities,
     xenomorphs,
     day,
-    hour,
     research,
     addStatusMessage
   } = useGameStore();
@@ -151,6 +150,7 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
       // Save progress
       localStorage.setItem('campaign-objective-progress', JSON.stringify(newCompletedObjectives));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resources, facilities, xenomorphs, day, research, objectives, completedObjectives, currentScenario, isActive]);
 
   const completeScenario = () => {

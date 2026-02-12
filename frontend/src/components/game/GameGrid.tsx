@@ -50,7 +50,7 @@ export function GameGrid() {
   const gridHeight = GAME_CONSTANTS.GRID_HEIGHT;
 
   // Floating text for visual feedback
-  const { addResourceChange, addFloatingText } = useFloatingTextContext();
+  const { addFloatingText } = useFloatingTextContext();
 
   // Camera controls
   const MIN_ZOOM = 0.5;
@@ -127,8 +127,6 @@ export function GameGrid() {
   // Get grid position from mouse coordinates (accounting for zoom and pan)
   const getGridPosition = useCallback((clientX: number, clientY: number): GridPosition | null => {
     if (!gridRef.current) return null;
-
-    const rect = gridRef.current.getBoundingClientRect();
 
     // Account for zoom and pan - transform coordinates back to grid space
     const container = gridRef.current.parentElement;

@@ -100,7 +100,6 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
   const { resources, research, addStatusMessage, updateResources } = useGameStore();
   const [selectedBaseSpecies, setSelectedBaseSpecies] = useState<XenomorphSpecies | null>(null);
   const [selectedTraits, setSelectedTraits] = useState<GeneticTrait[]>([]);
-  const [modifiedSpecies, setModifiedSpecies] = useState<XenomorphSpecies | null>(null);
   const [customName, setCustomName] = useState('');
 
   const availableSpecies = XENOMORPH_SPECIES.filter(species =>
@@ -130,7 +129,7 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
     let dangerLevel = selectedBaseSpecies.dangerLevel;
     let containmentDifficulty = selectedBaseSpecies.containmentDifficulty;
     let foodRequirement = selectedBaseSpecies.foodRequirement;
-    let specialAbilities = [...selectedBaseSpecies.specialAbilities];
+    const specialAbilities = [...selectedBaseSpecies.specialAbilities];
 
     // Apply trait effects
     selectedTraits.forEach(trait => {
@@ -183,7 +182,6 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
     setSelectedBaseSpecies(null);
     setSelectedTraits([]);
     setCustomName('');
-    setModifiedSpecies(null);
 
     onClose();
   };

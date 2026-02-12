@@ -1,7 +1,7 @@
 import { useGameStore } from '../../stores/gameStore';
 
 export function TimeDisplay() {
-  const { day, hour, tick, paused } = useGameStore();
+  const { day, hour, paused } = useGameStore();
 
   const formatTime = (hour: number) => {
     const ampm = hour >= 12 ? 'PM' : 'AM';

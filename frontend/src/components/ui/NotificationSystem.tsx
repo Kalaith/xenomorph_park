@@ -49,6 +49,21 @@ export function NotificationSystem({
   defaultDuration = 4000 
 }: NotificationSystemProps) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const windowWithNotification = window as Window & {
+    addNotification?: (message: string, type: StatusMessage['type'], duration?: number) => void;
+  };
+
+  const removeNotification = useCallback((id: string) => {
+    // Start exit animation
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, isExiting: true } : n)
+    );
+
+    // Remove after animation completes
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 300);
+  }, []);
 
   // Add notification function that can be called from outside
   const addNotification = useCallback((message: string, type: StatusMessage['type'], duration?: number) => {
@@ -64,52 +79,35 @@ export function NotificationSystem({
 
     setNotifications(prev => {
       const newNotifications = [notification, ...prev];
-      
-      // Limit number of notifications
+
       if (newNotifications.length > maxNotifications) {
         return newNotifications.slice(0, maxNotifications);
       }
-      
+
       return newNotifications;
     });
 
-    // Make visible after a brief delay for animation
     setTimeout(() => {
-      setNotifications(prev => 
+      setNotifications(prev =>
         prev.map(n => n.id === notification.id ? { ...n, isVisible: true } : n)
       );
     }, 10);
 
-    // Auto remove after duration
     if (notification.duration > 0) {
       setTimeout(() => {
         removeNotification(notification.id);
       }, notification.duration);
     }
-  }, [defaultDuration, maxNotifications]);
-
-  const removeNotification = useCallback((id: string) => {
-    // Start exit animation
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, isExiting: true } : n)
-    );
-
-    // Remove after animation completes
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 300);
-  }, []);
+  }, [defaultDuration, maxNotifications, removeNotification]);
 
   // Expose addNotification globally for use in stores
   useEffect(() => {
-    // @ts-ignore - Adding to window for global access
-    window.addNotification = addNotification;
+    windowWithNotification.addNotification = addNotification;
     
     return () => {
-      // @ts-ignore
-      delete window.addNotification;
+      delete windowWithNotification.addNotification;
     };
-  }, [addNotification]);
+  }, [addNotification, windowWithNotification]);
 
   const getPositionClasses = () => {
     const baseClasses = 'fixed z-50 pointer-events-none';
@@ -209,15 +207,17 @@ export function NotificationSystem({
 
 // Hook for easy access to notifications
 export function useNotifications() {
+  const windowWithNotification = window as Window & {
+    addNotification?: (message: string, type: StatusMessage['type'], duration?: number) => void;
+  };
+
   const addNotification = useCallback((message: string, type: StatusMessage['type'], duration?: number) => {
-    // @ts-ignore
-    if (window.addNotification) {
-      // @ts-ignore
-      window.addNotification(message, type, duration);
+    if (windowWithNotification.addNotification) {
+      windowWithNotification.addNotification(message, type, duration);
     } else {
       console.log(`${type.toUpperCase()}: ${message}`);
     }
-  }, []);
+  }, [windowWithNotification]);
 
   return { addNotification };
 }

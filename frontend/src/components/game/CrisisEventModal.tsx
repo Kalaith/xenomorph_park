@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
 import { PulseEffect, ShakeEffect } from '../ui/VisualFeedback';
 import { CrisisEvent, Severity } from '../../types';
 
@@ -100,6 +99,7 @@ const EXTENDED_CRISIS_EVENTS: CrisisEvent[] = [
 ];
 
 export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisEventModalProps) {
+  void onClose;
   const [selectedResponse, setSelectedResponse] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(30);
   const [isShaking, setIsShaking] = useState(false);
@@ -282,7 +282,6 @@ export function useCrisisManager() {
   const { 
     updateResources, 
     resources, 
-    facilities,
     xenomorphs,
     addStatusMessage,
     day
@@ -351,6 +350,7 @@ export function useCrisisManager() {
       addStatusMessage(consequence, 'warning');
     });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCrisis, addStatusMessage]);
 
   const applyCrisisConsequences = (event: CrisisEvent, response: string): string[] => {

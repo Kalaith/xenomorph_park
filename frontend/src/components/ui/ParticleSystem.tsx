@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Particle {
   id: string;
@@ -45,26 +45,7 @@ export function ParticleSystem({
   const animationRef = useRef<number>();
   const startTimeRef = useRef<number>();
 
-  useEffect(() => {
-    if (isActive) {
-      startTimeRef.current = Date.now();
-      createParticles();
-      animate();
-    } else {
-      setParticles([]);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [isActive]);
-
-  const createParticles = () => {
+  const createParticles = useCallback(() => {
     const newParticles: Particle[] = [];
 
     for (let i = 0; i < config.particleCount; i++) {
@@ -89,31 +70,54 @@ export function ParticleSystem({
     }
 
     setParticles(newParticles);
-  };
+  }, [config, position.x, position.y]);
 
-  const animate = () => {
-    setParticles(prevParticles => {
-      const currentTime = Date.now();
-      const elapsed = currentTime - (startTimeRef.current || 0);
+  const animate = useCallback(() => {
+    const step = () => {
+      setParticles(prevParticles => {
+        const currentTime = Date.now();
+        const elapsed = currentTime - (startTimeRef.current || 0);
 
-      if (elapsed >= duration) {
-        onComplete?.();
-        return [];
+        if (elapsed >= duration) {
+          onComplete?.();
+          return [];
+        }
+
+        return prevParticles
+          .map(particle => ({
+            ...particle,
+            x: particle.x + particle.vx,
+            y: particle.y + particle.vy,
+            vy: particle.vy + (particle.gravity || 0),
+            life: particle.life - 1,
+          }))
+          .filter(particle => particle.life > 0);
+      });
+
+      animationRef.current = requestAnimationFrame(step);
+    };
+
+    animationRef.current = requestAnimationFrame(step);
+  }, [duration, onComplete]);
+
+  useEffect(() => {
+    if (isActive) {
+      startTimeRef.current = Date.now();
+      createParticles();
+      animate();
+    } else {
+      setParticles([]);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
+    }
 
-      return prevParticles
-        .map(particle => ({
-          ...particle,
-          x: particle.x + particle.vx,
-          y: particle.y + particle.vy,
-          vy: particle.vy + (particle.gravity || 0),
-          life: particle.life - 1,
-        }))
-        .filter(particle => particle.life > 0);
-    });
-
-    animationRef.current = requestAnimationFrame(animate);
-  };
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [animate, createParticles, isActive]);
 
   if (!isActive || particles.length === 0) {
     return null;

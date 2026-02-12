@@ -322,7 +322,7 @@ class CampaignSaveManager {
     try {
       const scenarioData = localStorage.getItem('current-campaign-scenario');
       return scenarioData ? JSON.parse(scenarioData) : null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -331,7 +331,7 @@ class CampaignSaveManager {
     try {
       const progressData = localStorage.getItem('campaign-objective-progress');
       return progressData ? JSON.parse(progressData) : {};
-    } catch (error) {
+    } catch {
       return {};
     }
   }
@@ -352,7 +352,7 @@ class CampaignSaveManager {
 
       const sessionInfo = JSON.parse(sessionString);
       return sessionInfo.sessionData;
-    } catch (error) {
+    } catch {
       return {
         startTime: Date.now(),
         elapsedTime: 0,

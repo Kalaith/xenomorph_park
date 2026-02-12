@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useGameStore } from './stores/gameStore';
 import { ResourceCounter } from './components/game/ResourceCounter';
 import { SmartResourceDisplay } from './components/ui/SmartResourceDisplay';
 import { TimeDisplay } from './components/game/TimeDisplay';
@@ -46,11 +45,11 @@ function App() {
   // Use the smart toolbar hook
   const { groups: toolbarGroups, modals } = useMainToolbar(startTutorial);
   
-  const { activeCrisis, checkForCrisis, CrisisModal } = useCrisisManager();
+  const { activeCrisis, CrisisModal } = useCrisisManager();
   
   // Game loop and accessibility hooks
   useGameLoop();
-  const [highContrast] = useHighContrastMode();
+  useHighContrastMode();
   const reducedMotion = useReducedMotion();
 
   // Floating text for visual feedback
@@ -96,8 +95,8 @@ function App() {
         <BiomeSystem>
           <WeatherSystem>
             <SwipeGesture
-              onSwipeLeft={() => isMobile && setShowSettings(false)}
-              onSwipeRight={() => isMobile && setShowSettings(true)}
+              onSwipeLeft={() => isMobile && modals.setShowSettings(false)}
+              onSwipeRight={() => isMobile && modals.setShowSettings(true)}
               className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400"
             >
       {/* Accessibility Features */}

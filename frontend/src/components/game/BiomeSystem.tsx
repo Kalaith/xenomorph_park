@@ -41,7 +41,7 @@ export interface BiomeHazard {
   };
 }
 
-export const BIOMES: Record<string, Biome> = {
+const BIOMES: Record<string, Biome> = {
   earth_colony: {
     id: 'earth_colony',
     name: 'Earth Colony',
@@ -432,6 +432,7 @@ export function BiomeSystem({ children }: BiomeSystemProps) {
 
     return effects;
   };
+  void getBiomeEffectDescription;
 
   return (
     <div className="relative">

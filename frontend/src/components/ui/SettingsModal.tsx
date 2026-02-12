@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS: GameSettings = {
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [activeTab, setActiveTab] = useState<'game' | 'display' | 'audio' | 'saves'>('game');
-  const { addStatusMessage, saveGame, loadGame } = useGameStore();
+  const { addStatusMessage, loadGame } = useGameStore();
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -94,7 +94,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         const imported = JSON.parse(e.target?.result as string);
         saveSettings({ ...DEFAULT_SETTINGS, ...imported });
         addStatusMessage('Settings imported successfully', 'success');
-      } catch (error) {
+      } catch {
         addStatusMessage('Failed to import settings', 'error');
       }
     };

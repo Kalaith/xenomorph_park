@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { campaignRewardManager } from '../../utils/campaignRewards';
-import { campaignSaveManager } from '../../utils/campaignSaveManager';
 import { campaignEventManager } from '../../utils/campaignEvents';
 
 interface CampaignStatisticsProps {
@@ -72,7 +71,7 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
   };
 
   const getPerformanceRating = (): string => {
-    const { perfectRuns, scenariosCompleted, fastestCompletion } = statistics;
+    const { perfectRuns, scenariosCompleted } = statistics;
 
     if (perfectRuns >= 3) return 'Legendary';
     if (perfectRuns >= 2) return 'Master';

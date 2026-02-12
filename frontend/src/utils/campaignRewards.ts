@@ -308,6 +308,7 @@ class CampaignRewardManager {
   }
 
   public startScenario(scenarioId: string): void {
+    void scenarioId;
     const progress = this.getProgress();
     progress.statistics.scenariosAttempted++;
     this.saveProgress(progress);

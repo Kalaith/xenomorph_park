@@ -1,5 +1,4 @@
-import { useState, ReactNode } from 'react';
-import { useGameStore } from '../../stores/gameStore';
+import { useState } from 'react';
 import { Button } from './Button';
 
 interface ToolbarGroup {
@@ -26,7 +25,6 @@ interface SmartToolbarProps {
 
 export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const toggleGroup = (groupId: string) => {
     if (activeGroup === groupId) {
@@ -34,16 +32,6 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
     } else {
       setActiveGroup(groupId);
     }
-  };
-
-  const toggleExpanded = (groupId: string) => {
-    const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(groupId)) {
-      newExpanded.delete(groupId);
-    } else {
-      newExpanded.add(groupId);
-    }
-    setExpandedGroups(newExpanded);
   };
 
   return (

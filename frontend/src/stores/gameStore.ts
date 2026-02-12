@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
 import { GAME_CONSTANTS } from '../constants/gameConstants';
-import { DEFAULT_OBJECTIVES } from '../data/gameData';
 import { RESEARCH_TREE } from '../data/researchTree';
 import { saveManager } from '../utils/saveManager';
 
@@ -267,10 +266,11 @@ export const useGameStore = create<GameStore>()(
         // Status messages
         addStatusMessage: (message, type) => {
           // Use global notification system if available
-          // @ts-ignore
-          if (window.addNotification) {
-            // @ts-ignore
-            window.addNotification(message, type);
+          const windowWithNotification = window as Window & {
+            addNotification?: (msg: string, level: string) => void;
+          };
+          if (windowWithNotification.addNotification) {
+            windowWithNotification.addNotification(message, type);
           } else {
             console.log(`${type.toUpperCase()}: ${message}`);
           }
@@ -420,8 +420,6 @@ export const useGameStore = create<GameStore>()(
 
         // Research tree management
         startResearchNode: (nodeId) => set((state) => {
-          // Import the research tree data to get costs
-          const RESEARCH_TREE = require('../data/researchTree').RESEARCH_TREE;
           const nodeData = RESEARCH_TREE.find((n: any) => n.id === nodeId);
 
           if (!nodeData) return state;
@@ -575,7 +573,7 @@ export const useGameStore = create<GameStore>()(
           if (!currentAction.previousState) return state;
 
           // Apply previous state
-          const newState = {
+          return {
             ...state,
             ...currentAction.previousState,
             undoRedo: {
@@ -583,8 +581,6 @@ export const useGameStore = create<GameStore>()(
               currentIndex: state.undoRedo.currentIndex - 1,
             },
           };
-
-          return newState;
         }),
 
         redo: () => set((state) => {
@@ -594,7 +590,7 @@ export const useGameStore = create<GameStore>()(
           const nextAction = state.undoRedo.history[nextIndex];
 
           // Reapply the action
-          let newState = { ...state };
+          const newState = { ...state };
 
           if (nextAction.type === 'PLACE_FACILITY') {
             newState.facilities = [...state.facilities, nextAction.data.facility];
@@ -637,7 +633,7 @@ export const useGameStore = create<GameStore>()(
       {
         name: 'xenomorph-park-game',
         version: 1,
-        migrate: (persistedState: any, version) => {
+        migrate: (persistedState: any) => {
           // Handle migration for research.available field
           if (persistedState && persistedState.research) {
             if (!persistedState.research.available) {

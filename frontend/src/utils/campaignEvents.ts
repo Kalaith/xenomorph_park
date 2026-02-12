@@ -1,5 +1,4 @@
 import { useGameStore } from '../stores/gameStore';
-import { CampaignScenario } from '../components/game/CampaignMode';
 
 export interface CampaignEvent {
   id: string;
@@ -466,10 +465,12 @@ class CampaignEventManager {
         return Math.random() < (trigger.probability || 0.1);
 
       case 'objective':
+      {
         const progress = localStorage.getItem('campaign-objective-progress');
         if (!progress) return false;
         const completedObjectives = JSON.parse(progress);
         return completedObjectives.includes(trigger.condition.objectiveId);
+      }
 
       default:
         return false;
@@ -490,7 +491,7 @@ class CampaignEventManager {
 
     choice.consequences.forEach(consequence => {
       switch (consequence.type) {
-        case 'resource':
+        case 'resource': {
           const resourceUpdates: any = {};
           Object.entries(consequence.effect).forEach(([resource, value]) => {
             const currentValue = gameStore.resources[resource] || 0;
@@ -498,6 +499,7 @@ class CampaignEventManager {
           });
           gameStore.updateResources(resourceUpdates);
           break;
+        }
 
         case 'species':
           if (consequence.effect.unlock) {
@@ -508,7 +510,7 @@ class CampaignEventManager {
           }
           break;
 
-        case 'story':
+        case 'story': {
           // Store story flags for future reference
           const storyFlags = JSON.parse(localStorage.getItem('campaign-story-flags') || '{}');
           if (consequence.effect.flag) {
@@ -516,6 +518,7 @@ class CampaignEventManager {
             localStorage.setItem('campaign-story-flags', JSON.stringify(storyFlags));
           }
           break;
+        }
 
         case 'crisis':
           // Trigger a crisis event

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
 import { AnimatedProgressBar, PulseEffect } from '../ui/VisualFeedback';
 
 interface Achievement {
@@ -329,10 +328,11 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
             case 'queen_researched':
               shouldUnlock = research.completed.includes('Queen');
               break;
-            case 'all_achievements':
+            case 'all_achievements': {
               const otherAchievements = prev.filter(a => a.id !== 'completionist');
               shouldUnlock = otherAchievements.every(a => a.unlocked);
               break;
+            }
             // Add more custom achievements as needed
           }
           break;
@@ -389,7 +389,7 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
     }, 10000); // Only check every 10 seconds
 
     return () => clearInterval(intervalId);
-  }, []); // Only run once after mount
+  }, [checkAchievements]);
 
   // Also check when significant milestones are reached
   useEffect(() => {
@@ -407,7 +407,7 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [facilities.length, research.completed.length, day]);
+  }, [facilities.length, research.completed.length, day, checkAchievements]);
 
   const categories = ['all', 'building', 'research', 'management', 'survival', 'special'];
 
@@ -438,7 +438,6 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
   });
 
   const totalPoints = achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
-  const totalPossiblePoints = achievements.reduce((sum, a) => sum + a.points, 0);
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
@@ -577,35 +576,3 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
   );
 }
 
-// Hook for external access to achievement system
-export function useAchievements() {
-  const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
-
-  const triggerCustomAchievement = useCallback((achievementId: string) => {
-    setAchievements(prev => prev.map(achievement => {
-      if (achievement.id === achievementId && !achievement.unlocked) {
-        return {
-          ...achievement,
-          unlocked: true,
-          unlockedAt: Date.now()
-        };
-      }
-      return achievement;
-    }));
-  }, []);
-
-  const getUnlockedCount = useCallback(() => {
-    return achievements.filter(a => a.unlocked).length;
-  }, [achievements]);
-
-  const getTotalPoints = useCallback(() => {
-    return achievements.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
-  }, [achievements]);
-
-  return {
-    achievements,
-    triggerCustomAchievement,
-    getUnlockedCount,
-    getTotalPoints
-  };
-}

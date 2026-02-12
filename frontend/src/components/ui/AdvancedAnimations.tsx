@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 // Particle system for various effects
 interface Particle {
