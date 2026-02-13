@@ -13,14 +13,14 @@ interface NotificationItem extends StatusMessage {
   isExiting: boolean;
 }
 
-const NOTIFICATION_ICONS = {
+const notificationIcons = {
   info: 'ℹ️',
   success: '✅',
   warning: '⚠️',
   error: '❌'
 };
 
-const NOTIFICATION_COLORS = {
+const notificationColors = {
   info: {
     bg: 'bg-blue-400/20',
     border: 'border-blue-400/30',
@@ -134,8 +134,8 @@ export function NotificationSystem({
     <div className={getPositionClasses()}>
       <div className="space-y-2 w-80">
         {notifications.map((notification) => {
-          const colors = NOTIFICATION_COLORS[notification.type];
-          const icon = NOTIFICATION_ICONS[notification.type];
+          const colors = notificationColors[notification.type];
+          const icon = notificationIcons[notification.type];
           
           return (
             <div

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { XENOMORPH_SPECIES } from '../../data/gameData';
-import { DANGER_LEVEL_COLORS } from '../../constants/gameConstants';
+import { xenomorphSpecies } from '../../data/gameData';
+import { dangerLevelColors } from '../../constants/gameConstants';
 import { XenomorphSpecies } from '../../types';
 import { GeneticModification } from './GeneticModification';
 import { Button } from '../ui/Button';
@@ -27,7 +27,7 @@ export function SpeciesPanel() {
   };
 
   const getDangerLevelColor = (level: number) => {
-    return DANGER_LEVEL_COLORS[level as keyof typeof DANGER_LEVEL_COLORS] || 'text-red-600';
+    return dangerLevelColors[level as keyof typeof dangerLevelColors] || 'text-red-600';
   };
 
   return (
@@ -44,7 +44,7 @@ export function SpeciesPanel() {
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-2">
-        {XENOMORPH_SPECIES.map((species) => {
+        {xenomorphSpecies.map((species) => {
           const isSelected = selectedSpecies?.name === species.name;
           const researched = isResearched(species);
           const available = isAvailable(species);

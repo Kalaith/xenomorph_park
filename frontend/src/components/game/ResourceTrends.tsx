@@ -259,7 +259,7 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
     }
   };
 
-  const formatValue = (metric: keyof Resources, value: any) => {
+  const formatValue = (metric: keyof Resources, value: Resources[keyof Resources]) => {
     if (typeof value === 'number') {
       return metric === 'credits' ? `💰 ${value}` :
              metric === 'power' || metric === 'maxPower' ? `⚡ ${value}` :
@@ -267,7 +267,7 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
              metric === 'visitors' ? `👥 ${value}` :
              value.toString();
     }
-    return value?.toString() || '';
+    return String(value ?? '');
   };
 
   const resourceMetrics: (keyof Resources)[] = ['credits', 'power', 'research', 'visitors'];

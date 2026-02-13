@@ -17,7 +17,7 @@ interface TutorialStep {
   skippable?: boolean;
 }
 
-const TUTORIAL_STEPS: TutorialStep[] = [
+const tutorialSteps: TutorialStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to Xenomorph Park!',
@@ -169,8 +169,8 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
   const [isWaitingForAction, setIsWaitingForAction] = useState(false);
   const [highlightedElement, setHighlightedElement] = useState<Element | null>(null);
 
-  const currentStep = TUTORIAL_STEPS[currentStepIndex];
-  const isLastStep = currentStepIndex === TUTORIAL_STEPS.length - 1;
+  const currentStep = tutorialSteps[currentStepIndex];
+  const isLastStep = currentStepIndex === tutorialSteps.length - 1;
 
   // Highlight target element
   useEffect(() => {
@@ -293,7 +293,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
           <div>
             <h3 className="text-xl font-bold text-green-400">{currentStep.title}</h3>
             <div className="text-sm text-slate-400 mt-1">
-              Step {currentStepIndex + 1} of {TUTORIAL_STEPS.length}
+              Step {currentStepIndex + 1} of {tutorialSteps.length}
             </div>
           </div>
           <button
@@ -309,7 +309,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
         <div className="w-full bg-slate-700 rounded-full h-2 mb-4">
           <div
             className="bg-green-400 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentStepIndex + 1) / TUTORIAL_STEPS.length) * 100}%` }}
+            style={{ width: `${((currentStepIndex + 1) / tutorialSteps.length) * 100}%` }}
           />
         </div>
 

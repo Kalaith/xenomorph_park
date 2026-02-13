@@ -18,7 +18,7 @@ interface ActiveCrisis {
   resolved: boolean;
 }
 
-const EXTENDED_CRISIS_EVENTS: CrisisEvent[] = [
+const extendedCrisisEvents: CrisisEvent[] = [
   {
     name: "Containment Breach",
     probability: 0.3,
@@ -318,8 +318,8 @@ export function useCrisisManager() {
     const probability = calculateCrisisProbability();
     if (Math.random() < probability) {
       // Select random crisis event
-      const availableEvents = EXTENDED_CRISIS_EVENTS.filter(event => 
-        !crisisHistory.includes(event.name) || crisisHistory.length >= EXTENDED_CRISIS_EVENTS.length
+      const availableEvents = extendedCrisisEvents.filter(event => 
+        !crisisHistory.includes(event.name) || crisisHistory.length >= extendedCrisisEvents.length
       );
       
       const selectedEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];

@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 export interface GameAction {
   type: 'PLACE_FACILITY' | 'PLACE_XENOMORPH' | 'REMOVE_FACILITY' | 'REMOVE_XENOMORPH' | 'MODIFY_RESOURCES';
   timestamp: number;
-  data: any;
+  data: unknown;
   previousState?: Partial<GameState>;
 }
 

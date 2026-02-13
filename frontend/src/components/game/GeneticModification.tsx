@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { XENOMORPH_SPECIES } from '../../data/gameData';
+import { xenomorphSpecies } from '../../data/gameData';
 import { XenomorphSpecies } from '../../types';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
@@ -20,7 +20,7 @@ interface GeneticTrait {
   };
 }
 
-const GENETIC_TRAITS: GeneticTrait[] = [
+const geneticTraits: GeneticTrait[] = [
   {
     id: 'enhanced_carapace',
     name: 'Enhanced Carapace',
@@ -102,7 +102,7 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
   const [selectedTraits, setSelectedTraits] = useState<GeneticTrait[]>([]);
   const [customName, setCustomName] = useState('');
 
-  const availableSpecies = XENOMORPH_SPECIES.filter(species =>
+  const availableSpecies = xenomorphSpecies.filter(species =>
     research.completed.includes(species.name)
   );
 
@@ -140,10 +140,10 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
         containmentDifficulty = Math.min(10, containmentDifficulty + trait.effect.containmentDifficulty);
       }
       if (trait.effect.foodRequirement) {
-        const foodLevels = ['Low', 'Medium', 'High', 'Very High'];
+        const foodLevels: XenomorphSpecies['foodRequirement'][] = ['Low', 'Medium', 'High', 'Very High'];
         const currentIndex = foodLevels.indexOf(foodRequirement);
         const newIndex = Math.min(foodLevels.length - 1, currentIndex + trait.effect.foodRequirement);
-        foodRequirement = foodLevels[newIndex] as any;
+        foodRequirement = foodLevels[newIndex];
       }
       if (trait.effect.specialAbilities) {
         specialAbilities.push(...trait.effect.specialAbilities);
@@ -235,7 +235,7 @@ export function GeneticModification({ isOpen, onClose }: GeneticModificationProp
           <div>
             <h4 className="text-green-400 font-semibold mb-3">Available Genetic Modifications</h4>
             <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
-              {GENETIC_TRAITS.map(trait => {
+              {geneticTraits.map(trait => {
                 const isSelected = selectedTraits.find(t => t.id === trait.id);
                 const canAffordTrait = resources.credits >= trait.cost;
 

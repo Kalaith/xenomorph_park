@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { RESEARCH_TREE, RESEARCH_CATEGORIES, updateResearchAvailability, ResearchNode } from '../../data/researchTree';
+import { researchTree, researchCategories, updateResearchAvailability, ResearchNode } from '../../data/researchTree';
 
 interface ResearchTreeViewProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ function ResearchNodeComponent({ node, onNodeClick }: ResearchNodeComponentProps
     }
   };
 
-  const categoryData = RESEARCH_CATEGORIES[node.category];
+  const categoryData = researchCategories[node.category];
 
   return (
     <div
@@ -171,7 +171,7 @@ function ResearchNodeDetailModal({ node, isOpen, onClose, onStart }: {
           <span className="text-4xl">{node.icon}</span>
           <div>
             <h3 className="text-xl font-bold text-green-400">{node.name}</h3>
-            <p className="text-slate-400">Tier {node.tier} • {RESEARCH_CATEGORIES[node.category].name}</p>
+            <p className="text-slate-400">Tier {node.tier} • {researchCategories[node.category].name}</p>
           </div>
         </div>
 
@@ -207,7 +207,7 @@ function ResearchNodeDetailModal({ node, isOpen, onClose, onStart }: {
             <h4 className="font-semibold mb-2">Prerequisites</h4>
             <ul className="space-y-1">
               {node.prerequisites.map(prereqId => {
-                const prereqNode = RESEARCH_TREE.find(n => n.id === prereqId);
+                const prereqNode = researchTree.find(n => n.id === prereqId);
                 const prereqCompleted = research.researchTree[prereqId]?.completed || false;
                 return (
                   <li key={prereqId} className={`flex items-center gap-2 ${prereqCompleted ? 'text-green-400' : 'text-red-400'}`}>
@@ -311,7 +311,7 @@ export function ResearchTreeView({ isOpen, onClose }: ResearchTreeViewProps) {
 
   // Update research tree with current progress
   const researchTree = updateResearchAvailability(
-    RESEARCH_TREE.map(node => ({
+    researchTree.map(node => ({
       ...node,
       completed: research.researchTree[node.id]?.completed || false,
       inProgress: research.researchTree[node.id]?.inProgress || false,

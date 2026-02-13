@@ -1,5 +1,5 @@
 import { useGameStore } from '../../stores/gameStore';
-import { FACILITY_DEFINITIONS } from '../../data/gameData';
+import { facilityDefinitions } from '../../data/gameData';
 import { FacilityDefinition } from '../../types';
 
 export function FacilityPanel() {
@@ -21,7 +21,7 @@ export function FacilityPanel() {
     <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-4 mb-4">
       <h3 className="text-green-400 font-bold text-lg mb-4 glow">Facilities</h3>
       <div className="grid grid-cols-1 gap-2">
-        {FACILITY_DEFINITIONS.map((facility) => {
+        {facilityDefinitions.map((facility) => {
           const isSelected = selectedFacility?.name === facility.name;
           const affordable = canAfford(facility);
           

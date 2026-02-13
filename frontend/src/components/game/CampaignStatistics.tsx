@@ -8,10 +8,40 @@ interface CampaignStatisticsProps {
 }
 
 export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps) {
-  const [statistics, setStatistics] = useState<any>({});
-  const [achievements, setAchievements] = useState<any[]>([]);
-  const [completionData, setCompletionData] = useState<any>({});
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'scenarios' | 'achievements' | 'performance'>('overview');
+  type CampaignStats = {
+    scenariosAttempted?: number;
+    scenariosCompleted?: number;
+    perfectRuns?: number;
+    totalObjectivesCompleted?: number;
+    facilitiesBuilt?: number;
+    speciesContained?: number;
+    crisisesHandled?: number;
+    fastestCompletion?: number;
+  };
+
+  type CampaignAchievement = {
+    name: string;
+    description: string;
+    dateUnlocked: number;
+    unlockedBy: string;
+  };
+
+  type CompletionData = {
+    completionRate: number;
+    totalScenarios: number;
+    completedScenarios: number;
+  };
+
+  type TabId = 'overview' | 'scenarios' | 'achievements' | 'performance';
+
+  const [statistics, setStatistics] = useState<CampaignStats>({});
+  const [achievements, setAchievements] = useState<CampaignAchievement[]>([]);
+  const [completionData, setCompletionData] = useState<CompletionData>({
+    completionRate: 0,
+    totalScenarios: 6,
+    completedScenarios: 0,
+  });
+  const [selectedTab, setSelectedTab] = useState<TabId>('overview');
 
   useEffect(() => {
     if (isOpen) {
@@ -20,8 +50,8 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
   }, [isOpen]);
 
   const loadStatistics = () => {
-    const stats = campaignRewardManager.getStatistics();
-    const achievementsList = campaignRewardManager.getAchievements();
+    const stats = campaignRewardManager.getStatistics() as CampaignStats;
+    const achievementsList = campaignRewardManager.getAchievements() as CampaignAchievement[];
     const completionRate = campaignRewardManager.getCompletionRate();
 
     setStatistics(stats);
@@ -115,15 +145,15 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
 
           {/* Tabs */}
           <div className="flex gap-2 mt-4">
-            {[
+            {([
               { id: 'overview', label: 'Overview', icon: '📊' },
               { id: 'scenarios', label: 'Scenarios', icon: '🎯' },
               { id: 'achievements', label: 'Achievements', icon: '🏆' },
               { id: 'performance', label: 'Performance', icon: '⚡' }
-            ].map(tab => (
+            ] as const satisfies ReadonlyArray<{ id: TabId; label: string; icon: string }>).map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setSelectedTab(tab.id as any)}
+                onClick={() => setSelectedTab(tab.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedTab === tab.id
                     ? 'bg-green-400/20 text-green-400 border border-green-400'

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { GAME_CONSTANTS } from '../../constants/gameConstants';
-import { GridPosition } from '../../types';
+import { gameConstants } from '../../constants/gameConstants';
+import type { FacilityDefinition, GridPosition, PlacedFacility, PlacedXenomorph, XenomorphSpecies } from '../../types';
 import { ContextMenu } from '../ui/ContextMenu';
 import { Tooltip, TooltipContent } from '../ui/Tooltip';
 import { useFloatingTextContext } from '../../contexts/FloatingTextContext';
@@ -20,7 +20,11 @@ export function GameGrid() {
   } = useGameStore();
 
   // Drag and drop state
-  const [draggedItem, setDraggedItem] = useState<{type: 'facility' | 'xenomorph', data: any} | null>(null);
+  type DragItem =
+    | { type: 'facility'; data: FacilityDefinition | PlacedFacility }
+    | { type: 'xenomorph'; data: XenomorphSpecies | PlacedXenomorph };
+
+  const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const [dragPreview, setDragPreview] = useState<GridPosition | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -29,7 +33,7 @@ export function GameGrid() {
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean;
     position: { x: number; y: number };
-    target: { type: 'facility' | 'xenomorph'; data: any } | null;
+    target: { type: 'facility' | 'xenomorph'; data: PlacedFacility | PlacedXenomorph } | null;
   }>({
     isOpen: false,
     position: { x: 0, y: 0 },
@@ -46,22 +50,22 @@ export function GameGrid() {
   const [isPanning, setIsPanning] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
 
-  const gridWidth = GAME_CONSTANTS.GRID_WIDTH;
-  const gridHeight = GAME_CONSTANTS.GRID_HEIGHT;
+  const gridWidth = gameConstants.GRID_WIDTH;
+  const gridHeight = gameConstants.GRID_HEIGHT;
 
   // Floating text for visual feedback
   const { addFloatingText } = useFloatingTextContext();
 
   // Camera controls
-  const MIN_ZOOM = 0.5;
-  const MAX_ZOOM = 3;
+  const minZoom = 0.5;
+  const maxZoom = 3;
 
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(MAX_ZOOM, prev + 0.25));
+    setZoomLevel(prev => Math.min(maxZoom, prev + 0.25));
   };
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(MIN_ZOOM, prev - 0.25));
+    setZoomLevel(prev => Math.max(minZoom, prev - 0.25));
   };
 
   const handleResetCamera = () => {
@@ -87,9 +91,9 @@ export function GameGrid() {
 
     const scaleX = (containerRect.width * 0.9) / gridTotalWidth;
     const scaleY = (containerRect.height * 0.9) / gridTotalHeight;
-    const optimalZoom = Math.min(scaleX, scaleY, MAX_ZOOM);
+    const optimalZoom = Math.min(scaleX, scaleY, maxZoom);
 
-    setZoomLevel(Math.max(MIN_ZOOM, optimalZoom));
+    setZoomLevel(Math.max(minZoom, optimalZoom));
     setPanOffset({ x: 0, y: 0 });
   };
 
@@ -152,9 +156,9 @@ export function GameGrid() {
   }, [gridWidth, gridHeight, zoomLevel, panOffset]);
 
   // Drag and drop handlers
-  const handleDragStart = (e: React.DragEvent, type: 'facility' | 'xenomorph', data: any) => {
+  const handleDragStart = (e: React.DragEvent, type: DragItem['type'], data: DragItem['data']) => {
     e.dataTransfer.effectAllowed = 'move';
-    setDraggedItem({ type, data });
+    setDraggedItem({ type, data } as DragItem);
     setIsDragging(true);
   };
 
@@ -178,7 +182,8 @@ export function GameGrid() {
       if (draggedItem.type === 'facility') {
         placeFacility(draggedItem.data, position);
       } else if (draggedItem.type === 'xenomorph') {
-        placeXenomorph(draggedItem.data, position);
+        const species = 'species' in draggedItem.data ? draggedItem.data.species : draggedItem.data;
+        placeXenomorph(species, position);
       }
     }
 
@@ -382,7 +387,7 @@ export function GameGrid() {
     return [];
   };
 
-  const getFacilityTooltipContent = (facility: any) => {
+  const getFacilityTooltipContent = (facility: PlacedFacility) => {
     const stats = [
       { label: 'Cost', value: `$${facility.cost}`, color: 'text-yellow-400' },
       { label: 'Power Required', value: `${facility.powerRequirement}`, color: 'text-blue-400' },
@@ -408,7 +413,7 @@ export function GameGrid() {
     );
   };
 
-  const getXenomorphTooltipContent = (xenomorph: any) => {
+  const getXenomorphTooltipContent = (xenomorph: PlacedXenomorph) => {
     const stats = [
       { label: 'Species', value: xenomorph.species.name, color: 'text-red-400' },
       { label: 'Containment Level', value: `${xenomorph.containmentLevel}/10`, color: 'text-orange-400' },
@@ -561,7 +566,7 @@ export function GameGrid() {
               <span className="opacity-70 animate-pulse">
                 {draggedItem.type === 'facility'
                   ? getFacilityIcon(draggedItem.data.name)
-                  : getSpeciesIcon(draggedItem.data.species?.name || draggedItem.data.name)
+                  : getSpeciesIcon(('species' in draggedItem.data ? draggedItem.data.species.name : draggedItem.data.name))
                 }
               </span>
             )}
@@ -589,7 +594,7 @@ export function GameGrid() {
           <div className="flex items-center gap-1 bg-slate-800/50 rounded px-2 py-1">
             <button
               onClick={handleZoomOut}
-              disabled={zoomLevel <= MIN_ZOOM}
+              disabled={zoomLevel <= minZoom}
               className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Zoom Out (Use zoom buttons - scroll wheel disabled)"
             >
@@ -600,7 +605,7 @@ export function GameGrid() {
             </span>
             <button
               onClick={handleZoomIn}
-              disabled={zoomLevel >= MAX_ZOOM}
+              disabled={zoomLevel >= maxZoom}
               className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Zoom In (Use zoom buttons - scroll wheel disabled)"
             >

@@ -14,10 +14,10 @@ export interface SaveSlot {
   isAutoSave: boolean;
 }
 
-const SAVE_KEY_PREFIX = 'xenomorph-park-save';
-const CURRENT_VERSION = '1.0.0';
-const MAX_SAVE_SLOTS = 5;
-const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
+const saveKeyPrefix = 'xenomorph-park-save';
+const currentVersion = '1.0.0';
+const maxSaveSlots = 5;
+const autoSaveInterval = 30000; // 30 seconds
 
 export class SaveManager {
   private autoSaveTimer: NodeJS.Timeout | null = null;
@@ -30,7 +30,7 @@ export class SaveManager {
       const saveData: SaveData = {
         gameState: state,
         timestamp: Date.now(),
-        version: CURRENT_VERSION,
+        version: currentVersion,
         playTime
       };
 
@@ -41,7 +41,7 @@ export class SaveManager {
         isAutoSave: slotId === 'autosave'
       };
 
-      localStorage.setItem(`${SAVE_KEY_PREFIX}-${slotId}`, JSON.stringify(saveSlot));
+      localStorage.setItem(`${saveKeyPrefix}-${slotId}`, JSON.stringify(saveSlot));
       return true;
     } catch (error) {
       console.error('Failed to save game:', error);
@@ -52,14 +52,14 @@ export class SaveManager {
   // Load game from specific slot
   loadGame(slotId: string): SaveData | null {
     try {
-      const saveDataString = localStorage.getItem(`${SAVE_KEY_PREFIX}-${slotId}`);
+      const saveDataString = localStorage.getItem(`${saveKeyPrefix}-${slotId}`);
       if (!saveDataString) return null;
 
       const saveSlot: SaveSlot = JSON.parse(saveDataString);
       
       // Version compatibility check
-      if (saveSlot.data.version !== CURRENT_VERSION) {
-        console.warn(`Save version mismatch: ${saveSlot.data.version} vs ${CURRENT_VERSION}`);
+      if (saveSlot.data.version !== currentVersion) {
+        console.warn(`Save version mismatch: ${saveSlot.data.version} vs ${currentVersion}`);
         // Could implement migration logic here
       }
 
@@ -77,7 +77,7 @@ export class SaveManager {
     
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith(SAVE_KEY_PREFIX)) {
+      if (key?.startsWith(saveKeyPrefix)) {
         try {
           const saveDataString = localStorage.getItem(key);
           if (saveDataString) {
@@ -96,7 +96,7 @@ export class SaveManager {
   // Delete save slot
   deleteSave(slotId: string): boolean {
     try {
-      localStorage.removeItem(`${SAVE_KEY_PREFIX}-${slotId}`);
+      localStorage.removeItem(`${saveKeyPrefix}-${slotId}`);
       return true;
     } catch (error) {
       console.error('Failed to delete save:', error);
@@ -109,7 +109,7 @@ export class SaveManager {
     this.stopAutoSave();
     this.autoSaveTimer = setInterval(() => {
       this.saveGame(getGameState(), 'autosave', 'Auto Save');
-    }, AUTO_SAVE_INTERVAL);
+    }, autoSaveInterval);
   }
 
   stopAutoSave(): void {
@@ -159,7 +159,7 @@ export class SaveManager {
           saveSlot.id = newId;
           saveSlot.name = `Imported - ${saveSlot.name}`;
           
-          localStorage.setItem(`${SAVE_KEY_PREFIX}-${newId}`, JSON.stringify(saveSlot));
+          localStorage.setItem(`${saveKeyPrefix}-${newId}`, JSON.stringify(saveSlot));
           resolve(true);
         } catch (error) {
           console.error('Failed to import save:', error);
@@ -188,7 +188,7 @@ export class SaveManager {
       let used = 0;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith(SAVE_KEY_PREFIX)) {
+        if (key?.startsWith(saveKeyPrefix)) {
           used += localStorage.getItem(key)?.length || 0;
         }
       }
@@ -206,8 +206,8 @@ export class SaveManager {
   // Clean up old saves if storage is getting full
   cleanupOldSaves(): void {
     const saves = this.getAllSaves().filter(save => !save.isAutoSave);
-    if (saves.length > MAX_SAVE_SLOTS) {
-      const toDelete = saves.slice(MAX_SAVE_SLOTS);
+    if (saves.length > maxSaveSlots) {
+      const toDelete = saves.slice(maxSaveSlots);
       toDelete.forEach(save => this.deleteSave(save.id));
     }
   }

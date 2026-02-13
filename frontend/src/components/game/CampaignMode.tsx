@@ -40,7 +40,7 @@ export interface CampaignObjective {
   required: boolean; // Must complete to win scenario
 }
 
-const CAMPAIGN_SCENARIOS: CampaignScenario[] = [
+const campaignScenarios: CampaignScenario[] = [
   {
     id: 'tutorial_first_park',
     name: 'Your First Xenomorph Park',
@@ -294,12 +294,12 @@ export function CampaignMode({ isOpen, onClose }: CampaignModeProps) {
           <div className="flex items-center gap-4">
             <div className="text-sm">
               <span className="text-slate-400">Completed:</span>
-              <span className="text-green-400 ml-2">{completedScenarios.length}/{CAMPAIGN_SCENARIOS.length}</span>
+              <span className="text-green-400 ml-2">{completedScenarios.length}/{campaignScenarios.length}</span>
             </div>
             <div className="flex-1 bg-slate-700 rounded-full h-2">
               <div
                 className="bg-green-400 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(completedScenarios.length / CAMPAIGN_SCENARIOS.length) * 100}%` }}
+                style={{ width: `${(completedScenarios.length / campaignScenarios.length) * 100}%` }}
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ export function CampaignMode({ isOpen, onClose }: CampaignModeProps) {
 
         {/* Scenario List */}
         <div className="grid grid-cols-1 gap-4">
-          {CAMPAIGN_SCENARIOS.map(scenario => (
+          {campaignScenarios.map(scenario => (
             <ScenarioCard key={scenario.id} scenario={scenario} />
           ))}
         </div>

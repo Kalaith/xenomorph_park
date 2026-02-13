@@ -14,7 +14,7 @@ interface WeatherEffects {
   };
 }
 
-const WEATHER_EFFECTS: Record<Weather, WeatherEffects> = {
+const weatherEffects: Record<Weather, WeatherEffects> = {
   clear: {
     visibility: 1,
     mood: 'calm',
@@ -52,7 +52,7 @@ const WEATHER_EFFECTS: Record<Weather, WeatherEffects> = {
   }
 };
 
-const TIME_EFFECTS: Record<TimeOfDay, { brightness: number; hue: number; filter: string }> = {
+const timeEffects: Record<TimeOfDay, { brightness: number; hue: number; filter: string }> = {
   dawn: { brightness: 0.7, hue: 30, filter: 'sepia(0.3) saturate(1.2)' },
   morning: { brightness: 1, hue: 0, filter: 'brightness(1.1) saturate(1.1)' },
   noon: { brightness: 1.2, hue: 0, filter: 'brightness(1.2) contrast(1.1)' },
@@ -123,8 +123,8 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
   }, [hour, day, currentWeather]);
 
   const timeOfDay = getTimeOfDay(hour);
-  const weatherEffect = WEATHER_EFFECTS[currentWeather];
-  const timeEffect = TIME_EFFECTS[timeOfDay];
+  const weatherEffect = weatherEffects[currentWeather];
+  const timeEffect = timeEffects[timeOfDay];
 
   // Combine weather and time effects
   const combinedFilter = [

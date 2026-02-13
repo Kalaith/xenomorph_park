@@ -18,7 +18,7 @@ export function TouchControls({
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
   const joystickRef = useRef<HTMLDivElement>(null);
 
-  const handleJoystickDrag = (event: any, info: PanInfo) => {
+  const handleJoystickDrag = (_event: unknown, info: PanInfo) => {
     const maxDistance = 40;
     const distance = Math.sqrt(info.offset.x ** 2 + info.offset.y ** 2);
     
@@ -124,7 +124,7 @@ export function SwipeGesture({
   children, 
   className = '' 
 }: SwipeGestureProps) {
-  const handleDragEnd = (event: any, info: PanInfo) => {
+  const handleDragEnd = (_event: unknown, info: PanInfo) => {
     const { offset, velocity } = info;
     const swipeThreshold = 50;
     const velocityThreshold = 500;

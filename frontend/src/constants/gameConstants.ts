@@ -1,4 +1,4 @@
-export const GAME_CONSTANTS = {
+export const gameConstants = {
   // Grid configuration
   GRID_WIDTH: 20,
   GRID_HEIGHT: 15,
@@ -48,7 +48,7 @@ export const GAME_CONSTANTS = {
   STATUS_MESSAGE_DURATION: 3000,
 } as const;
 
-export const DANGER_LEVEL_COLORS = {
+export const dangerLevelColors = {
   1: 'text-green-400',
   2: 'text-green-400',
   3: 'text-yellow-400',
@@ -57,14 +57,14 @@ export const DANGER_LEVEL_COLORS = {
   6: 'text-red-600',
 } as const;
 
-export const SECURITY_COLORS = {
+export const securityColors = {
   Low: 'text-red-400',
   Medium: 'text-yellow-400',
   High: 'text-green-400',
   Maximum: 'text-blue-400',
 } as const;
 
-export const SEVERITY_COLORS = {
+export const severityColors = {
   Low: 'text-green-400',
   Medium: 'text-yellow-400',
   High: 'text-red-400',

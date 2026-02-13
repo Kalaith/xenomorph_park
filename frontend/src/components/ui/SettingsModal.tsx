@@ -20,7 +20,7 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-const DEFAULT_SETTINGS: GameSettings = {
+const defaultSettings: GameSettings = {
   autoSave: true,
   autoSaveInterval: 30,
   gridSize: 'medium',
@@ -32,7 +32,7 @@ const DEFAULT_SETTINGS: GameSettings = {
 };
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<GameSettings>(defaultSettings);
   const [activeTab, setActiveTab] = useState<'game' | 'display' | 'audio' | 'saves'>('game');
   const { addStatusMessage, loadGame } = useGameStore();
 
@@ -42,7 +42,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
-        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+        setSettings({ ...defaultSettings, ...parsed });
       } catch (error) {
         console.error('Failed to load settings:', error);
       }
@@ -66,7 +66,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   const resetSettings = () => {
     if (confirm('Reset all settings to default values?')) {
-      saveSettings(DEFAULT_SETTINGS);
+      saveSettings(defaultSettings);
     }
   };
 
@@ -92,7 +92,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     reader.onload = (e) => {
       try {
         const imported = JSON.parse(e.target?.result as string);
-        saveSettings({ ...DEFAULT_SETTINGS, ...imported });
+        saveSettings({ ...defaultSettings, ...imported });
         addStatusMessage('Settings imported successfully', 'success');
       } catch {
         addStatusMessage('Failed to import settings', 'error');

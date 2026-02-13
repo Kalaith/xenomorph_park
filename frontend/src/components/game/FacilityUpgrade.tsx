@@ -28,7 +28,7 @@ interface FacilityUpgradeProps {
   onClose: () => void;
 }
 
-const UPGRADE_DEFINITIONS: Record<string, UpgradeDefinition[]> = {
+const upgradeDefinitions: Record<string, UpgradeDefinition[]> = {
   'Research Lab': [
     {
       id: 'advanced_equipment',
@@ -212,7 +212,7 @@ export function FacilityUpgrade({ isOpen, facility, onClose }: FacilityUpgradePr
 
   if (!facility) return null;
 
-  const availableUpgrades = UPGRADE_DEFINITIONS[facility.name] || [];
+  const availableUpgrades = upgradeDefinitions[facility.name] || [];
   const facilityUpgrades = installedUpgrades[facility.id] || [];
 
   const canInstallUpgrade = (upgrade: UpgradeDefinition): boolean => {

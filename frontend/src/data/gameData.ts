@@ -1,6 +1,6 @@
 import { XenomorphSpecies, FacilityDefinition, Weapon, CrisisEvent } from '../types';
 
-export const XENOMORPH_SPECIES: XenomorphSpecies[] = [
+export const xenomorphSpecies: XenomorphSpecies[] = [
   {
     name: "Drone",
     description: "Basic worker xenomorph, birthed from human hosts",
@@ -251,7 +251,7 @@ export const XENOMORPH_SPECIES: XenomorphSpecies[] = [
   }
 ];
 
-export const FACILITY_DEFINITIONS: FacilityDefinition[] = [
+export const facilityDefinitions: FacilityDefinition[] = [
   // Basic Facilities
   {
     name: "Research Lab",
@@ -459,7 +459,7 @@ export const WEAPONS: Weapon[] = [
   }
 ];
 
-export const CRISIS_EVENTS: CrisisEvent[] = [
+export const crisisEvents: CrisisEvent[] = [
   {
     name: "Containment Breach",
     probability: 0.3,
@@ -483,7 +483,7 @@ export const CRISIS_EVENTS: CrisisEvent[] = [
   }
 ];
 
-export const DEFAULT_OBJECTIVES = [
+export const defaultObjectives = [
   'Restore power to main grid',
   'Evacuate remaining civilians',
   'Eliminate xenomorph threats'

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '../stores/gameStore';
-import { GAME_CONSTANTS } from '../constants/gameConstants';
+import { gameConstants } from '../constants/gameConstants';
 
 export function useGameLoop() {
   const { gameTick, paused, mode } = useGameStore();
@@ -10,7 +10,7 @@ export function useGameLoop() {
     if (!paused && mode === 'building') {
       intervalRef.current = setInterval(() => {
         gameTick();
-      }, GAME_CONSTANTS.GAME_TICK_INTERVAL);
+      }, gameConstants.GAME_TICK_INTERVAL);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);

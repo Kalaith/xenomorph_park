@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { SECURITY_COLORS } from '../../constants/gameConstants';
+import { securityColors } from '../../constants/gameConstants';
 import { Tooltip } from './Tooltip';
 import { Button } from './Button';
+import type { Resources } from '../../types';
 
 type ViewMode = 'compact' | 'detailed' | 'trends';
 
@@ -53,13 +54,22 @@ export function SmartResourceDisplay() {
       <div className="p-3">
         {viewMode === 'compact' && <CompactView resources={resources} formatNumber={formatNumber} />}
         {viewMode === 'detailed' && <DetailedView resources={resources} />}
-        {viewMode === 'trends' && <TrendsView resources={resources} />}
+        {viewMode === 'trends' && <TrendsView resources={resources} formatNumber={formatNumber} />}
       </div>
     </div>
   );
 }
 
-function CompactView({ resources, formatNumber }: any) {
+type CompactViewProps = {
+  resources: Resources;
+  formatNumber: (num: number) => string;
+};
+
+type DetailedViewProps = {
+  resources: Resources;
+};
+
+function CompactView({ resources, formatNumber }: CompactViewProps) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
 
   return (
@@ -105,7 +115,7 @@ function CompactView({ resources, formatNumber }: any) {
   );
 }
 
-function DetailedView({ resources }: any) {
+function DetailedView({ resources }: DetailedViewProps) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
 
   return (
@@ -149,7 +159,7 @@ function DetailedView({ resources }: any) {
           </div>
           <div>
             <span className="text-slate-400">Security:</span>
-            <span className={`ml-2 font-mono ${SECURITY_COLORS[resources.security]}`}>
+            <span className={`ml-2 font-mono ${securityColors[resources.security]}`}>
               {resources.security}
             </span>
           </div>
@@ -167,7 +177,7 @@ function DetailedView({ resources }: any) {
   );
 }
 
-function TrendsView({ resources }: any) {
+function TrendsView({ resources, formatNumber }: CompactViewProps) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
   const powerUtilization = Math.round((resources.power / resources.maxPower) * 100);
   const visitorCapacity = Math.round((resources.visitors / resources.maxVisitors) * 100);

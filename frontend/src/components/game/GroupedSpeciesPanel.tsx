@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { XENOMORPH_SPECIES } from '../../data/gameData';
-import { DANGER_LEVEL_COLORS } from '../../constants/gameConstants';
+import { xenomorphSpecies } from '../../data/gameData';
+import { dangerLevelColors } from '../../constants/gameConstants';
 import { XenomorphSpecies } from '../../types';
 import { CollapsiblePanel } from '../ui/CollapsiblePanel';
 import { Button } from '../ui/Button';
@@ -95,7 +95,7 @@ export function GroupedSpeciesPanel() {
     ];
 
     // Categorize all species
-    XENOMORPH_SPECIES.forEach(species => {
+    xenomorphSpecies.forEach(species => {
       const category = categorizeSpecies(species);
       const group = groups.find(g => g.category === category);
       if (group) {
@@ -139,11 +139,11 @@ export function GroupedSpeciesPanel() {
   };
 
   const getDangerLevelColor = (level: number) => {
-    return DANGER_LEVEL_COLORS[level as keyof typeof DANGER_LEVEL_COLORS] || 'text-red-600';
+    return dangerLevelColors[level as keyof typeof dangerLevelColors] || 'text-red-600';
   };
 
   const groups = groupSpecies();
-  const totalAvailable = XENOMORPH_SPECIES.filter(s => isResearched(s) || isAvailable(s)).length;
+  const totalAvailable = xenomorphSpecies.filter(s => isResearched(s) || isAvailable(s)).length;
 
   return (
     <div className="space-y-3">
@@ -151,7 +151,7 @@ export function GroupedSpeciesPanel() {
       <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-3">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h3 className="text-green-400 font-bold text-lg glow">
-            Xenomorph Species ({totalAvailable}/{XENOMORPH_SPECIES.length})
+            Xenomorph Species ({totalAvailable}/{xenomorphSpecies.length})
           </h3>
           <div className="flex gap-1">
             <Button

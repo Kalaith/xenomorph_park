@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { FACILITY_DEFINITIONS } from '../../data/gameData';
+import { facilityDefinitions } from '../../data/gameData';
 import { FacilityDefinition } from '../../types';
 import { CollapsiblePanel } from '../ui/CollapsiblePanel';
 import { Button } from '../ui/Button';
@@ -98,7 +98,7 @@ export function GroupedFacilityPanel() {
     ];
 
     // Categorize all facilities
-    FACILITY_DEFINITIONS.forEach(facility => {
+    facilityDefinitions.forEach(facility => {
       const category = categorizeFacility(facility);
       const group = groups.find(g => g.category === category);
       if (group) {
@@ -141,7 +141,7 @@ export function GroupedFacilityPanel() {
   };
 
   const groups = groupFacilities();
-  const totalAffordable = FACILITY_DEFINITIONS.filter(f => canAfford(f)).length;
+  const totalAffordable = facilityDefinitions.filter(f => canAfford(f)).length;
 
   return (
     <div className="space-y-3">
@@ -149,7 +149,7 @@ export function GroupedFacilityPanel() {
       <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-3">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h3 className="text-green-400 font-bold text-lg glow">
-            Facilities ({totalAffordable}/{FACILITY_DEFINITIONS.length} affordable)
+            Facilities ({totalAffordable}/{facilityDefinitions.length} affordable)
           </h3>
           <div className="flex gap-1">
             <Button

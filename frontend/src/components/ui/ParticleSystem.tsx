@@ -151,7 +151,7 @@ export function ParticleSystem({
 }
 
 // Predefined particle configurations
-export const PARTICLE_CONFIGS = {
+export const particleConfigs = {
   containmentBreach: {
     particleCount: 50,
     particleLifespan: 120,
@@ -225,19 +225,19 @@ export function useParticles() {
 
   // Convenience methods for common effects
   const triggerContainmentBreach = (position: { x: number; y: number }) => {
-    addParticleEffect(position, PARTICLE_CONFIGS.containmentBreach, 4000);
+    addParticleEffect(position, particleConfigs.containmentBreach, 4000);
   };
 
   const triggerExplosion = (position: { x: number; y: number }) => {
-    addParticleEffect(position, PARTICLE_CONFIGS.explosion, 2500);
+    addParticleEffect(position, particleConfigs.explosion, 2500);
   };
 
   const triggerSparks = (position: { x: number; y: number }) => {
-    addParticleEffect(position, PARTICLE_CONFIGS.sparks, 2000);
+    addParticleEffect(position, particleConfigs.sparks, 2000);
   };
 
   const triggerSmoke = (position: { x: number; y: number }) => {
-    addParticleEffect(position, PARTICLE_CONFIGS.smoke, 5000);
+    addParticleEffect(position, particleConfigs.smoke, 5000);
   };
 
   return {

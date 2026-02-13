@@ -233,7 +233,7 @@ export function FeedbackButton({
   error = false,
   disabled = false,
   ...props 
-}: {
+}: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> & {
   children: React.ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'secondary' | 'danger';
@@ -241,7 +241,6 @@ export function FeedbackButton({
   success?: boolean;
   error?: boolean;
   disabled?: boolean;
-  [key: string]: any;
 }) {
   const [isClicked, setIsClicked] = useState(false);
 

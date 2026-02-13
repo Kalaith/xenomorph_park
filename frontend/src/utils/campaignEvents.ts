@@ -1,4 +1,6 @@
 import { useGameStore } from '../stores/gameStore';
+import type { GameState } from '../types';
+import type { CampaignScenario } from '../components/game/CampaignMode';
 
 export interface CampaignEvent {
   id: string;
@@ -14,7 +16,7 @@ export interface CampaignEvent {
 
 export interface EventTrigger {
   type: 'time' | 'resource' | 'facility' | 'species' | 'random' | 'objective';
-  condition: any;
+  condition: unknown;
   probability?: number;
 }
 
@@ -29,13 +31,13 @@ export interface EventChoice {
 
 export interface EventConsequence {
   type: 'resource' | 'facility' | 'species' | 'story' | 'objective' | 'crisis';
-  effect: any;
+  effect: unknown;
   description: string;
 }
 
 export interface EventRequirement {
   type: 'resource' | 'facility' | 'research' | 'species';
-  condition: any;
+  condition: unknown;
 }
 
 class CampaignEventManager {
@@ -387,7 +389,7 @@ class CampaignEventManager {
     ];
   }
 
-  public checkForEvents(gameState: any): CampaignEvent | null {
+  public checkForEvents(gameState: GameState): CampaignEvent | null {
     const now = Date.now();
     if (now - this.lastEventCheck < this.EVENT_CHECK_INTERVAL) {
       return null;
@@ -435,29 +437,30 @@ class CampaignEventManager {
     return null;
   }
 
-  private checkTriggerCondition(trigger: EventTrigger, gameState: any): boolean {
+  private checkTriggerCondition(trigger: EventTrigger, gameState: GameState): boolean {
     switch (trigger.type) {
       case 'time':
-        return gameState.day >= trigger.condition.day;
+        return gameState.day >= (trigger.condition as { day: number }).day;
 
       case 'resource':
-        return Object.entries(trigger.condition).every(([resource, value]) => {
-          return gameState.resources[resource] >= value;
+        return Object.entries(trigger.condition as Record<string, number>).every(([resource, value]) => {
+          const current = (gameState.resources as Record<string, number>)[resource] ?? 0;
+          return current >= value;
         });
 
       case 'facility':
-        if (trigger.condition.minFacilities) {
-          return gameState.facilities.length >= trigger.condition.minFacilities;
+        if ((trigger.condition as { minFacilities?: number }).minFacilities) {
+          return gameState.facilities.length >= (trigger.condition as { minFacilities: number }).minFacilities;
         }
-        if (trigger.condition.hasType) {
-          return gameState.facilities.some((f: any) => f.name === trigger.condition.hasType);
+        if ((trigger.condition as { hasType?: string }).hasType) {
+          return gameState.facilities.some((f) => f.name === (trigger.condition as { hasType: string }).hasType);
         }
         return false;
 
       case 'species':
-        if (trigger.condition.minSpecies) {
-          const uniqueSpecies = new Set(gameState.xenomorphs.map((x: any) => x.species.name));
-          return uniqueSpecies.size >= trigger.condition.minSpecies;
+        if ((trigger.condition as { minSpecies?: number }).minSpecies) {
+          const uniqueSpecies = new Set(gameState.xenomorphs.map((x) => x.species.name));
+          return uniqueSpecies.size >= (trigger.condition as { minSpecies: number }).minSpecies;
         }
         return false;
 
@@ -468,8 +471,9 @@ class CampaignEventManager {
       {
         const progress = localStorage.getItem('campaign-objective-progress');
         if (!progress) return false;
-        const completedObjectives = JSON.parse(progress);
-        return completedObjectives.includes(trigger.condition.objectiveId);
+        const completedObjectives = JSON.parse(progress) as unknown;
+        if (!Array.isArray(completedObjectives)) return false;
+        return completedObjectives.includes((trigger.condition as { objectiveId: string }).objectiveId);
       }
 
       default:
@@ -492,20 +496,21 @@ class CampaignEventManager {
     choice.consequences.forEach(consequence => {
       switch (consequence.type) {
         case 'resource': {
-          const resourceUpdates: any = {};
-          Object.entries(consequence.effect).forEach(([resource, value]) => {
-            const currentValue = gameStore.resources[resource] || 0;
-            resourceUpdates[resource] = currentValue + (value as number);
+          const resourceUpdates: Partial<GameState['resources']> = {};
+          Object.entries(consequence.effect as Record<string, number>).forEach(([resource, value]) => {
+            const currentValue = (gameStore.resources as Record<string, number>)[resource] ?? 0;
+            (resourceUpdates as Record<string, number>)[resource] = currentValue + value;
           });
           gameStore.updateResources(resourceUpdates);
           break;
         }
 
         case 'species':
-          if (consequence.effect.unlock) {
+          if ((consequence.effect as { unlock?: string }).unlock) {
             const research = gameStore.research;
-            if (!research.completed.includes(consequence.effect.unlock)) {
-              research.completed.push(consequence.effect.unlock);
+            const unlockId = (consequence.effect as { unlock: string }).unlock;
+            if (!research.completed.includes(unlockId)) {
+              research.completed.push(unlockId);
             }
           }
           break;
@@ -513,8 +518,8 @@ class CampaignEventManager {
         case 'story': {
           // Store story flags for future reference
           const storyFlags = JSON.parse(localStorage.getItem('campaign-story-flags') || '{}');
-          if (consequence.effect.flag) {
-            storyFlags[consequence.effect.flag] = true;
+          if ((consequence.effect as { flag?: string }).flag) {
+            storyFlags[(consequence.effect as { flag: string }).flag] = true;
             localStorage.setItem('campaign-story-flags', JSON.stringify(storyFlags));
           }
           break;
@@ -540,34 +545,35 @@ class CampaignEventManager {
     );
   }
 
-  public isChoiceAvailable(choice: EventChoice, gameState: any): boolean {
+  public isChoiceAvailable(choice: EventChoice, gameState: GameState): boolean {
     if (!choice.requirements) return true;
 
     return choice.requirements.every(req => {
       switch (req.type) {
         case 'resource':
-          return Object.entries(req.condition).every(([resource, value]) => {
-            return gameState.resources[resource] >= value;
+          return Object.entries(req.condition as Record<string, number>).every(([resource, value]) => {
+            const current = (gameState.resources as Record<string, number>)[resource] ?? 0;
+            return current >= value;
           });
 
         case 'facility':
-          if (req.condition.hasType) {
-            return gameState.facilities.some((f: any) => f.name === req.condition.hasType);
+          if ((req.condition as { hasType?: string }).hasType) {
+            return gameState.facilities.some((f) => f.name === (req.condition as { hasType: string }).hasType);
           }
           return false;
 
         case 'research':
-          if (req.condition.completed) {
-            return req.condition.completed.every((research: string) =>
+          if ((req.condition as { completed?: string[] }).completed) {
+            return (req.condition as { completed: string[] }).completed.every((research: string) =>
               gameState.research.completed.includes(research)
             );
           }
           return false;
 
         case 'species':
-          if (req.condition.minSpecies) {
-            const uniqueSpecies = new Set(gameState.xenomorphs.map((x: any) => x.species.name));
-            return uniqueSpecies.size >= req.condition.minSpecies;
+          if ((req.condition as { minSpecies?: number }).minSpecies) {
+            const uniqueSpecies = new Set(gameState.xenomorphs.map((x) => x.species.name));
+            return uniqueSpecies.size >= (req.condition as { minSpecies: number }).minSpecies;
           }
           return false;
 
@@ -577,10 +583,10 @@ class CampaignEventManager {
     });
   }
 
-  private getCurrentScenario(): any {
+  private getCurrentScenario(): CampaignScenario | null {
     try {
       const scenarioData = localStorage.getItem('current-campaign-scenario');
-      return scenarioData ? JSON.parse(scenarioData) : null;
+      return scenarioData ? (JSON.parse(scenarioData) as CampaignScenario) : null;
     } catch {
       return null;
     }

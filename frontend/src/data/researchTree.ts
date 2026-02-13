@@ -28,7 +28,7 @@ export interface ResearchNode {
   progress: number; // 0-100
 }
 
-export const RESEARCH_TREE: ResearchNode[] = [
+export const researchTree: ResearchNode[] = [
   // TIER 1 - Basic Research
   {
     id: 'xenobiology_basics',
@@ -395,7 +395,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
   }
 ];
 
-export const RESEARCH_CATEGORIES = {
+export const researchCategories = {
   basic: { name: 'Basic Research', color: 'text-green-400', bgColor: 'bg-green-400/20' },
   biology: { name: 'Biology', color: 'text-blue-400', bgColor: 'bg-blue-400/20' },
   containment: { name: 'Containment', color: 'text-orange-400', bgColor: 'bg-orange-400/20' },

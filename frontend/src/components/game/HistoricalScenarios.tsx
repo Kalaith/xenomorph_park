@@ -55,7 +55,7 @@ export interface HistoricalObjective {
   storyContext: string;
 }
 
-const HISTORICAL_SCENARIOS: HistoricalScenario[] = [
+const historicalScenarios: HistoricalScenario[] = [
   {
     id: 'nostromo_encounter',
     name: 'The Nostromo Incident',
@@ -576,12 +576,12 @@ export function HistoricalScenarios({ isOpen, onClose }: HistoricalScenariosProp
           <div className="flex items-center gap-4">
             <div className="text-sm">
               <span className="text-slate-400">Completed:</span>
-              <span className="text-green-400 ml-2">{completedScenarios.length}/{HISTORICAL_SCENARIOS.length}</span>
+              <span className="text-green-400 ml-2">{completedScenarios.length}/{historicalScenarios.length}</span>
             </div>
             <div className="flex-1 bg-slate-700 rounded-full h-2">
               <div
                 className="bg-green-400 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(completedScenarios.length / HISTORICAL_SCENARIOS.length) * 100}%` }}
+                style={{ width: `${(completedScenarios.length / historicalScenarios.length) * 100}%` }}
               />
             </div>
           </div>
@@ -589,7 +589,7 @@ export function HistoricalScenarios({ isOpen, onClose }: HistoricalScenariosProp
 
         {/* Scenario List */}
         <div className="grid grid-cols-1 gap-4">
-          {HISTORICAL_SCENARIOS.map(scenario => (
+          {historicalScenarios.map(scenario => (
             <ScenarioCard key={scenario.id} scenario={scenario} />
           ))}
         </div>

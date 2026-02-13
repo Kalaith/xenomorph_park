@@ -126,7 +126,7 @@ class CampaignSaveManager {
   public saveCampaign(
     scenarioId: string,
     gameState: GameState,
-    objectives: any,
+    objectives: CampaignSaveData['objectives'],
     playerNotes?: string
   ): boolean {
     try {
@@ -318,25 +318,25 @@ class CampaignSaveManager {
     }
   }
 
-  private getCurrentScenario(): any {
+  private getCurrentScenario(): CampaignScenario | null {
     try {
       const scenarioData = localStorage.getItem('current-campaign-scenario');
-      return scenarioData ? JSON.parse(scenarioData) : null;
+      return scenarioData ? (JSON.parse(scenarioData) as CampaignScenario) : null;
     } catch {
       return null;
     }
   }
 
-  private getCurrentObjectiveProgress(): any {
+  private getCurrentObjectiveProgress(): CampaignSaveData['objectives'] {
     try {
       const progressData = localStorage.getItem('campaign-objective-progress');
-      return progressData ? JSON.parse(progressData) : {};
+      return progressData ? (JSON.parse(progressData) as CampaignSaveData['objectives']) : {};
     } catch {
       return {};
     }
   }
 
-  private getCurrentSessionData(): any {
+  private getCurrentSessionData(): CampaignSaveData['sessionData'] {
     try {
       const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) {

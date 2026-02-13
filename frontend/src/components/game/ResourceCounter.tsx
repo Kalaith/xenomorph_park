@@ -1,5 +1,5 @@
 import { useGameStore } from '../../stores/gameStore';
-import { SECURITY_COLORS } from '../../constants/gameConstants';
+import { securityColors } from '../../constants/gameConstants';
 import { Tooltip, TooltipContent } from '../ui/Tooltip';
 
 export function ResourceCounter() {
@@ -97,7 +97,7 @@ export function ResourceCounter() {
               title="Security Level"
               description="Determines containment effectiveness and emergency response capabilities"
               stats={[
-                { label: 'Current Level', value: resources.security, color: SECURITY_COLORS[resources.security] },
+                { label: 'Current Level', value: resources.security, color: securityColors[resources.security] },
                 { label: 'Status', value: resources.security === 'Maximum' ? 'All systems operational' : 'Can be improved' },
               ]}
               actions={[
@@ -112,7 +112,7 @@ export function ResourceCounter() {
             <span className="text-orange-400 text-lg">🛡️</span>
             <div>
               <div className="text-green-400 font-mono">Security</div>
-              <div className={`font-bold ${SECURITY_COLORS[resources.security]}`}>
+              <div className={`font-bold ${securityColors[resources.security]}`}>
                 {resources.security}
               </div>
             </div>

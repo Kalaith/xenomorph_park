@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
-import { GAME_CONSTANTS } from '../constants/gameConstants';
-import { RESEARCH_TREE } from '../data/researchTree';
+import { gameConstants } from '../constants/gameConstants';
+import { researchTree } from '../data/researchTree';
 import { saveManager } from '../utils/saveManager';
 
 const initialState: GameState = {
@@ -11,12 +11,12 @@ const initialState: GameState = {
   hour: 9,
   tick: 0,
   resources: {
-    credits: GAME_CONSTANTS.STARTING_CREDITS,
-    power: GAME_CONSTANTS.STARTING_POWER,
-    maxPower: GAME_CONSTANTS.STARTING_MAX_POWER,
-    research: GAME_CONSTANTS.STARTING_RESEARCH,
-    security: GAME_CONSTANTS.STARTING_SECURITY,
-    visitors: GAME_CONSTANTS.STARTING_VISITORS,
+    credits: gameConstants.STARTING_CREDITS,
+    power: gameConstants.STARTING_POWER,
+    maxPower: gameConstants.STARTING_MAX_POWER,
+    research: gameConstants.STARTING_RESEARCH,
+    security: gameConstants.STARTING_SECURITY,
+    visitors: gameConstants.STARTING_VISITORS,
     maxVisitors: 50,
     dailyRevenue: 0,
     dailyExpenses: 0,
@@ -329,11 +329,11 @@ export const useGameStore = create<GameStore>()(
           let newHour = state.hour;
           let newDay = state.day;
 
-          if (newTick >= GAME_CONSTANTS.TICKS_PER_HOUR) {
+          if (newTick >= gameConstants.TICKS_PER_HOUR) {
             newTick = 0;
             newHour++;
 
-            if (newHour >= GAME_CONSTANTS.HOURS_PER_DAY) {
+            if (newHour >= gameConstants.HOURS_PER_DAY) {
               newHour = 0;
               newDay++;
 
@@ -364,14 +364,14 @@ export const useGameStore = create<GameStore>()(
           const totalAttractionValue = state.xenomorphs.reduce((sum, x) => sum + x.species.dangerLevel, 0);
 
           // Calculate visitor flow based on time of day
-          let flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_NIGHT;
-          if (state.hour >= 6 && state.hour < 12) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_MORNING;
-          else if (state.hour >= 12 && state.hour < 18) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_AFTERNOON;
-          else if (state.hour >= 18 && state.hour < 22) flowMultiplier = GAME_CONSTANTS.VISITOR_FLOW_EVENING;
+          let flowMultiplier = gameConstants.VISITOR_FLOW_NIGHT;
+          if (state.hour >= 6 && state.hour < 12) flowMultiplier = gameConstants.VISITOR_FLOW_MORNING;
+          else if (state.hour >= 12 && state.hour < 18) flowMultiplier = gameConstants.VISITOR_FLOW_AFTERNOON;
+          else if (state.hour >= 18 && state.hour < 22) flowMultiplier = gameConstants.VISITOR_FLOW_EVENING;
 
           // Calculate new visitors
-          const maxNewVisitors = Math.floor(GAME_CONSTANTS.MAX_VISITORS_PER_TICK * flowMultiplier);
-          const baseVisitorCapacity = visitorCenters * GAME_CONSTANTS.VISITORS_PER_FACILITY + 10;
+          const maxNewVisitors = Math.floor(gameConstants.MAX_VISITORS_PER_TICK * flowMultiplier);
+          const baseVisitorCapacity = visitorCenters * gameConstants.VISITORS_PER_FACILITY + 10;
           const attractionBonus = Math.floor(totalAttractionValue * 0.5);
           const newVisitorCount = Math.min(
             state.resources.visitors + Math.random() * maxNewVisitors,
@@ -379,13 +379,13 @@ export const useGameStore = create<GameStore>()(
           );
 
           // Calculate revenue
-          const admissionRevenue = (newVisitorCount - state.resources.visitors) * GAME_CONSTANTS.BASE_ADMISSION_PRICE;
+          const admissionRevenue = (newVisitorCount - state.resources.visitors) * gameConstants.BASE_ADMISSION_PRICE;
           const attractionRevenue = state.resources.visitors * totalAttractionValue * 0.1;
           const totalRevenue = admissionRevenue + attractionRevenue;
 
           // Calculate expenses
-          const facilityMaintenance = state.facilities.length * GAME_CONSTANTS.FACILITY_MAINTENANCE_COST;
-          const xenomorphFeeding = state.xenomorphs.length * GAME_CONSTANTS.XENOMORPH_FOOD_COST;
+          const facilityMaintenance = state.facilities.length * gameConstants.FACILITY_MAINTENANCE_COST;
+          const xenomorphFeeding = state.xenomorphs.length * gameConstants.XENOMORPH_FOOD_COST;
           const totalExpenses = facilityMaintenance + xenomorphFeeding;
 
           return {
@@ -420,7 +420,7 @@ export const useGameStore = create<GameStore>()(
 
         // Research tree management
         startResearchNode: (nodeId) => set((state) => {
-          const nodeData = RESEARCH_TREE.find((n: any) => n.id === nodeId);
+          const nodeData = researchTree.find((n) => n.id === nodeId);
 
           if (!nodeData) return state;
 
@@ -487,11 +487,11 @@ export const useGameStore = create<GameStore>()(
 
           // Generate research points from research labs
           const researchLabs = state.facilities.filter(f => f.name === 'Research Lab').length;
-          newResearchPoints += researchLabs * GAME_CONSTANTS.RESEARCH_POINTS_PER_TICK;
+          newResearchPoints += researchLabs * gameConstants.RESEARCH_POINTS_PER_TICK;
 
           Object.entries(updatedTree).forEach(([nodeId, nodeData]) => {
             if (nodeData.inProgress && nodeData.startedAt) {
-              const nodeConfig = RESEARCH_TREE.find((n: any) => n.id === nodeId);
+              const nodeConfig = researchTree.find((n) => n.id === nodeId);
               if (!nodeConfig) return;
 
               // Calculate progress based on time
@@ -633,17 +633,27 @@ export const useGameStore = create<GameStore>()(
       {
         name: 'xenomorph-park-game',
         version: 1,
-        migrate: (persistedState: any) => {
+        migrate: (persistedState: unknown) => {
           // Handle migration for research.available field
-          if (persistedState && persistedState.research) {
-            if (!persistedState.research.available) {
-              persistedState.research.available = ['Drone'];
+          if (!persistedState || typeof persistedState !== 'object') return persistedState;
+
+          type PersistedState = Record<string, unknown> & {
+            research?: {
+              available?: string[];
+              researchTree?: Record<string, unknown>;
+            };
+          };
+
+          const next = persistedState as PersistedState;
+          if (next.research) {
+            if (!next.research.available) {
+              next.research.available = ['Drone'];
             }
-            if (!persistedState.research.researchTree) {
-              persistedState.research.researchTree = {};
+            if (!next.research.researchTree) {
+              next.research.researchTree = {};
             }
           }
-          return persistedState;
+          return next;
         },
         partialize: (state) => ({
           // Only persist certain parts of the state
