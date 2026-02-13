@@ -1,3 +1,4 @@
+
 import { useGameStore } from "../stores/gameStore";
 import { CampaignScenario } from "../components/game/CampaignMode";
 
@@ -44,7 +45,7 @@ class CampaignRewardManager {
     return CampaignRewardManager.instance;
   }
 
-  private getProgress(): CampaignProgress {
+  public getProgress(): CampaignProgress {
     const saved = localStorage.getItem("xenomorph-park-campaign-full-progress");
     if (saved) {
       return JSON.parse(saved);

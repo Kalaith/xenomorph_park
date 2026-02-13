@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { Modal } from "../ui/Modal";
@@ -314,32 +315,38 @@ export function AchievementSystem({ isOpen, onClose }: AchievementSystemProps) {
         switch (achievement.requirements.type) {
           case "facility_count":
             currentProgress = facilities.length;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "research_complete":
             currentProgress = research.completed.length;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "xenomorph_count":
             currentProgress = xenomorphs.length;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "credits":
             currentProgress = resources.credits;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "visitors":
             currentProgress = resources.visitors;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "days_survived":
             currentProgress = day;
-            shouldUnlock = currentProgress >= achievement.requirements.target;
+            shouldUnlock =
+              currentProgress >= Number(achievement.requirements.target);
             break;
 
           case "custom":

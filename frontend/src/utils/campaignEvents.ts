@@ -1,3 +1,4 @@
+
 import { useGameStore } from "../stores/gameStore";
 import type { GameState } from "../types";
 import type { CampaignScenario } from "../components/game/CampaignMode";
@@ -16,7 +17,7 @@ export interface CampaignEvent {
 
 export interface EventTrigger {
   type: "time" | "resource" | "facility" | "species" | "random" | "objective";
-  condition: unknown;
+  condition: Record<string, any>;
   probability?: number;
 }
 
@@ -31,13 +32,13 @@ export interface EventChoice {
 
 export interface EventConsequence {
   type: "resource" | "facility" | "species" | "story" | "objective" | "crisis";
-  effect: unknown;
+  effect: Record<string, any>;
   description: string;
 }
 
 export interface EventRequirement {
   type: "resource" | "facility" | "research" | "species";
-  condition: unknown;
+  condition: Record<string, any>;
 }
 
 class CampaignEventManager {
@@ -476,7 +477,9 @@ class CampaignEventManager {
           trigger.condition as Record<string, number>,
         ).every(([resource, value]) => {
           const current =
-            (gameState.resources as Record<string, number>)[resource] ?? 0;
+            (gameState.resources as unknown as Record<string, number>)[
+              resource
+            ] ?? 0;
           return current >= value;
         });
 
@@ -547,7 +550,9 @@ class CampaignEventManager {
           Object.entries(consequence.effect as Record<string, number>).forEach(
             ([resource, value]) => {
               const currentValue =
-                (gameStore.resources as Record<string, number>)[resource] ?? 0;
+                (gameStore.resources as unknown as Record<string, number>)[
+                  resource
+                ] ?? 0;
               (resourceUpdates as Record<string, number>)[resource] =
                 currentValue + value;
             },
@@ -610,7 +615,9 @@ class CampaignEventManager {
           return Object.entries(req.condition as Record<string, number>).every(
             ([resource, value]) => {
               const current =
-                (gameState.resources as Record<string, number>)[resource] ?? 0;
+                (gameState.resources as unknown as Record<string, number>)[
+                  resource
+                ] ?? 0;
               return current >= value;
             },
           );

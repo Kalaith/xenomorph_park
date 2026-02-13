@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { Modal } from "../ui/Modal";
@@ -772,3 +773,4 @@ export function HistoricalScenarios({
     </Modal>
   );
 }
+

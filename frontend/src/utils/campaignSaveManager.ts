@@ -1,3 +1,4 @@
+
 import { GameState } from "../types";
 import { CampaignScenario } from "../components/game/CampaignMode";
 
@@ -33,7 +34,13 @@ export interface CampaignCheckpoint {
   id: string;
   timestamp: number;
   gameState: Partial<GameState>;
-  objectiveProgress: { [objectiveId: string]: number };
+  objectiveProgress: {
+    [objectiveId: string]: {
+      completed: boolean;
+      progress: number;
+      completedAt?: number;
+    };
+  };
   description: string;
   automatic: boolean; // true for auto-saves, false for manual
 }
@@ -42,7 +49,7 @@ class CampaignSaveManager {
   private static instance: CampaignSaveManager;
   private readonly MAX_SAVES_PER_SCENARIO = 5;
   private readonly AUTO_SAVE_INTERVAL = 5 * 60 * 1000; // 5 minutes
-  private autoSaveTimer: NodeJS.Timeout | null = null;
+  private autoSaveTimer: ReturnType<typeof setInterval> | null = null;
 
   public static getInstance(): CampaignSaveManager {
     if (!CampaignSaveManager.instance) {

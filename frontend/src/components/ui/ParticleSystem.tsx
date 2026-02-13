@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Particle {
@@ -42,8 +43,8 @@ export function ParticleSystem({
   onComplete,
 }: ParticleSystemProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
-  const animationRef = useRef<number>();
-  const startTimeRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   const createParticles = useCallback(() => {
     const newParticles: Particle[] = [];

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
@@ -224,7 +225,7 @@ export function AccessibleField({
       </label>
 
       <div>
-        {React.cloneElement(children as React.ReactElement, {
+        {React.cloneElement(children as React.ReactElement<any>, {
           id: fieldId,
           "aria-describedby":
             [errorId, hintId].filter(Boolean).join(" ") || undefined,

@@ -6,9 +6,10 @@ interface ButtonProps {
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   disabled?: boolean;
+  title?: string;
   children: ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: (event?: unknown) => void;
   type?: "button" | "submit" | "reset";
   as?: "button" | "span";
 }
@@ -38,6 +39,7 @@ export function Button({
   disabled = false,
   children,
   className = "",
+  title,
   onClick,
   type = "button",
   as = "button",
@@ -55,6 +57,7 @@ export function Button({
       ${className}
     `,
     onClick: isDisabled ? undefined : onClick,
+    title,
   };
 
   const content = loading ? (

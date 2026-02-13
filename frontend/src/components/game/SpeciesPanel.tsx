@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { xenomorphSpecies } from "../../data/gameData";
@@ -117,3 +118,4 @@ export function SpeciesPanel() {
     </div>
   );
 }
+

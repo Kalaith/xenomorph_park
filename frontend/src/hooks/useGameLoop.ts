@@ -1,10 +1,13 @@
+
 import { useEffect, useRef } from "react";
 import { useGameStore } from "../stores/gameStore";
 import { gameConstants } from "../constants/gameConstants";
 
 export function useGameLoop() {
-  const { gameTick, paused, mode } = useGameStore();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const gameTick = useGameStore((s) => s.gameTick);
+  const paused = useGameStore((s) => s.paused);
+  const mode = useGameStore((s) => s.mode);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!paused && mode === "building") {

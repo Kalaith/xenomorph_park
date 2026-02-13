@@ -1,4 +1,5 @@
-import { useState, ReactNode } from "react";
+
+import { useState, ReactNode, MouseEvent } from "react";
 import { Button } from "./Button";
 
 interface CollapsiblePanelProps {
@@ -54,7 +55,7 @@ export function CollapsiblePanel({
               variant={action.variant || "outline"}
               size="sm"
               onClick={(e) => {
-                e.stopPropagation(); // Prevent panel toggle
+                (e as MouseEvent).stopPropagation(); // Prevent panel toggle
                 action.onClick();
               }}
               className="text-xs flex items-center gap-1"

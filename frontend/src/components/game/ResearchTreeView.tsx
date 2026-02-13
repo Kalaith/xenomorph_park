@@ -1,9 +1,10 @@
+
 import React, { useState, useRef } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import {
-  researchTree,
+  researchTree as researchTreeData,
   researchCategories,
   updateResearchAvailability,
   ResearchNode,
@@ -270,7 +271,9 @@ function ResearchNodeDetailModal({
             <h4 className="font-semibold mb-2">Prerequisites</h4>
             <ul className="space-y-1">
               {node.prerequisites.map((prereqId) => {
-                const prereqNode = researchTree.find((n) => n.id === prereqId);
+                const prereqNode = researchTreeData.find(
+                  (n) => n.id === prereqId,
+                );
                 const prereqCompleted =
                   research.researchTree[prereqId]?.completed || false;
                 return (
@@ -381,7 +384,7 @@ export function ResearchTreeView({ isOpen, onClose }: ResearchTreeViewProps) {
 
   // Update research tree with current progress
   const researchTree = updateResearchAvailability(
-    researchTree.map((node) => ({
+    researchTreeData.map((node) => ({
       ...node,
       completed: research.researchTree[node.id]?.completed || false,
       inProgress: research.researchTree[node.id]?.inProgress || false,

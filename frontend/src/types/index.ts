@@ -9,7 +9,7 @@ export interface GameAction {
     | "REMOVE_XENOMORPH"
     | "MODIFY_RESOURCES";
   timestamp: number;
-  data: unknown;
+  data: any;
   previousState?: Partial<GameState>;
 }
 
@@ -21,6 +21,7 @@ export interface UndoRedoState {
 
 // Core game types
 export interface GameState {
+  mode: "building" | "scenario" | "paused" | "horror";
   paused: boolean;
   day: number;
   hour: number;
@@ -52,6 +53,7 @@ export type SecurityLevel = "Low" | "Medium" | "High" | "Maximum";
 export interface PlacedFacility {
   id: string;
   name: string;
+  species?: XenomorphSpecies;
   position: GridPosition;
   cost: number;
   powerRequirement: number;
@@ -60,6 +62,8 @@ export interface PlacedFacility {
 
 export interface PlacedXenomorph {
   id: string;
+  name?: string;
+  cost?: number;
   species: XenomorphSpecies;
   position: GridPosition;
   containmentLevel: number;
@@ -172,6 +176,7 @@ export interface StatusMessage {
 export interface GameStore extends GameState {
   // Actions
   togglePause: () => void;
+  setMode: (mode: GameState["mode"]) => void;
   updateResources: (resources: Partial<Resources>) => void;
   placeFacility: (facility: FacilityDefinition, position: GridPosition) => void;
   placeXenomorph: (species: XenomorphSpecies, position: GridPosition) => void;

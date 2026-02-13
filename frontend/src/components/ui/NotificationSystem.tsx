@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { StatusMessage } from "../../types";
 
@@ -208,7 +209,7 @@ export function NotificationSystem({
       </div>
 
       {/* CSS for progress bar animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes shrink {
           from {
             width: 100%;

@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { gameConstants } from "../../constants/gameConstants";
@@ -612,7 +613,9 @@ export function GameGrid() {
               cellContent.content &&
               "name" in cellContent.content && (
                 <Tooltip
-                  content={getFacilityTooltipContent(cellContent.content)}
+                  content={getFacilityTooltipContent(
+                    cellContent.content as PlacedFacility,
+                  )}
                   rich={true}
                   position="auto"
                   delay={300}
@@ -632,7 +635,9 @@ export function GameGrid() {
               cellContent.content &&
               "species" in cellContent.content && (
                 <Tooltip
-                  content={getXenomorphTooltipContent(cellContent.content)}
+                  content={getXenomorphTooltipContent(
+                    cellContent.content as PlacedXenomorph,
+                  )}
                   rich={true}
                   position="auto"
                   delay={300}

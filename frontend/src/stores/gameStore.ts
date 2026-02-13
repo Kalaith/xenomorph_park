@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import {
@@ -11,6 +12,7 @@ import { researchTree } from "../data/researchTree";
 import { saveManager } from "../utils/saveManager";
 
 const initialState: GameState = {
+  mode: "building",
   paused: false,
   day: 1,
   hour: 9,
@@ -59,6 +61,7 @@ export const useGameStore = create<GameStore>()(
         ...initialState,
 
         // Game management
+        setMode: (mode) => set({ mode }),
         togglePause: () => set((state) => ({ paused: !state.paused })),
 
         // Resource management
@@ -403,7 +406,7 @@ export const useGameStore = create<GameStore>()(
             );
 
             // Calculate visitor flow based on time of day
-            let flowMultiplier = gameConstants.VISITOR_FLOW_NIGHT;
+            let flowMultiplier: number = gameConstants.VISITOR_FLOW_NIGHT;
             if (state.hour >= 6 && state.hour < 12)
               flowMultiplier = gameConstants.VISITOR_FLOW_MORNING;
             else if (state.hour >= 12 && state.hour < 18)

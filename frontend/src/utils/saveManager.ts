@@ -1,3 +1,4 @@
+
 import { GameState } from "../types";
 
 export interface SaveData {
@@ -20,7 +21,7 @@ const maxSaveSlots = 5;
 const autoSaveInterval = 30000; // 30 seconds
 
 export class SaveManager {
-  private autoSaveTimer: NodeJS.Timeout | null = null;
+  private autoSaveTimer: ReturnType<typeof setInterval> | null = null;
   private playStartTime: number = Date.now();
 
   // Save game to specific slot
