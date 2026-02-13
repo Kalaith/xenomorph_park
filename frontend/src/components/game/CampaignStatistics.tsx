@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { campaignRewardManager } from "../../utils/campaignRewards";
 import { campaignEventManager } from "../../utils/campaignEvents";
@@ -46,6 +45,9 @@ export function CampaignStatistics({
     completedScenarios: 0,
   });
   const [selectedTab, setSelectedTab] = useState<TabId>("overview");
+  const scenariosCompleted = statistics.scenariosCompleted ?? 0;
+  const perfectRuns = statistics.perfectRuns ?? 0;
+  const fastestCompletion = statistics.fastestCompletion ?? Infinity;
 
   useEffect(() => {
     if (isOpen) {
@@ -106,8 +108,6 @@ export function CampaignStatistics({
   };
 
   const getPerformanceRating = (): string => {
-    const { perfectRuns, scenariosCompleted } = statistics;
-
     if (perfectRuns >= 3) return "Legendary";
     if (perfectRuns >= 2) return "Master";
     if (scenariosCompleted >= 4) return "Expert";
@@ -236,7 +236,7 @@ export function CampaignStatistics({
                 <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-600">
                   <div className="text-2xl mb-2">⏱️</div>
                   <div className="text-2xl font-bold text-blue-400">
-                    {formatTime(statistics.fastestCompletion)}
+                    {formatTime(fastestCompletion)}
                   </div>
                   <div className="text-sm text-slate-400">Best Time</div>
                 </div>
@@ -468,10 +468,9 @@ export function CampaignStatistics({
                       <div className="flex justify-between mb-1">
                         <span className="text-slate-400">Perfect Run Rate</span>
                         <span className="text-purple-400">
-                          {statistics.scenariosCompleted > 0
+                          {scenariosCompleted > 0
                             ? (
-                                (statistics.perfectRuns /
-                                  statistics.scenariosCompleted) *
+                                (perfectRuns / scenariosCompleted) *
                                 100
                               ).toFixed(1)
                             : 0}
@@ -483,10 +482,8 @@ export function CampaignStatistics({
                           className="bg-purple-400 h-2 rounded-full"
                           style={{
                             width: `${
-                              statistics.scenariosCompleted > 0
-                                ? (statistics.perfectRuns /
-                                    statistics.scenariosCompleted) *
-                                  100
+                              scenariosCompleted > 0
+                                ? (perfectRuns / scenariosCompleted) * 100
                                 : 0
                             }%`,
                           }}
@@ -513,19 +510,18 @@ export function CampaignStatistics({
                       </div>
                     )}
 
-                    {statistics.perfectRuns === 0 &&
-                      statistics.scenariosCompleted > 0 && (
-                        <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded">
-                          <div className="text-purple-400 font-medium">
-                            💎 Aim for Perfect Runs
-                          </div>
-                          <div className="text-slate-400">
-                            Complete all optional objectives for better ratings
-                          </div>
+                    {perfectRuns === 0 && scenariosCompleted > 0 && (
+                      <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded">
+                        <div className="text-purple-400 font-medium">
+                          💎 Aim for Perfect Runs
                         </div>
-                      )}
+                        <div className="text-slate-400">
+                          Complete all optional objectives for better ratings
+                        </div>
+                      </div>
+                    )}
 
-                    {statistics.fastestCompletion === Infinity && (
+                    {fastestCompletion === Infinity && (
                       <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded">
                         <div className="text-yellow-400 font-medium">
                           ⚡ Speed Challenge
@@ -577,4 +573,3 @@ export function CampaignStatistics({
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { Modal } from "../ui/Modal";
@@ -454,4 +453,3 @@ export function useCrisisManager() {
     ),
   };
 }
-

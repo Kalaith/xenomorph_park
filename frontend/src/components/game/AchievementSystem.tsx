@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { Modal } from "../ui/Modal";

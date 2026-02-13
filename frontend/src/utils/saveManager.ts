@@ -1,4 +1,3 @@
-
 import { GameState } from "../types";
 
 export interface SaveData {

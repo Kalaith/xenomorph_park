@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from "react";
 import { useGameStore } from "../../stores/gameStore";
 import { gameConstants } from "../../constants/gameConstants";
@@ -30,6 +29,10 @@ export function GameGrid() {
   type DragItem =
     | { type: "facility"; data: FacilityDefinition | PlacedFacility }
     | { type: "xenomorph"; data: XenomorphSpecies | PlacedXenomorph };
+  type CellContent =
+    | { type: "facility"; content: PlacedFacility }
+    | { type: "xenomorph"; content: PlacedXenomorph }
+    | { type: "empty"; content: null };
 
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const [dragPreview, setDragPreview] = useState<GridPosition | null>(null);
@@ -40,10 +43,10 @@ export function GameGrid() {
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean;
     position: { x: number; y: number };
-    target: {
-      type: "facility" | "xenomorph";
-      data: PlacedFacility | PlacedXenomorph;
-    } | null;
+    target:
+      | { type: "facility"; data: PlacedFacility }
+      | { type: "xenomorph"; data: PlacedXenomorph }
+      | null;
   }>({
     isOpen: false,
     position: { x: 0, y: 0 },
@@ -320,10 +323,10 @@ export function GameGrid() {
     setContextMenu({
       isOpen: true,
       position: { x: e.clientX, y: e.clientY },
-      target: {
-        type: cellContent.type as "facility" | "xenomorph",
-        data: cellContent.content,
-      },
+      target:
+        cellContent.type === "facility"
+          ? { type: "facility", data: cellContent.content }
+          : { type: "xenomorph", data: cellContent.content },
     });
   };
 
@@ -505,7 +508,7 @@ export function GameGrid() {
     );
   };
 
-  const getCellContent = (row: number, col: number) => {
+  const getCellContent = (row: number, col: number): CellContent => {
     const facility = facilities.find(
       (f) => f.position.row === row && f.position.col === col,
     );
@@ -556,6 +559,9 @@ export function GameGrid() {
 
   const renderGrid = () => {
     const cells = [];
+    const getDraggedXenomorphName = (
+      data: XenomorphSpecies | PlacedXenomorph,
+    ): string => ("species" in data ? data.species.name : data.name);
 
     for (let row = 0; row < gridHeight; row++) {
       for (let col = 0; col < gridWidth; col++) {
@@ -609,61 +615,49 @@ export function GameGrid() {
             disabled={isOccupied && !contextMenu.isOpen}
           >
             {/* Regular content */}
-            {cellContent.type === "facility" &&
-              cellContent.content &&
-              "name" in cellContent.content && (
-                <Tooltip
-                  content={getFacilityTooltipContent(
-                    cellContent.content as PlacedFacility,
-                  )}
-                  rich={true}
-                  position="auto"
-                  delay={300}
+            {cellContent.type === "facility" && cellContent.content && (
+              <Tooltip
+                content={getFacilityTooltipContent(cellContent.content)}
+                rich={true}
+                position="auto"
+                delay={300}
+              >
+                <span
+                  draggable={true}
+                  onDragStart={(e) =>
+                    handleDragStart(e, "facility", cellContent.content)
+                  }
+                  className="cursor-move block"
                 >
-                  <span
-                    draggable={true}
-                    onDragStart={(e) =>
-                      handleDragStart(e, "facility", cellContent.content)
-                    }
-                    className="cursor-move block"
-                  >
-                    {getFacilityIcon(cellContent.content.name)}
-                  </span>
-                </Tooltip>
-              )}
-            {cellContent.type === "xenomorph" &&
-              cellContent.content &&
-              "species" in cellContent.content && (
-                <Tooltip
-                  content={getXenomorphTooltipContent(
-                    cellContent.content as PlacedXenomorph,
-                  )}
-                  rich={true}
-                  position="auto"
-                  delay={300}
+                  {getFacilityIcon(cellContent.content.name)}
+                </span>
+              </Tooltip>
+            )}
+            {cellContent.type === "xenomorph" && cellContent.content && (
+              <Tooltip
+                content={getXenomorphTooltipContent(cellContent.content)}
+                rich={true}
+                position="auto"
+                delay={300}
+              >
+                <span
+                  draggable={true}
+                  onDragStart={(e) =>
+                    handleDragStart(e, "xenomorph", cellContent.content)
+                  }
+                  className="cursor-move block"
                 >
-                  <span
-                    draggable={true}
-                    onDragStart={(e) =>
-                      handleDragStart(e, "xenomorph", cellContent.content)
-                    }
-                    className="cursor-move block"
-                  >
-                    {getSpeciesIcon(cellContent.content.species.name)}
-                  </span>
-                </Tooltip>
-              )}
+                  {getSpeciesIcon(cellContent.content.species.name)}
+                </span>
+              </Tooltip>
+            )}
 
             {/* Drag preview content */}
             {isPreview && draggedItem && (
               <span className="opacity-70 animate-pulse">
                 {draggedItem.type === "facility"
                   ? getFacilityIcon(draggedItem.data.name)
-                  : getSpeciesIcon(
-                      "species" in draggedItem.data
-                        ? draggedItem.data.species.name
-                        : draggedItem.data.name,
-                    )}
+                  : getSpeciesIcon(getDraggedXenomorphName(draggedItem.data))}
               </span>
             )}
 
