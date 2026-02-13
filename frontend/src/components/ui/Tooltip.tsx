@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, ReactNode } from 'react';
+import { useState, useRef, useEffect, ReactNode } from "react";
 
 interface TooltipProps {
   content: ReactNode;
   children: ReactNode;
-  position?: 'top' | 'bottom' | 'left' | 'right' | 'auto';
+  position?: "top" | "bottom" | "left" | "right" | "auto";
   delay?: number;
   disabled?: boolean;
   rich?: boolean; // Whether to show rich content
@@ -13,11 +13,11 @@ interface TooltipProps {
 export function Tooltip({
   content,
   children,
-  position = 'auto',
+  position = "auto",
   delay = 500,
   disabled = false,
   rich = false,
-  maxWidth = 300
+  maxWidth = 300,
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState(position);
@@ -62,7 +62,7 @@ export function Tooltip({
 
     let optimalPosition = position;
 
-    if (position === 'auto') {
+    if (position === "auto") {
       // Calculate which position fits best
       const spaceTop = triggerRect.top;
       const spaceBottom = viewport.height - triggerRect.bottom;
@@ -70,15 +70,15 @@ export function Tooltip({
       const spaceRight = viewport.width - triggerRect.right;
 
       if (spaceBottom >= tooltipRect.height) {
-        optimalPosition = 'bottom';
+        optimalPosition = "bottom";
       } else if (spaceTop >= tooltipRect.height) {
-        optimalPosition = 'top';
+        optimalPosition = "top";
       } else if (spaceRight >= tooltipRect.width) {
-        optimalPosition = 'right';
+        optimalPosition = "right";
       } else if (spaceLeft >= tooltipRect.width) {
-        optimalPosition = 'left';
+        optimalPosition = "left";
       } else {
-        optimalPosition = 'bottom'; // Default fallback
+        optimalPosition = "bottom"; // Default fallback
       }
     }
 
@@ -92,50 +92,51 @@ export function Tooltip({
     const offset = 8;
 
     switch (tooltipPosition) {
-      case 'top':
+      case "top":
         return {
           bottom: window.innerHeight - triggerRect.top + offset,
           left: triggerRect.left + triggerRect.width / 2,
-          transform: 'translateX(-50%)',
+          transform: "translateX(-50%)",
         };
-      case 'bottom':
+      case "bottom":
         return {
           top: triggerRect.bottom + offset,
           left: triggerRect.left + triggerRect.width / 2,
-          transform: 'translateX(-50%)',
+          transform: "translateX(-50%)",
         };
-      case 'left':
+      case "left":
         return {
           top: triggerRect.top + triggerRect.height / 2,
           right: window.innerWidth - triggerRect.left + offset,
-          transform: 'translateY(-50%)',
+          transform: "translateY(-50%)",
         };
-      case 'right':
+      case "right":
         return {
           top: triggerRect.top + triggerRect.height / 2,
           left: triggerRect.right + offset,
-          transform: 'translateY(-50%)',
+          transform: "translateY(-50%)",
         };
       default:
         return {
           top: triggerRect.bottom + offset,
           left: triggerRect.left + triggerRect.width / 2,
-          transform: 'translateX(-50%)',
+          transform: "translateX(-50%)",
         };
     }
   };
 
   const getArrowStyle = () => {
-    const baseClasses = 'absolute w-2 h-2 bg-slate-800 border border-slate-600 rotate-45';
+    const baseClasses =
+      "absolute w-2 h-2 bg-slate-800 border border-slate-600 rotate-45";
 
     switch (tooltipPosition) {
-      case 'top':
+      case "top":
         return `${baseClasses} -bottom-1 left-1/2 transform -translate-x-1/2`;
-      case 'bottom':
+      case "bottom":
         return `${baseClasses} -top-1 left-1/2 transform -translate-x-1/2`;
-      case 'left':
+      case "left":
         return `${baseClasses} -right-1 top-1/2 transform -translate-y-1/2`;
-      case 'right':
+      case "right":
         return `${baseClasses} -left-1 top-1/2 transform -translate-y-1/2`;
       default:
         return `${baseClasses} -top-1 left-1/2 transform -translate-x-1/2`;
@@ -170,7 +171,7 @@ export function Tooltip({
               className={`
                 bg-slate-800 border border-slate-600 rounded-lg shadow-xl p-3
                 text-sm text-slate-200
-                ${rich ? 'min-w-48' : 'whitespace-nowrap'}
+                ${rich ? "min-w-48" : "whitespace-nowrap"}
                 animate-in fade-in-0 zoom-in-95 duration-200
               `}
               style={{ maxWidth: `${maxWidth}px` }}
@@ -179,9 +180,7 @@ export function Tooltip({
               <div className={getArrowStyle()} />
 
               {/* Content */}
-              <div className="relative z-10">
-                {content}
-              </div>
+              <div className="relative z-10">{content}</div>
             </div>
           </div>
         </>
@@ -191,7 +190,12 @@ export function Tooltip({
 }
 
 // Rich tooltip content components
-export function TooltipContent({ title, description, stats, actions }: {
+export function TooltipContent({
+  title,
+  description,
+  stats,
+  actions,
+}: {
   title: string;
   description?: string;
   stats?: Array<{ label: string; value: string | number; color?: string }>;
@@ -210,9 +214,12 @@ export function TooltipContent({ title, description, stats, actions }: {
       {stats && stats.length > 0 && (
         <div className="space-y-1 border-t border-slate-600 pt-2">
           {stats.map((stat, index) => (
-            <div key={index} className="flex justify-between items-center text-xs">
+            <div
+              key={index}
+              className="flex justify-between items-center text-xs"
+            >
               <span className="text-slate-400">{stat.label}:</span>
-              <span className={stat.color || 'text-slate-200'}>
+              <span className={stat.color || "text-slate-200"}>
                 {stat.value}
               </span>
             </div>
@@ -223,7 +230,10 @@ export function TooltipContent({ title, description, stats, actions }: {
       {actions && actions.length > 0 && (
         <div className="space-y-1 border-t border-slate-600 pt-2">
           {actions.map((action, index) => (
-            <div key={index} className="flex justify-between items-center text-xs">
+            <div
+              key={index}
+              className="flex justify-between items-center text-xs"
+            >
               <span className="text-slate-400">{action.label}</span>
               {action.shortcut && (
                 <kbd className="px-1 py-0.5 bg-slate-700 rounded text-slate-300 text-xs">

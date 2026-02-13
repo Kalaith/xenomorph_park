@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface ContextMenuItem {
   id: string;
@@ -16,7 +16,12 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuProps) {
+export function ContextMenu({
+  isOpen,
+  position,
+  items,
+  onClose,
+}: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,19 +32,19 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen, onClose]);
 
@@ -99,11 +104,12 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
             className={`
               w-full px-4 py-2 text-left text-sm transition-colors
               flex items-center gap-3
-              ${item.disabled
-                ? 'text-slate-500 cursor-not-allowed'
-                : item.destructive
-                ? 'text-red-400 hover:bg-red-400/10'
-                : 'text-slate-200 hover:bg-slate-700'
+              ${
+                item.disabled
+                  ? "text-slate-500 cursor-not-allowed"
+                  : item.destructive
+                    ? "text-red-400 hover:bg-red-400/10"
+                    : "text-slate-200 hover:bg-slate-700"
               }
             `}
           >

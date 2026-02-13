@@ -1,5 +1,5 @@
-import { useGameStore } from '../../stores/gameStore';
-import { Button } from '../ui/Button';
+import { useGameStore } from "../../stores/gameStore";
+import { Button } from "../ui/Button";
 
 export function GameControls() {
   const { paused, togglePause, undo, redo, canUndo, canRedo } = useGameStore();
@@ -10,9 +10,9 @@ export function GameControls() {
         variant="outline"
         onClick={togglePause}
         className="text-sm px-3 py-1"
-        title={paused ? 'Resume Game' : 'Pause Game'}
+        title={paused ? "Resume Game" : "Pause Game"}
       >
-        {paused ? '▶️' : '⏸️'}
+        {paused ? "▶️" : "⏸️"}
       </Button>
 
       <Button

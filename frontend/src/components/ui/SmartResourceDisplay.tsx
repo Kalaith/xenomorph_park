@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { useGameStore } from '../../stores/gameStore';
-import { securityColors } from '../../constants/gameConstants';
-import { Tooltip } from './Tooltip';
-import { Button } from './Button';
-import type { Resources } from '../../types';
+import { useState } from "react";
+import { useGameStore } from "../../stores/gameStore";
+import { securityColors } from "../../constants/gameConstants";
+import { Tooltip } from "./Tooltip";
+import { Button } from "./Button";
+import type { Resources } from "../../types";
 
-type ViewMode = 'compact' | 'detailed' | 'trends';
+type ViewMode = "compact" | "detailed" | "trends";
 
 export function SmartResourceDisplay() {
   const { resources } = useGameStore();
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
+  const [viewMode, setViewMode] = useState<ViewMode>("compact");
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -24,25 +24,25 @@ export function SmartResourceDisplay() {
         <h3 className="text-green-400 font-bold glow">Resources</h3>
         <div className="flex gap-1">
           <Button
-            variant={viewMode === 'compact' ? 'primary' : 'outline'}
+            variant={viewMode === "compact" ? "primary" : "outline"}
             size="sm"
-            onClick={() => setViewMode('compact')}
+            onClick={() => setViewMode("compact")}
             className="text-xs"
           >
             📊 Compact
           </Button>
           <Button
-            variant={viewMode === 'detailed' ? 'primary' : 'outline'}
+            variant={viewMode === "detailed" ? "primary" : "outline"}
             size="sm"
-            onClick={() => setViewMode('detailed')}
+            onClick={() => setViewMode("detailed")}
             className="text-xs"
           >
             📋 Detailed
           </Button>
           <Button
-            variant={viewMode === 'trends' ? 'primary' : 'outline'}
+            variant={viewMode === "trends" ? "primary" : "outline"}
             size="sm"
-            onClick={() => setViewMode('trends')}
+            onClick={() => setViewMode("trends")}
             className="text-xs"
           >
             📈 Trends
@@ -52,9 +52,13 @@ export function SmartResourceDisplay() {
 
       {/* Content based on view mode */}
       <div className="p-3">
-        {viewMode === 'compact' && <CompactView resources={resources} formatNumber={formatNumber} />}
-        {viewMode === 'detailed' && <DetailedView resources={resources} />}
-        {viewMode === 'trends' && <TrendsView resources={resources} formatNumber={formatNumber} />}
+        {viewMode === "compact" && (
+          <CompactView resources={resources} formatNumber={formatNumber} />
+        )}
+        {viewMode === "detailed" && <DetailedView resources={resources} />}
+        {viewMode === "trends" && (
+          <TrendsView resources={resources} formatNumber={formatNumber} />
+        )}
       </div>
     </div>
   );
@@ -81,7 +85,9 @@ function CompactView({ resources, formatNumber }: CompactViewProps) {
       >
         <div className="text-center p-2 bg-slate-800/50 rounded cursor-help">
           <div className="text-green-400 text-2xl">💰</div>
-          <div className="text-white font-bold">{formatNumber(resources.credits)}</div>
+          <div className="text-white font-bold">
+            {formatNumber(resources.credits)}
+          </div>
           <div className="text-xs text-slate-400">Credits</div>
         </div>
       </Tooltip>
@@ -93,7 +99,9 @@ function CompactView({ resources, formatNumber }: CompactViewProps) {
       >
         <div className="text-center p-2 bg-slate-800/50 rounded cursor-help">
           <div className="text-yellow-400 text-2xl">⚡</div>
-          <div className="text-white font-bold">{resources.power}/{resources.maxPower}</div>
+          <div className="text-white font-bold">
+            {resources.power}/{resources.maxPower}
+          </div>
           <div className="text-xs text-slate-400">Power</div>
         </div>
       </Tooltip>
@@ -105,7 +113,9 @@ function CompactView({ resources, formatNumber }: CompactViewProps) {
       >
         <div className="text-center p-2 bg-slate-800/50 rounded cursor-help">
           <div className="text-cyan-400 text-2xl">📊</div>
-          <div className={`font-bold ${netIncome >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <div
+            className={`font-bold ${netIncome >= 0 ? "text-green-400" : "text-red-400"}`}
+          >
             {formatNumber(netIncome)}
           </div>
           <div className="text-xs text-slate-400">Daily P&L</div>
@@ -128,21 +138,30 @@ function DetailedView({ resources }: DetailedViewProps) {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <span className="text-slate-400">Credits:</span>
-            <span className="ml-2 text-white font-mono">{resources.credits.toLocaleString()}</span>
+            <span className="ml-2 text-white font-mono">
+              {resources.credits.toLocaleString()}
+            </span>
           </div>
           <div>
             <span className="text-slate-400">Daily Net:</span>
-            <span className={`ml-2 font-mono ${netIncome >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {netIncome >= 0 ? '+' : ''}{netIncome.toLocaleString()}
+            <span
+              className={`ml-2 font-mono ${netIncome >= 0 ? "text-green-400" : "text-red-400"}`}
+            >
+              {netIncome >= 0 ? "+" : ""}
+              {netIncome.toLocaleString()}
             </span>
           </div>
           <div>
             <span className="text-slate-400">Revenue:</span>
-            <span className="ml-2 text-green-400 font-mono">+{resources.dailyRevenue.toLocaleString()}</span>
+            <span className="ml-2 text-green-400 font-mono">
+              +{resources.dailyRevenue.toLocaleString()}
+            </span>
           </div>
           <div>
             <span className="text-slate-400">Expenses:</span>
-            <span className="ml-2 text-red-400 font-mono">-{resources.dailyExpenses.toLocaleString()}</span>
+            <span className="ml-2 text-red-400 font-mono">
+              -{resources.dailyExpenses.toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
@@ -155,21 +174,29 @@ function DetailedView({ resources }: DetailedViewProps) {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <span className="text-slate-400">Power:</span>
-            <span className="ml-2 text-white font-mono">{resources.power}/{resources.maxPower}</span>
+            <span className="ml-2 text-white font-mono">
+              {resources.power}/{resources.maxPower}
+            </span>
           </div>
           <div>
             <span className="text-slate-400">Security:</span>
-            <span className={`ml-2 font-mono ${securityColors[resources.security]}`}>
+            <span
+              className={`ml-2 font-mono ${securityColors[resources.security]}`}
+            >
               {resources.security}
             </span>
           </div>
           <div>
             <span className="text-slate-400">Visitors:</span>
-            <span className="ml-2 text-white font-mono">{resources.visitors}/{resources.maxVisitors}</span>
+            <span className="ml-2 text-white font-mono">
+              {resources.visitors}/{resources.maxVisitors}
+            </span>
           </div>
           <div>
             <span className="text-slate-400">Research:</span>
-            <span className="ml-2 text-blue-400 font-mono">{resources.research}</span>
+            <span className="ml-2 text-blue-400 font-mono">
+              {resources.research}
+            </span>
           </div>
         </div>
       </div>
@@ -179,8 +206,12 @@ function DetailedView({ resources }: DetailedViewProps) {
 
 function TrendsView({ resources, formatNumber }: CompactViewProps) {
   const netIncome = resources.dailyRevenue - resources.dailyExpenses;
-  const powerUtilization = Math.round((resources.power / resources.maxPower) * 100);
-  const visitorCapacity = Math.round((resources.visitors / resources.maxVisitors) * 100);
+  const powerUtilization = Math.round(
+    (resources.power / resources.maxPower) * 100,
+  );
+  const visitorCapacity = Math.round(
+    (resources.visitors / resources.maxVisitors) * 100,
+  );
 
   return (
     <div className="space-y-3">
@@ -194,8 +225,11 @@ function TrendsView({ resources, formatNumber }: CompactViewProps) {
           <div className="w-full bg-slate-700 rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                powerUtilization >= 90 ? 'bg-red-400' :
-                powerUtilization >= 70 ? 'bg-yellow-400' : 'bg-green-400'
+                powerUtilization >= 90
+                  ? "bg-red-400"
+                  : powerUtilization >= 70
+                    ? "bg-yellow-400"
+                    : "bg-green-400"
               }`}
               style={{ width: `${Math.min(powerUtilization, 100)}%` }}
             />
@@ -219,7 +253,9 @@ function TrendsView({ resources, formatNumber }: CompactViewProps) {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div className="bg-slate-800/30 rounded p-2 text-center">
-          <div className="text-cyan-400 font-bold">{formatNumber(netIncome)}</div>
+          <div className="text-cyan-400 font-bold">
+            {formatNumber(netIncome)}
+          </div>
           <div className="text-xs text-slate-400">Daily Net</div>
         </div>
         <div className="bg-slate-800/30 rounded p-2 text-center">

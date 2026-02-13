@@ -1,6 +1,6 @@
-import { ReactNode, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from './Button';
+import { ReactNode, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "./Button";
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,22 +10,28 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children, className = '' }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className = "",
+}: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -41,7 +47,7 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
           />
-          
+
           {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -65,11 +71,9 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
                 ×
               </Button>
             </div>
-            
+
             {/* Content */}
-            <div className="p-4 overflow-y-auto">
-              {children}
-            </div>
+            <div className="p-4 overflow-y-auto">{children}</div>
           </motion.div>
         </div>
       )}

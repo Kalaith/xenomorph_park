@@ -1,17 +1,17 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from "react";
 
 interface FloatingTextContextType {
   addResourceChange: (
     resource: string,
     amount: number,
-    element?: HTMLElement
+    element?: HTMLElement,
   ) => void;
   addFloatingText: (
     text: string,
     position: { x: number; y: number },
     color?: string,
     duration?: number,
-    size?: 'sm' | 'md' | 'lg'
+    size?: "sm" | "md" | "lg",
   ) => void;
 }
 

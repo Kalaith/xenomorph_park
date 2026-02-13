@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from "react";
 
 interface ParticleContextType {
   triggerContainmentBreach: (position: { x: number; y: number }) => void;

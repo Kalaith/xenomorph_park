@@ -1,8 +1,13 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 // Undo/Redo types
 export interface GameAction {
-  type: 'PLACE_FACILITY' | 'PLACE_XENOMORPH' | 'REMOVE_FACILITY' | 'REMOVE_XENOMORPH' | 'MODIFY_RESOURCES';
+  type:
+    | "PLACE_FACILITY"
+    | "PLACE_XENOMORPH"
+    | "REMOVE_FACILITY"
+    | "REMOVE_XENOMORPH"
+    | "MODIFY_RESOURCES";
   timestamp: number;
   data: unknown;
   previousState?: Partial<GameState>;
@@ -42,7 +47,7 @@ export interface Resources {
   dailyExpenses: number;
 }
 
-export type SecurityLevel = 'Low' | 'Medium' | 'High' | 'Maximum';
+export type SecurityLevel = "Low" | "Medium" | "High" | "Maximum";
 
 export interface PlacedFacility {
   id: string;
@@ -80,7 +85,6 @@ export interface ResearchState {
   };
 }
 
-
 export interface EconomicsState {
   totalRevenue: number;
   totalExpenses: number;
@@ -101,7 +105,7 @@ export interface XenomorphSpecies {
   specialAbilities: string[];
 }
 
-export type FoodRequirement = 'Low' | 'Medium' | 'High' | 'Very High';
+export type FoodRequirement = "Low" | "Medium" | "High" | "Very High";
 
 export interface FacilityDefinition {
   name: string;
@@ -118,7 +122,7 @@ export interface Weapon {
   special: string;
 }
 
-export type RateOfFire = 'Low' | 'Medium' | 'High' | 'Very High';
+export type RateOfFire = "Low" | "Medium" | "High" | "Very High";
 
 export interface CrisisEvent {
   name: string;
@@ -128,7 +132,7 @@ export interface CrisisEvent {
   responseOptions: string[];
 }
 
-export type Severity = 'Low' | 'Medium' | 'High' | 'Critical';
+export type Severity = "Low" | "Medium" | "High" | "Critical";
 
 export interface GridConfig {
   width: number;
@@ -139,13 +143,13 @@ export interface GridCell {
   position: GridPosition;
   occupied: boolean;
   content: PlacedFacility | PlacedXenomorph | null;
-  type: 'empty' | 'facility' | 'xenomorph';
+  type: "empty" | "facility" | "xenomorph";
 }
 
 // UI types
 export interface ButtonVariant {
-  variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "danger" | "warning" | "outline";
+  size?: "sm" | "md" | "lg";
   disabled?: boolean;
   loading?: boolean;
 }
@@ -160,7 +164,7 @@ export interface ModalProps {
 export interface StatusMessage {
   id: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   timestamp: number;
 }
 
@@ -177,7 +181,7 @@ export interface GameStore extends GameState {
   selectSpecies: (species: XenomorphSpecies | null) => void;
   startResearch: (species: string) => void;
   completeResearch: (species: string) => void;
-  addStatusMessage: (message: string, type: StatusMessage['type']) => void;
+  addStatusMessage: (message: string, type: StatusMessage["type"]) => void;
 
   // Game mechanics actions
   gameTick: () => void;

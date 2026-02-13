@@ -1,42 +1,46 @@
-import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "danger" | "warning" | "outline";
+  size?: "sm" | "md" | "lg";
   loading?: boolean;
   disabled?: boolean;
   children: ReactNode;
   className?: string;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  as?: 'button' | 'span';
+  type?: "button" | "submit" | "reset";
+  as?: "button" | "span";
 }
 
 const variantClasses = {
-  primary: 'bg-green-600 hover:bg-green-500 text-black border-green-400 shadow-lg shadow-green-400/20',
-  secondary: 'bg-slate-700 hover:bg-slate-600 text-green-400 border-slate-500',
-  danger: 'bg-red-600 hover:bg-red-500 text-white border-red-400 shadow-lg shadow-red-400/20',
-  warning: 'bg-yellow-600 hover:bg-yellow-500 text-black border-yellow-400 shadow-lg shadow-yellow-400/20',
-  outline: 'bg-transparent hover:bg-green-400/10 text-green-400 border-green-400',
+  primary:
+    "bg-green-600 hover:bg-green-500 text-black border-green-400 shadow-lg shadow-green-400/20",
+  secondary: "bg-slate-700 hover:bg-slate-600 text-green-400 border-slate-500",
+  danger:
+    "bg-red-600 hover:bg-red-500 text-white border-red-400 shadow-lg shadow-red-400/20",
+  warning:
+    "bg-yellow-600 hover:bg-yellow-500 text-black border-yellow-400 shadow-lg shadow-yellow-400/20",
+  outline:
+    "bg-transparent hover:bg-green-400/10 text-green-400 border-green-400",
 };
 
 const sizeClasses = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-lg',
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2 text-base",
+  lg: "px-6 py-3 text-lg",
 };
 
 export function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   loading = false,
   disabled = false,
   children,
-  className = '',
+  className = "",
   onClick,
-  type = 'button',
-  as = 'button',
+  type = "button",
+  as = "button",
 }: ButtonProps) {
   const isDisabled = disabled || loading;
 
@@ -47,7 +51,7 @@ export function Button({
       disabled:opacity-50 disabled:cursor-not-allowed
       ${variantClasses[variant]}
       ${sizeClasses[size]}
-      ${isDisabled ? 'hover:scale-100' : ''}
+      ${isDisabled ? "hover:scale-100" : ""}
       ${className}
     `,
     onClick: isDisabled ? undefined : onClick,
@@ -62,7 +66,7 @@ export function Button({
     children
   );
 
-  if (as === 'span') {
+  if (as === "span") {
     return (
       <motion.span
         whileHover={!isDisabled ? { scale: 1.02 } : {}}

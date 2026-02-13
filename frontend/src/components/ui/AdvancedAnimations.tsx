@@ -1,5 +1,5 @@
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { useState, useEffect } from "react";
 
 // Particle system for various effects
 interface Particle {
@@ -12,7 +12,7 @@ interface Particle {
   maxLife: number;
   size: number;
   color: string;
-  type: 'spark' | 'smoke' | 'acid' | 'blood' | 'energy';
+  type: "spark" | "smoke" | "acid" | "blood" | "energy";
 }
 
 interface ParticleSystemProps {
@@ -20,32 +20,35 @@ interface ParticleSystemProps {
   className?: string;
 }
 
-export function ParticleSystem({ particles, className = '' }: ParticleSystemProps) {
+export function ParticleSystem({
+  particles,
+  className = "",
+}: ParticleSystemProps) {
   return (
     <div className={`fixed inset-0 pointer-events-none z-40 ${className}`}>
       <AnimatePresence>
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            initial={{ 
-              x: particle.x, 
-              y: particle.y, 
+            initial={{
+              x: particle.x,
+              y: particle.y,
               scale: 0,
-              opacity: 1 
+              opacity: 1,
             }}
-            animate={{ 
+            animate={{
               x: particle.x + particle.vx * particle.life,
               y: particle.y + particle.vy * particle.life,
               scale: particle.size,
-              opacity: 1 - (particle.life / particle.maxLife)
+              opacity: 1 - particle.life / particle.maxLife,
             }}
-            exit={{ 
-              scale: 0, 
-              opacity: 0 
+            exit={{
+              scale: 0,
+              opacity: 0,
             }}
-            transition={{ 
+            transition={{
               duration: particle.maxLife / 1000,
-              ease: "easeOut" 
+              ease: "easeOut",
             }}
             className={`absolute w-2 h-2 rounded-full ${getParticleStyle(particle.type)}`}
             style={{ backgroundColor: particle.color }}
@@ -56,26 +59,28 @@ export function ParticleSystem({ particles, className = '' }: ParticleSystemProp
   );
 }
 
-function getParticleStyle(type: Particle['type']): string {
+function getParticleStyle(type: Particle["type"]): string {
   switch (type) {
-    case 'spark':
-      return 'shadow-lg shadow-yellow-400/50';
-    case 'smoke':
-      return 'opacity-60 blur-sm';
-    case 'acid':
-      return 'shadow-lg shadow-green-400/50';
-    case 'blood':
-      return 'shadow-sm';
-    case 'energy':
-      return 'shadow-lg shadow-blue-400/50 animate-pulse';
+    case "spark":
+      return "shadow-lg shadow-yellow-400/50";
+    case "smoke":
+      return "opacity-60 blur-sm";
+    case "acid":
+      return "shadow-lg shadow-green-400/50";
+    case "blood":
+      return "shadow-sm";
+    case "energy":
+      return "shadow-lg shadow-blue-400/50 animate-pulse";
     default:
-      return '';
+      return "";
   }
 }
 
 // Animated background effects
 export function AnimatedBackground() {
-  const [stars, setStars] = useState<Array<{ id: string; x: number; y: number; opacity: number; size: number }>>([]);
+  const [stars, setStars] = useState<
+    Array<{ id: string; x: number; y: number; opacity: number; size: number }>
+  >([]);
 
   useEffect(() => {
     const starCount = 50;
@@ -84,7 +89,7 @@ export function AnimatedBackground() {
       x: Math.random() * 100,
       y: Math.random() * 100,
       opacity: Math.random() * 0.8 + 0.2,
-      size: Math.random() * 2 + 1
+      size: Math.random() * 2 + 1,
     }));
     setStars(newStars);
   }, []);
@@ -112,7 +117,7 @@ export function AnimatedBackground() {
           }}
         />
       ))}
-      
+
       {/* Animated grid lines */}
       <motion.div
         className="absolute inset-0"
@@ -121,10 +126,10 @@ export function AnimatedBackground() {
             linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px),
             linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px)
           `,
-          backgroundSize: '50px 50px',
+          backgroundSize: "50px 50px",
         }}
         animate={{
-          backgroundPosition: ['0px 0px', '50px 50px'],
+          backgroundPosition: ["0px 0px", "50px 50px"],
         }}
         transition={{
           duration: 20,
@@ -139,32 +144,37 @@ export function AnimatedBackground() {
 // Glitch effect component
 interface GlitchTextProps {
   children: React.ReactNode;
-  intensity?: 'low' | 'medium' | 'high';
+  intensity?: "low" | "medium" | "high";
   trigger?: boolean;
 }
 
-export function GlitchText({ children, intensity = 'medium', trigger = false }: GlitchTextProps) {
+export function GlitchText({
+  children,
+  intensity = "medium",
+  trigger = false,
+}: GlitchTextProps) {
   const controls = useAnimation();
 
   useEffect(() => {
     if (trigger) {
       const glitchAnimation = async () => {
-        const iterations = intensity === 'low' ? 3 : intensity === 'medium' ? 5 : 8;
-        
+        const iterations =
+          intensity === "low" ? 3 : intensity === "medium" ? 5 : 8;
+
         for (let i = 0; i < iterations; i++) {
           await controls.start({
             x: [0, -2, 2, -1, 1, 0],
             textShadow: [
-              '0 0 0 transparent',
-              '2px 0 0 #ff0040, -2px 0 0 #00ff41',
-              '-2px 0 0 #ff0040, 2px 0 0 #00ff41',
-              '0 0 0 transparent'
+              "0 0 0 transparent",
+              "2px 0 0 #ff0040, -2px 0 0 #00ff41",
+              "-2px 0 0 #ff0040, 2px 0 0 #00ff41",
+              "0 0 0 transparent",
             ],
-            transition: { duration: 0.1 }
+            transition: { duration: 0.1 },
           });
         }
       };
-      
+
       glitchAnimation();
     }
   }, [trigger, intensity, controls]);
@@ -186,17 +196,17 @@ export function ContainmentBreachEffect({ isActive }: { isActive: boolean }) {
           <motion.div
             className="fixed inset-0 bg-red-600/20 pointer-events-none z-30"
             initial={{ opacity: 0 }}
-            animate={{ 
+            animate={{
               opacity: [0, 0.8, 0, 0.8, 0],
             }}
             exit={{ opacity: 0 }}
-            transition={{ 
+            transition={{
               duration: 2,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
-          
+
           {/* Screen shake effect */}
           <motion.div
             className="fixed inset-0 pointer-events-none z-20"
@@ -207,20 +217,20 @@ export function ContainmentBreachEffect({ isActive }: { isActive: boolean }) {
             transition={{
               duration: 0.5,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
-          
+
           {/* Alert borders */}
           <motion.div
             className="fixed inset-0 border-4 border-red-500 pointer-events-none z-25"
             animate={{
-              borderColor: ['#ef4444', '#7f1d1d', '#ef4444'],
+              borderColor: ["#ef4444", "#7f1d1d", "#ef4444"],
             }}
             transition={{
               duration: 1,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
         </>
@@ -236,26 +246,36 @@ interface HologramProps {
   flicker?: boolean;
 }
 
-export function Hologram({ children, className = '', flicker = true }: HologramProps) {
+export function Hologram({
+  children,
+  className = "",
+  flicker = true,
+}: HologramProps) {
   return (
     <motion.div
       className={`relative ${className}`}
-      animate={flicker ? {
-        opacity: [1, 0.8, 1, 0.9, 1],
-      } : {}}
-      transition={flicker ? {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      } : {}}
+      animate={
+        flicker
+          ? {
+              opacity: [1, 0.8, 1, 0.9, 1],
+            }
+          : {}
+      }
+      transition={
+        flicker
+          ? {
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }
+          : {}
+      }
     >
       {/* Hologram content */}
-      <div className="relative z-10 text-cyan-400">
-        {children}
-      </div>
-      
+      <div className="relative z-10 text-cyan-400">{children}</div>
+
       {/* Scan lines */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `repeating-linear-gradient(
@@ -264,10 +284,10 @@ export function Hologram({ children, className = '', flicker = true }: HologramP
             transparent 2px,
             rgba(6, 182, 212, 0.1) 2px,
             rgba(6, 182, 212, 0.1) 4px
-          )`
+          )`,
         }}
       />
-      
+
       {/* Glow effect */}
       <div className="absolute inset-0 bg-cyan-400/10 rounded blur-sm -z-10" />
     </motion.div>
@@ -275,7 +295,13 @@ export function Hologram({ children, className = '', flicker = true }: HologramP
 }
 
 // Energy pulse effect for facilities
-export function EnergyPulse({ isActive, color = '#10b981' }: { isActive: boolean; color?: string }) {
+export function EnergyPulse({
+  isActive,
+  color = "#10b981",
+}: {
+  isActive: boolean;
+  color?: string;
+}) {
   return (
     <AnimatePresence>
       {isActive && (
@@ -283,15 +309,15 @@ export function EnergyPulse({ isActive, color = '#10b981' }: { isActive: boolean
           className="absolute inset-0 rounded-full border-2 pointer-events-none"
           style={{ borderColor: color }}
           initial={{ scale: 1, opacity: 1 }}
-          animate={{ 
+          animate={{
             scale: [1, 2, 3],
-            opacity: [1, 0.5, 0]
+            opacity: [1, 0.5, 0],
           }}
           exit={{ opacity: 0 }}
           transition={{
             duration: 2,
             repeat: Infinity,
-            ease: "easeOut"
+            ease: "easeOut",
           }}
         />
       )}
@@ -301,21 +327,24 @@ export function EnergyPulse({ isActive, color = '#10b981' }: { isActive: boolean
 
 // Matrix-style digital rain
 export function DigitalRain() {
-  const [drops, setDrops] = useState<Array<{ id: string; x: number; chars: string[]; speed: number }>>([]);
+  const [drops, setDrops] = useState<
+    Array<{ id: string; x: number; chars: string[]; speed: number }>
+  >([]);
 
   useEffect(() => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split('');
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
     const columns = Math.floor(window.innerWidth / 20);
-    
+
     const newDrops = Array.from({ length: columns }, (_, i) => ({
       id: `drop-${i}`,
       x: i * 20,
-      chars: Array.from({ length: Math.floor(Math.random() * 20) + 10 }, () => 
-        chars[Math.floor(Math.random() * chars.length)]
+      chars: Array.from(
+        { length: Math.floor(Math.random() * 20) + 10 },
+        () => chars[Math.floor(Math.random() * chars.length)],
       ),
-      speed: Math.random() * 2 + 1
+      speed: Math.random() * 2 + 1,
     }));
-    
+
     setDrops(newDrops);
   }, []);
 
@@ -357,7 +386,7 @@ export function DigitalRain() {
 }
 
 // Morphing blob effect
-export function MorphingBlob({ className = '' }: { className?: string }) {
+export function MorphingBlob({ className = "" }: { className?: string }) {
   return (
     <motion.div
       className={`absolute rounded-full bg-gradient-to-r from-purple-500/30 to-blue-500/30 blur-xl ${className}`}
@@ -370,7 +399,7 @@ export function MorphingBlob({ className = '' }: { className?: string }) {
       transition={{
         duration: 8,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
     />
   );
@@ -384,15 +413,20 @@ interface TypewriterProps {
   onComplete?: () => void;
 }
 
-export function Typewriter({ text, speed = 50, className = '', onComplete }: TypewriterProps) {
-  const [displayText, setDisplayText] = useState('');
+export function Typewriter({
+  text,
+  speed = 50,
+  className = "",
+  onComplete,
+}: TypewriterProps) {
+  const [displayText, setDisplayText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (currentIndex < text.length) {
       const timer = setTimeout(() => {
-        setDisplayText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
+        setDisplayText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
       }, speed);
 
       return () => clearTimeout(timer);
@@ -438,10 +472,10 @@ export function Lightning({ isActive }: { isActive: boolean }) {
             />
             <defs>
               <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge> 
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
             </defs>
@@ -457,11 +491,11 @@ export function useParticleEffect() {
   const [particles, setParticles] = useState<Particle[]>([]);
 
   const createParticles = (
-    x: number, 
-    y: number, 
-    count: number, 
-    type: Particle['type'],
-    color?: string
+    x: number,
+    y: number,
+    count: number,
+    type: Particle["type"],
+    color?: string,
   ) => {
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: `particle-${Date.now()}-${i}`,
@@ -472,16 +506,22 @@ export function useParticleEffect() {
       life: 0,
       maxLife: Math.random() * 2000 + 1000,
       size: Math.random() * 1.5 + 0.5,
-      color: color || (type === 'spark' ? '#fbbf24' : type === 'acid' ? '#10b981' : '#ef4444'),
-      type
+      color:
+        color ||
+        (type === "spark"
+          ? "#fbbf24"
+          : type === "acid"
+            ? "#10b981"
+            : "#ef4444"),
+      type,
     }));
 
-    setParticles(prev => [...prev, ...newParticles]);
+    setParticles((prev) => [...prev, ...newParticles]);
 
     // Remove particles after their lifetime
-    newParticles.forEach(particle => {
+    newParticles.forEach((particle) => {
       setTimeout(() => {
-        setParticles(prev => prev.filter(p => p.id !== particle.id));
+        setParticles((prev) => prev.filter((p) => p.id !== particle.id));
       }, particle.maxLife);
     });
   };
@@ -489,6 +529,6 @@ export function useParticleEffect() {
   return {
     particles,
     createParticles,
-    ParticleRenderer: () => <ParticleSystem particles={particles} />
+    ParticleRenderer: () => <ParticleSystem particles={particles} />,
   };
 }

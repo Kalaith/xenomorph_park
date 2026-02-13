@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Particle {
   id: string;
@@ -39,7 +39,7 @@ export function ParticleSystem({
   position,
   config,
   duration = 3000,
-  onComplete
+  onComplete,
 }: ParticleSystemProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const animationRef = useRef<number>();
@@ -49,17 +49,25 @@ export function ParticleSystem({
     const newParticles: Particle[] = [];
 
     for (let i = 0; i < config.particleCount; i++) {
-      const angle = (config.direction || 0) + (Math.random() - 0.5) * config.spread;
-      const speed = config.particleSpeed.min + Math.random() * (config.particleSpeed.max - config.particleSpeed.min);
-      const size = config.particleSize.min + Math.random() * (config.particleSize.max - config.particleSize.min);
-      const color = config.particleColors[Math.floor(Math.random() * config.particleColors.length)];
+      const angle =
+        (config.direction || 0) + (Math.random() - 0.5) * config.spread;
+      const speed =
+        config.particleSpeed.min +
+        Math.random() * (config.particleSpeed.max - config.particleSpeed.min);
+      const size =
+        config.particleSize.min +
+        Math.random() * (config.particleSize.max - config.particleSize.min);
+      const color =
+        config.particleColors[
+          Math.floor(Math.random() * config.particleColors.length)
+        ];
 
       newParticles.push({
         id: `particle-${i}`,
         x: position.x,
         y: position.y,
-        vx: Math.cos(angle * Math.PI / 180) * speed,
-        vy: Math.sin(angle * Math.PI / 180) * speed,
+        vx: Math.cos((angle * Math.PI) / 180) * speed,
+        vy: Math.sin((angle * Math.PI) / 180) * speed,
         life: config.particleLifespan,
         maxLife: config.particleLifespan,
         size,
@@ -74,7 +82,7 @@ export function ParticleSystem({
 
   const animate = useCallback(() => {
     const step = () => {
-      setParticles(prevParticles => {
+      setParticles((prevParticles) => {
         const currentTime = Date.now();
         const elapsed = currentTime - (startTimeRef.current || 0);
 
@@ -84,14 +92,14 @@ export function ParticleSystem({
         }
 
         return prevParticles
-          .map(particle => ({
+          .map((particle) => ({
             ...particle,
             x: particle.x + particle.vx,
             y: particle.y + particle.vy,
             vy: particle.vy + (particle.gravity || 0),
             life: particle.life - 1,
           }))
-          .filter(particle => particle.life > 0);
+          .filter((particle) => particle.life > 0);
       });
 
       animationRef.current = requestAnimationFrame(step);
@@ -125,10 +133,8 @@ export function ParticleSystem({
 
   return (
     <div className="fixed inset-0 pointer-events-none z-40">
-      {particles.map(particle => {
-        const opacity = particle.fade
-          ? particle.life / particle.maxLife
-          : 1;
+      {particles.map((particle) => {
+        const opacity = particle.fade ? particle.life / particle.maxLife : 1;
 
         return (
           <div
@@ -157,7 +163,7 @@ export const particleConfigs = {
     particleLifespan: 120,
     particleSize: { min: 2, max: 8 },
     particleSpeed: { min: 2, max: 8 },
-    particleColors: ['#ff0040', '#ff4040', '#ff8080', '#ffaa00'],
+    particleColors: ["#ff0040", "#ff4040", "#ff8080", "#ffaa00"],
     gravity: 0.1,
     spread: 360,
     direction: 270, // Up
@@ -169,7 +175,7 @@ export const particleConfigs = {
     particleLifespan: 100,
     particleSize: { min: 3, max: 12 },
     particleSpeed: { min: 3, max: 12 },
-    particleColors: ['#ffaa00', '#ff4040', '#ff0040', '#ffffff'],
+    particleColors: ["#ffaa00", "#ff4040", "#ff0040", "#ffffff"],
     gravity: 0.2,
     spread: 360,
     direction: 0,
@@ -181,7 +187,7 @@ export const particleConfigs = {
     particleLifespan: 80,
     particleSize: { min: 1, max: 4 },
     particleSpeed: { min: 1, max: 6 },
-    particleColors: ['#00ff41', '#00cc33', '#ffffff'],
+    particleColors: ["#00ff41", "#00cc33", "#ffffff"],
     gravity: 0.05,
     spread: 90,
     direction: 270, // Up
@@ -193,7 +199,11 @@ export const particleConfigs = {
     particleLifespan: 200,
     particleSize: { min: 8, max: 20 },
     particleSpeed: { min: 0.5, max: 2 },
-    particleColors: ['rgba(100,100,100,0.7)', 'rgba(80,80,80,0.5)', 'rgba(60,60,60,0.3)'],
+    particleColors: [
+      "rgba(100,100,100,0.7)",
+      "rgba(80,80,80,0.5)",
+      "rgba(60,60,60,0.3)",
+    ],
     gravity: -0.02, // Negative gravity for upward movement
     spread: 45,
     direction: 270, // Up
@@ -203,24 +213,26 @@ export const particleConfigs = {
 
 // Hook for managing particle effects
 export function useParticles() {
-  const [activeEffects, setActiveEffects] = useState<Array<{
-    id: string;
-    position: { x: number; y: number };
-    config: ParticleConfig;
-    duration: number;
-  }>>([]);
+  const [activeEffects, setActiveEffects] = useState<
+    Array<{
+      id: string;
+      position: { x: number; y: number };
+      config: ParticleConfig;
+      duration: number;
+    }>
+  >([]);
 
   const addParticleEffect = (
     position: { x: number; y: number },
     config: ParticleConfig,
-    duration: number = 3000
+    duration: number = 3000,
   ) => {
     const id = `effect-${Date.now()}-${Math.random()}`;
-    setActiveEffects(prev => [...prev, { id, position, config, duration }]);
+    setActiveEffects((prev) => [...prev, { id, position, config, duration }]);
   };
 
   const removeParticleEffect = (id: string) => {
-    setActiveEffects(prev => prev.filter(effect => effect.id !== id));
+    setActiveEffects((prev) => prev.filter((effect) => effect.id !== id));
   };
 
   // Convenience methods for common effects
@@ -250,7 +262,7 @@ export function useParticles() {
     triggerSmoke,
     ParticleSystemComponent: () => (
       <>
-        {activeEffects.map(effect => (
+        {activeEffects.map((effect) => (
           <ParticleSystem
             key={effect.id}
             isActive={true}

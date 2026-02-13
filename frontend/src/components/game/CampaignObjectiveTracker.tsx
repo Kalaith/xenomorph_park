@@ -1,41 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useGameStore } from '../../stores/gameStore';
-import { CampaignScenario, CampaignObjective } from './CampaignMode';
+import { useState, useEffect } from "react";
+import { useGameStore } from "../../stores/gameStore";
+import { CampaignScenario, CampaignObjective } from "./CampaignMode";
 
 interface ObjectiveTrackerProps {
   isActive: boolean;
 }
 
 export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
-  const [currentScenario, setCurrentScenario] = useState<CampaignScenario | null>(null);
+  const [currentScenario, setCurrentScenario] =
+    useState<CampaignScenario | null>(null);
   const [objectives, setObjectives] = useState<CampaignObjective[]>([]);
   const [completedObjectives, setCompletedObjectives] = useState<string[]>([]);
   const [scenarioStartTime, setScenarioStartTime] = useState<number>(0);
 
-  const {
-    resources,
-    facilities,
-    xenomorphs,
-    day,
-    research,
-    addStatusMessage
-  } = useGameStore();
+  const { resources, facilities, xenomorphs, day, research, addStatusMessage } =
+    useGameStore();
 
   // Load current scenario
   useEffect(() => {
     if (!isActive) return;
 
-    const scenarioData = localStorage.getItem('current-campaign-scenario');
+    const scenarioData = localStorage.getItem("current-campaign-scenario");
     if (scenarioData) {
       const scenario = JSON.parse(scenarioData);
       setCurrentScenario(scenario);
       setObjectives(scenario.objectives || []);
 
-      const startTime = localStorage.getItem('campaign-start-time');
+      const startTime = localStorage.getItem("campaign-start-time");
       setScenarioStartTime(startTime ? parseInt(startTime) : Date.now());
 
       if (!startTime) {
-        localStorage.setItem('campaign-start-time', Date.now().toString());
+        localStorage.setItem("campaign-start-time", Date.now().toString());
       }
     }
   }, [isActive]);
@@ -46,7 +41,7 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
 
     const newCompletedObjectives: string[] = [];
 
-    objectives.forEach(objective => {
+    objectives.forEach((objective) => {
       if (completedObjectives.includes(objective.id)) {
         newCompletedObjectives.push(objective.id);
         return;
@@ -55,62 +50,67 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
       let isCompleted = false;
 
       switch (objective.type) {
-        case 'facility':
-          if (typeof objective.target === 'string') {
+        case "facility":
+          if (typeof objective.target === "string") {
             // Specific facility type
-            isCompleted = facilities.some(f => f.name === objective.target);
-          } else if (typeof objective.target === 'number') {
+            isCompleted = facilities.some((f) => f.name === objective.target);
+          } else if (typeof objective.target === "number") {
             // Number of facilities
             isCompleted = facilities.length >= objective.target;
           }
           break;
 
-        case 'species':
-          if (typeof objective.target === 'string') {
+        case "species":
+          if (typeof objective.target === "string") {
             // Specific species
-            isCompleted = xenomorphs.some(x => x.species.name === objective.target);
-          } else if (typeof objective.target === 'number') {
+            isCompleted = xenomorphs.some(
+              (x) => x.species.name === objective.target,
+            );
+          } else if (typeof objective.target === "number") {
             // Number of different species
-            const uniqueSpecies = new Set(xenomorphs.map(x => x.species.name));
+            const uniqueSpecies = new Set(
+              xenomorphs.map((x) => x.species.name),
+            );
             isCompleted = uniqueSpecies.size >= objective.target;
           }
           break;
 
-        case 'revenue':
-          if (typeof objective.target === 'number') {
+        case "revenue":
+          if (typeof objective.target === "number") {
             // Check total credits or daily revenue
-            isCompleted = resources.credits >= objective.target ||
-                         resources.dailyRevenue >= objective.target;
+            isCompleted =
+              resources.credits >= objective.target ||
+              resources.dailyRevenue >= objective.target;
           }
           break;
 
-        case 'visitors':
-          if (typeof objective.target === 'number') {
+        case "visitors":
+          if (typeof objective.target === "number") {
             isCompleted = resources.visitors >= objective.target;
           }
           break;
 
-        case 'research':
-          if (typeof objective.target === 'string') {
+        case "research":
+          if (typeof objective.target === "string") {
             // Specific research completed
             isCompleted = research.completed.includes(objective.target);
-          } else if (typeof objective.target === 'number') {
+          } else if (typeof objective.target === "number") {
             // Research points accumulated
             isCompleted = research.points >= objective.target;
           }
           break;
 
-        case 'time':
-          if (typeof objective.target === 'number') {
+        case "time":
+          if (typeof objective.target === "number") {
             // Days survived
             isCompleted = day >= objective.target;
           }
           break;
 
-        case 'survival':
+        case "survival":
           // This would be tracked by specific game events
           // For now, we'll use a simple check
-          if (typeof objective.target === 'number') {
+          if (typeof objective.target === "number") {
             if (objective.target === 0) {
               // No incidents (this would need to be tracked separately)
               isCompleted = true; // Placeholder
@@ -128,13 +128,15 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
         // Trigger completion notification
         addStatusMessage(
           `✅ Objective Complete: ${objective.description}`,
-          objective.required ? 'success' : 'info'
+          objective.required ? "success" : "info",
         );
 
         // Check if all required objectives are complete
-        const allRequired = objectives.filter(obj => obj.required);
-        const completedRequired = allRequired.filter(obj =>
-          newCompletedObjectives.includes(obj.id) || completedObjectives.includes(obj.id)
+        const allRequired = objectives.filter((obj) => obj.required);
+        const completedRequired = allRequired.filter(
+          (obj) =>
+            newCompletedObjectives.includes(obj.id) ||
+            completedObjectives.includes(obj.id),
         );
 
         if (completedRequired.length === allRequired.length) {
@@ -148,19 +150,37 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
       setCompletedObjectives(newCompletedObjectives);
 
       // Save progress
-      localStorage.setItem('campaign-objective-progress', JSON.stringify(newCompletedObjectives));
+      localStorage.setItem(
+        "campaign-objective-progress",
+        JSON.stringify(newCompletedObjectives),
+      );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resources, facilities, xenomorphs, day, research, objectives, completedObjectives, currentScenario, isActive]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    resources,
+    facilities,
+    xenomorphs,
+    day,
+    research,
+    objectives,
+    completedObjectives,
+    currentScenario,
+    isActive,
+  ]);
 
   const completeScenario = () => {
     if (!currentScenario) return;
 
     // Mark scenario as completed
-    const completedScenarios = JSON.parse(localStorage.getItem('xenomorph-park-campaign-progress') || '[]');
+    const completedScenarios = JSON.parse(
+      localStorage.getItem("xenomorph-park-campaign-progress") || "[]",
+    );
     if (!completedScenarios.includes(currentScenario.id)) {
       completedScenarios.push(currentScenario.id);
-      localStorage.setItem('xenomorph-park-campaign-progress', JSON.stringify(completedScenarios));
+      localStorage.setItem(
+        "xenomorph-park-campaign-progress",
+        JSON.stringify(completedScenarios),
+      );
     }
 
     // Apply rewards
@@ -169,13 +189,13 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
     // Show completion message
     addStatusMessage(
       `🎉 Campaign Scenario Complete: ${currentScenario.name}`,
-      'success'
+      "success",
     );
 
     // Clear current scenario
-    localStorage.removeItem('current-campaign-scenario');
-    localStorage.removeItem('campaign-start-time');
-    localStorage.removeItem('campaign-objective-progress');
+    localStorage.removeItem("current-campaign-scenario");
+    localStorage.removeItem("campaign-start-time");
+    localStorage.removeItem("campaign-objective-progress");
   };
 
   const applyScenarioRewards = (scenario: CampaignScenario) => {
@@ -183,26 +203,35 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
 
     if (scenario.rewards.credits) {
       updateResources({
-        credits: resources.credits + scenario.rewards.credits
+        credits: resources.credits + scenario.rewards.credits,
       });
-      addStatusMessage(`Received ${scenario.rewards.credits} credits reward`, 'success');
+      addStatusMessage(
+        `Received ${scenario.rewards.credits} credits reward`,
+        "success",
+      );
     }
 
     if (scenario.rewards.research) {
       updateResources({
-        research: resources.research + scenario.rewards.research
+        research: resources.research + scenario.rewards.research,
       });
-      addStatusMessage(`Received ${scenario.rewards.research} research points reward`, 'success');
+      addStatusMessage(
+        `Received ${scenario.rewards.research} research points reward`,
+        "success",
+      );
     }
 
     // Unlock new species and facilities
     if (scenario.rewards.unlockedSpecies) {
-      scenario.rewards.unlockedSpecies.forEach(species => {
+      scenario.rewards.unlockedSpecies.forEach((species) => {
         if (!research.completed.includes(species)) {
           research.completed.push(species);
         }
       });
-      addStatusMessage(`Unlocked ${scenario.rewards.unlockedSpecies.length} new species`, 'success');
+      addStatusMessage(
+        `Unlocked ${scenario.rewards.unlockedSpecies.length} new species`,
+        "success",
+      );
     }
   };
 
@@ -210,29 +239,29 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
     if (completedObjectives.includes(objective.id)) return 100;
 
     switch (objective.type) {
-      case 'revenue':
-        if (typeof objective.target === 'number') {
+      case "revenue":
+        if (typeof objective.target === "number") {
           return Math.min(100, (resources.credits / objective.target) * 100);
         }
         break;
-      case 'visitors':
-        if (typeof objective.target === 'number') {
+      case "visitors":
+        if (typeof objective.target === "number") {
           return Math.min(100, (resources.visitors / objective.target) * 100);
         }
         break;
-      case 'research':
-        if (typeof objective.target === 'number') {
+      case "research":
+        if (typeof objective.target === "number") {
           return Math.min(100, (research.points / objective.target) * 100);
         }
         break;
-      case 'time':
-        if (typeof objective.target === 'number') {
+      case "time":
+        if (typeof objective.target === "number") {
           return Math.min(100, (day / objective.target) * 100);
         }
         break;
-      case 'species':
-        if (typeof objective.target === 'number') {
-          const uniqueSpecies = new Set(xenomorphs.map(x => x.species.name));
+      case "species":
+        if (typeof objective.target === "number") {
+          const uniqueSpecies = new Set(xenomorphs.map((x) => x.species.name));
           return Math.min(100, (uniqueSpecies.size / objective.target) * 100);
         }
         break;
@@ -276,33 +305,47 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
       <div className="text-xs text-slate-400 mb-3 flex justify-between">
         <span>Elapsed: {getScenarioElapsedTime()}</span>
         {getRemainingTime() && (
-          <span className={getRemainingTime()?.includes('Up') ? 'text-red-400' : 'text-yellow-400'}>
+          <span
+            className={
+              getRemainingTime()?.includes("Up")
+                ? "text-red-400"
+                : "text-yellow-400"
+            }
+          >
             {getRemainingTime()}
           </span>
         )}
       </div>
 
       <div className="space-y-2">
-        <div className="text-sm font-semibold text-slate-300 mb-2">Objectives:</div>
-        {objectives.map(objective => {
+        <div className="text-sm font-semibold text-slate-300 mb-2">
+          Objectives:
+        </div>
+        {objectives.map((objective) => {
           const isCompleted = completedObjectives.includes(objective.id);
           const progress = getObjectiveProgress(objective);
 
           return (
             <div key={objective.id} className="space-y-1">
               <div className="flex items-center gap-2 text-sm">
-                <span className={`text-xs ${
-                  isCompleted
-                    ? 'text-green-400'
-                    : objective.required
-                      ? 'text-red-400'
-                      : 'text-blue-400'
-                }`}>
-                  {isCompleted ? '✅' : objective.required ? '🔴' : '🔵'}
+                <span
+                  className={`text-xs ${
+                    isCompleted
+                      ? "text-green-400"
+                      : objective.required
+                        ? "text-red-400"
+                        : "text-blue-400"
+                  }`}
+                >
+                  {isCompleted ? "✅" : objective.required ? "🔴" : "🔵"}
                 </span>
-                <span className={`flex-1 ${
-                  isCompleted ? 'text-green-400 line-through' : 'text-slate-300'
-                }`}>
+                <span
+                  className={`flex-1 ${
+                    isCompleted
+                      ? "text-green-400 line-through"
+                      : "text-slate-300"
+                  }`}
+                >
                   {objective.description}
                 </span>
               </div>
@@ -331,7 +374,9 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
           <div>Day: {day}</div>
           <div>Credits: {resources.credits}</div>
           <div>Facilities: {facilities.length}</div>
-          <div>Species: {new Set(xenomorphs.map(x => x.species.name)).size}</div>
+          <div>
+            Species: {new Set(xenomorphs.map((x) => x.species.name)).size}
+          </div>
         </div>
       </div>
     </div>

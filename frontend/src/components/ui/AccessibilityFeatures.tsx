@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 // Screen reader announcements
 interface ScreenReaderAnnouncementProps {
   message: string;
-  priority?: 'polite' | 'assertive';
+  priority?: "polite" | "assertive";
 }
 
-export function ScreenReaderAnnouncement({ message, priority = 'polite' }: ScreenReaderAnnouncementProps) {
+export function ScreenReaderAnnouncement({
+  message,
+  priority = "polite",
+}: ScreenReaderAnnouncementProps) {
   return (
     <div
       role="status"
@@ -47,7 +50,11 @@ interface FocusTrapProps {
   className?: string;
 }
 
-export function FocusTrap({ isActive, children, className = '' }: FocusTrapProps) {
+export function FocusTrap({
+  isActive,
+  children,
+  className = "",
+}: FocusTrapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLElement | null>(null);
   const lastFocusableRef = useRef<HTMLElement | null>(null);
@@ -56,7 +63,7 @@ export function FocusTrap({ isActive, children, className = '' }: FocusTrapProps
     if (!isActive || !containerRef.current) return;
 
     const focusableElements = containerRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
 
     const focusableArray = Array.from(focusableElements) as HTMLElement[];
@@ -69,7 +76,7 @@ export function FocusTrap({ isActive, children, className = '' }: FocusTrapProps
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         if (e.shiftKey) {
           // Shift + Tab
           if (document.activeElement === firstFocusableRef.current) {
@@ -85,17 +92,17 @@ export function FocusTrap({ isActive, children, className = '' }: FocusTrapProps
         }
       }
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         // Allow parent to handle escape
-        const escapeEvent = new CustomEvent('focustrap-escape');
+        const escapeEvent = new CustomEvent("focustrap-escape");
         containerRef.current?.dispatchEvent(escapeEvent);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isActive]);
 
@@ -112,8 +119,8 @@ interface AccessibleButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "danger";
+  size?: "sm" | "md" | "lg";
   ariaLabel?: string;
   ariaDescribedBy?: string;
   className?: string;
@@ -124,31 +131,31 @@ export function AccessibleButton({
   onClick,
   disabled = false,
   loading = false,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   ariaLabel,
   ariaDescribedBy,
-  className = ''
+  className = "",
 }: AccessibleButtonProps) {
   const getVariantClasses = () => {
     switch (variant) {
-      case 'secondary':
-        return 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600';
-      case 'danger':
-        return 'bg-red-600 hover:bg-red-700 text-white border-red-500';
+      case "secondary":
+        return "bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600";
+      case "danger":
+        return "bg-red-600 hover:bg-red-700 text-white border-red-500";
       default:
-        return 'bg-green-600 hover:bg-green-700 text-white border-green-500';
+        return "bg-green-600 hover:bg-green-700 text-white border-green-500";
     }
   };
 
   const getSizeClasses = () => {
     switch (size) {
-      case 'sm':
-        return 'px-3 py-1.5 text-sm';
-      case 'lg':
-        return 'px-6 py-3 text-lg';
+      case "sm":
+        return "px-3 py-1.5 text-sm";
+      case "lg":
+        return "px-6 py-3 text-lg";
       default:
-        return 'px-4 py-2 text-base';
+        return "px-4 py-2 text-base";
     }
   };
 
@@ -196,7 +203,7 @@ export function AccessibleField({
   error,
   hint,
   required = false,
-  className = ''
+  className = "",
 }: AccessibleFieldProps) {
   const fieldId = `field-${Math.random().toString(36).substr(2, 9)}`;
   const errorId = error ? `${fieldId}-error` : undefined;
@@ -219,9 +226,10 @@ export function AccessibleField({
       <div>
         {React.cloneElement(children as React.ReactElement, {
           id: fieldId,
-          'aria-describedby': [errorId, hintId].filter(Boolean).join(' ') || undefined,
-          'aria-invalid': error ? 'true' : undefined,
-          'aria-required': required,
+          "aria-describedby":
+            [errorId, hintId].filter(Boolean).join(" ") || undefined,
+          "aria-invalid": error ? "true" : undefined,
+          "aria-required": required,
         })}
       </div>
 
@@ -256,22 +264,24 @@ export function AccessibleModal({
   title,
   description,
   children,
-  className = ''
+  className = "",
 }: AccessibleModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = `modal-title-${Math.random().toString(36).substr(2, 9)}`;
-  const descriptionId = description ? `modal-desc-${Math.random().toString(36).substr(2, 9)}` : undefined;
+  const descriptionId = description
+    ? `modal-desc-${Math.random().toString(36).substr(2, 9)}`
+    : undefined;
 
   useEffect(() => {
     if (isOpen) {
       // Prevent background scrolling
-      document.body.style.overflow = 'hidden';
-      
+      document.body.style.overflow = "hidden";
+
       // Announce modal opening
-      const announcement = document.createElement('div');
-      announcement.setAttribute('aria-live', 'assertive');
-      announcement.setAttribute('aria-atomic', 'true');
-      announcement.className = 'sr-only';
+      const announcement = document.createElement("div");
+      announcement.setAttribute("aria-live", "assertive");
+      announcement.setAttribute("aria-atomic", "true");
+      announcement.className = "sr-only";
       announcement.textContent = `Dialog opened: ${title}`;
       document.body.appendChild(announcement);
 
@@ -279,11 +289,11 @@ export function AccessibleModal({
         document.body.removeChild(announcement);
       }, 1000);
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen, title]);
 
@@ -297,7 +307,10 @@ export function AccessibleModal({
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
     >
-      <FocusTrap isActive={isOpen} className="w-full max-w-2xl max-h-[90vh] mx-4">
+      <FocusTrap
+        isActive={isOpen}
+        className="w-full max-w-2xl max-h-[90vh] mx-4"
+      >
         <motion.div
           ref={modalRef}
           initial={{ opacity: 0, scale: 0.9 }}
@@ -305,7 +318,7 @@ export function AccessibleModal({
           exit={{ opacity: 0, scale: 0.9 }}
           className={`bg-slate-900 border border-green-400/30 rounded-lg overflow-hidden ${className}`}
           onKeyDown={(e) => {
-            if (e.key === 'Escape') {
+            if (e.key === "Escape") {
               onClose();
             }
           }}
@@ -326,7 +339,10 @@ export function AccessibleModal({
 
           {/* Description */}
           {description && (
-            <p id={descriptionId} className="px-4 py-2 text-slate-400 text-sm border-b border-slate-700">
+            <p
+              id={descriptionId}
+              className="px-4 py-2 text-slate-400 text-sm border-b border-slate-700"
+            >
               {description}
             </p>
           )}
@@ -346,13 +362,13 @@ export function useHighContrastMode() {
   const [highContrast, setHighContrast] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('high-contrast-mode');
-    if (saved === 'true') {
+    const saved = localStorage.getItem("high-contrast-mode");
+    if (saved === "true") {
       setHighContrast(true);
     }
 
     // Check for system preference
-    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
+    const mediaQuery = window.matchMedia("(prefers-contrast: high)");
     if (mediaQuery.matches) {
       setHighContrast(true);
     }
@@ -361,18 +377,18 @@ export function useHighContrastMode() {
       setHighContrast(e.matches);
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   useEffect(() => {
     if (highContrast) {
-      document.documentElement.classList.add('high-contrast');
+      document.documentElement.classList.add("high-contrast");
     } else {
-      document.documentElement.classList.remove('high-contrast');
+      document.documentElement.classList.remove("high-contrast");
     }
-    
-    localStorage.setItem('high-contrast-mode', highContrast.toString());
+
+    localStorage.setItem("high-contrast-mode", highContrast.toString());
   }, [highContrast]);
 
   return [highContrast, setHighContrast] as const;
@@ -383,22 +399,22 @@ export function useReducedMotion() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mediaQuery.matches);
 
     const handleChange = (e: MediaQueryListEvent) => {
       setReducedMotion(e.matches);
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   useEffect(() => {
     if (reducedMotion) {
-      document.documentElement.classList.add('reduce-motion');
+      document.documentElement.classList.add("reduce-motion");
     } else {
-      document.documentElement.classList.remove('reduce-motion');
+      document.documentElement.classList.remove("reduce-motion");
     }
   }, [reducedMotion]);
 
@@ -408,16 +424,16 @@ export function useReducedMotion() {
 // Live region for dynamic content updates
 interface LiveRegionProps {
   children: React.ReactNode;
-  priority?: 'polite' | 'assertive';
+  priority?: "polite" | "assertive";
   atomic?: boolean;
   className?: string;
 }
 
-export function LiveRegion({ 
-  children, 
-  priority = 'polite', 
-  atomic = true, 
-  className = '' 
+export function LiveRegion({
+  children,
+  priority = "polite",
+  atomic = true,
+  className = "",
 }: LiveRegionProps) {
   return (
     <div
@@ -437,7 +453,10 @@ interface KeyboardHintsProps {
   className?: string;
 }
 
-export function KeyboardHints({ shortcuts, className = '' }: KeyboardHintsProps) {
+export function KeyboardHints({
+  shortcuts,
+  className = "",
+}: KeyboardHintsProps) {
   const [showHints, setShowHints] = useState(false);
 
   return (
@@ -458,7 +477,9 @@ export function KeyboardHints({ shortcuts, className = '' }: KeyboardHintsProps)
           role="region"
           aria-label="Keyboard shortcuts"
         >
-          <h3 className="text-green-400 font-semibold mb-3">Keyboard Shortcuts</h3>
+          <h3 className="text-green-400 font-semibold mb-3">
+            Keyboard Shortcuts
+          </h3>
           <ul className="space-y-2">
             {shortcuts.map((shortcut, index) => (
               <li key={index} className="flex justify-between text-sm">
@@ -483,7 +504,12 @@ interface AccessibleProgressProps {
   className?: string;
 }
 
-export function AccessibleProgress({ value, max, label, className = '' }: AccessibleProgressProps) {
+export function AccessibleProgress({
+  value,
+  max,
+  label,
+  className = "",
+}: AccessibleProgressProps) {
   const percentage = Math.round((value / max) * 100);
 
   return (
@@ -532,7 +558,11 @@ export class AccessibleErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Accessibility Error Boundary caught an error:', error, errorInfo);
+    console.error(
+      "Accessibility Error Boundary caught an error:",
+      error,
+      errorInfo,
+    );
   }
 
   render() {
@@ -547,7 +577,8 @@ export class AccessibleErrorBoundary extends React.Component<
               Something went wrong
             </h2>
             <p className="text-slate-300 mb-4">
-              An error occurred while rendering this component. Please try refreshing the page.
+              An error occurred while rendering this component. Please try
+              refreshing the page.
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}

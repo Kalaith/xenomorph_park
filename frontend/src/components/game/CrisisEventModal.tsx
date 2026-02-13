@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useGameStore } from '../../stores/gameStore';
-import { Modal } from '../ui/Modal';
-import { PulseEffect, ShakeEffect } from '../ui/VisualFeedback';
-import { CrisisEvent, Severity } from '../../types';
+import { useState, useEffect, useCallback } from "react";
+import { useGameStore } from "../../stores/gameStore";
+import { Modal } from "../ui/Modal";
+import { PulseEffect, ShakeEffect } from "../ui/VisualFeedback";
+import { CrisisEvent, Severity } from "../../types";
 
 interface CrisisEventModalProps {
   isOpen: boolean;
@@ -23,82 +23,94 @@ const extendedCrisisEvents: CrisisEvent[] = [
     name: "Containment Breach",
     probability: 0.3,
     severity: "Medium",
-    description: "Single xenomorph escapes containment. Security protocols activated.",
+    description:
+      "Single xenomorph escapes containment. Security protocols activated.",
     responseOptions: [
       "Security lockdown - Seal all exits (-20 visitors, +10 security)",
       "Colonial Marine deployment - Send armed response (+resources cost, guaranteed success)",
-      "Facility evacuation - Evacuate all civilians (-50% visitors, -facility income)"
-    ]
+      "Facility evacuation - Evacuate all civilians (-50% visitors, -facility income)",
+    ],
   },
   {
     name: "Power Failure",
     probability: 0.2,
-    severity: "High", 
-    description: "Main power grid failure detected. All containment systems at risk of shutdown.",
+    severity: "High",
+    description:
+      "Main power grid failure detected. All containment systems at risk of shutdown.",
     responseOptions: [
       "Emergency power - Use backup generators (-50% power for 2 days)",
       "Immediate evacuation - Clear facility entirely (-80% visitors, -security risk)",
-      "Manual lockdown - Manually secure all containment (-power, requires staff)"
-    ]
+      "Manual lockdown - Manually secure all containment (-power, requires staff)",
+    ],
   },
   {
     name: "Hive Outbreak",
     probability: 0.1,
     severity: "Critical",
-    description: "Multiple xenomorphs coordinate escape attempt. Threat level: MAXIMUM",
+    description:
+      "Multiple xenomorphs coordinate escape attempt. Threat level: MAXIMUM",
     responseOptions: [
       "Nuclear option - Sterilize contaminated areas (-facilities, guaranteed elimination)",
       "Full marine assault - Deploy entire security force (-credits, -staff safety)",
-      "Abandon facility - Evacuate all personnel and seal facility (-game over scenario)"
-    ]
+      "Abandon facility - Evacuate all personnel and seal facility (-game over scenario)",
+    ],
   },
   {
     name: "Visitor Incident",
     probability: 0.25,
     severity: "Low",
-    description: "Tourist safety incident reported. Media attention increasing.",
+    description:
+      "Tourist safety incident reported. Media attention increasing.",
     responseOptions: [
       "Cover-up - Use corporate influence to suppress news (-credits, +reputation)",
       "Public relations - Hold press conference and show transparency (+trust, -secrets)",
-      "Compensation - Pay damages to affected parties (-credits, +visitor confidence)"
-    ]
+      "Compensation - Pay damages to affected parties (-credits, +visitor confidence)",
+    ],
   },
   {
     name: "Research Contamination",
     probability: 0.15,
     severity: "Medium",
-    description: "Laboratory contamination detected. Research materials compromised.",
+    description:
+      "Laboratory contamination detected. Research materials compromised.",
     responseOptions: [
       "Quarantine lab - Seal and decontaminate research area (-research progress)",
       "Continue research - Risk spreading contamination for scientific gain (+research, +risk)",
-      "Destroy samples - Eliminate contamination but lose research data (-research points)"
-    ]
+      "Destroy samples - Eliminate contamination but lose research data (-research points)",
+    ],
   },
   {
     name: "Staff Rebellion",
     probability: 0.1,
     severity: "High",
-    description: "Facility staff protest dangerous working conditions. Morale critical.",
+    description:
+      "Facility staff protest dangerous working conditions. Morale critical.",
     responseOptions: [
       "Increase security - Use force to maintain order (-staff morale, +control)",
       "Negotiate demands - Meet staff safety requirements (+credits cost, +morale)",
-      "Replace staff - Hire new personnel with fewer scruples (-time, -expertise)"
-    ]
+      "Replace staff - Hire new personnel with fewer scruples (-time, -expertise)",
+    ],
   },
   {
     name: "Corporate Inspection",
     probability: 0.2,
     severity: "Medium",
-    description: "Weyland-Yutani corporate inspection team arrives unannounced.",
+    description:
+      "Weyland-Yutani corporate inspection team arrives unannounced.",
     responseOptions: [
       "Full cooperation - Show all facilities and records (+corporate standing)",
       "Limited access - Restrict access to sensitive areas (+secrecy, -trust)",
-      "Bribe officials - Use credits to ensure favorable report (-credits, +results)"
-    ]
-  }
+      "Bribe officials - Use credits to ensure favorable report (-credits, +results)",
+    ],
+  },
 ];
 
-export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisEventModalProps) {
+export function CrisisEventModal({
+  isOpen,
+  event,
+  onClose,
+  onResponse,
+}: CrisisEventModalProps) {
   void onClose;
   const [selectedResponse, setSelectedResponse] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(30);
@@ -109,15 +121,15 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
 
     setTimeRemaining(30);
     setSelectedResponse(null);
-    
+
     // Trigger shake effect for high severity events
-    if (event.severity === 'Critical' || event.severity === 'High') {
+    if (event.severity === "Critical" || event.severity === "High") {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 1000);
     }
 
     const timer = setInterval(() => {
-      setTimeRemaining(prev => {
+      setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Auto-select first option if time runs out
           onResponse(event.responseOptions[0]);
@@ -139,27 +151,27 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
 
   const getSeverityColor = (severity: Severity) => {
     switch (severity) {
-      case 'Critical':
-        return 'text-red-400 border-red-400 bg-red-400/20';
-      case 'High':
-        return 'text-orange-400 border-orange-400 bg-orange-400/20';
-      case 'Medium':
-        return 'text-yellow-400 border-yellow-400 bg-yellow-400/20';
+      case "Critical":
+        return "text-red-400 border-red-400 bg-red-400/20";
+      case "High":
+        return "text-orange-400 border-orange-400 bg-orange-400/20";
+      case "Medium":
+        return "text-yellow-400 border-yellow-400 bg-yellow-400/20";
       default:
-        return 'text-green-400 border-green-400 bg-green-400/20';
+        return "text-green-400 border-green-400 bg-green-400/20";
     }
   };
 
   const getSeverityIcon = (severity: Severity) => {
     switch (severity) {
-      case 'Critical':
-        return '🚨';
-      case 'High':
-        return '⚠️';
-      case 'Medium':
-        return '🔶';
+      case "Critical":
+        return "🚨";
+      case "High":
+        return "⚠️";
+      case "Medium":
+        return "🔶";
       default:
-        return 'ℹ️';
+        return "ℹ️";
     }
   };
 
@@ -167,16 +179,20 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
 
   return (
     <ShakeEffect shake={isShaking}>
-      <Modal 
-        isOpen={isOpen} 
+      <Modal
+        isOpen={isOpen}
         onClose={() => {}} // Prevent manual close during crisis
         title={`🚨 CRISIS EVENT`}
       >
         <div className="space-y-6">
           {/* Event Header */}
-          <div className={`border rounded-lg p-4 ${getSeverityColor(event.severity)}`}>
+          <div
+            className={`border rounded-lg p-4 ${getSeverityColor(event.severity)}`}
+          >
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">{getSeverityIcon(event.severity)}</span>
+              <span className="text-2xl">
+                {getSeverityIcon(event.severity)}
+              </span>
               <div>
                 <h3 className="text-xl font-bold">{event.name}</h3>
                 <div className="flex items-center gap-4 text-sm">
@@ -194,14 +210,20 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Response Time Remaining</span>
-              <span className={timeRemaining <= 10 ? 'text-red-400 font-bold' : 'text-slate-400'}>
+              <span
+                className={
+                  timeRemaining <= 10
+                    ? "text-red-400 font-bold"
+                    : "text-slate-400"
+                }
+              >
                 {timeRemaining}s
               </span>
             </div>
             <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
-              <div 
+              <div
                 className={`h-full transition-all duration-1000 ${
-                  timeRemaining <= 10 ? 'bg-red-400' : 'bg-yellow-400'
+                  timeRemaining <= 10 ? "bg-red-400" : "bg-yellow-400"
                 }`}
                 style={{ width: `${(timeRemaining / 30) * 100}%` }}
               />
@@ -210,11 +232,13 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
 
           {/* Response Options */}
           <div className="space-y-3">
-            <h4 className="text-green-400 font-semibold">Choose Your Response:</h4>
+            <h4 className="text-green-400 font-semibold">
+              Choose Your Response:
+            </h4>
             {event.responseOptions.map((option, index) => {
               const isSelected = selectedResponse === option;
-              const [action, consequence] = option.split(' - ');
-              
+              const [action, consequence] = option.split(" - ");
+
               return (
                 <PulseEffect key={index} pulse={isSelected} color="green">
                   <button
@@ -222,17 +246,18 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
                     disabled={!!selectedResponse}
                     className={`
                       w-full text-left p-4 rounded-lg border-2 transition-all duration-200
-                      ${isSelected 
-                        ? 'border-green-400 bg-green-400/20 text-green-400' 
-                        : 'border-slate-600 bg-slate-800 hover:border-green-400/50 hover:bg-slate-700'
+                      ${
+                        isSelected
+                          ? "border-green-400 bg-green-400/20 text-green-400"
+                          : "border-slate-600 bg-slate-800 hover:border-green-400/50 hover:bg-slate-700"
                       }
-                      ${selectedResponse && !isSelected ? 'opacity-50' : ''}
+                      ${selectedResponse && !isSelected ? "opacity-50" : ""}
                       disabled:cursor-not-allowed
                     `}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-xl mt-1">
-                        {index === 0 ? '🛡️' : index === 1 ? '⚔️' : '🏃'}
+                        {index === 0 ? "🛡️" : index === 1 ? "⚔️" : "🏃"}
                       </span>
                       <div className="flex-1">
                         <div className="font-semibold text-slate-300 mb-1">
@@ -260,7 +285,8 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
               <span>⚠️</span>
               <span>
                 Crisis events have permanent consequences. Choose carefully!
-                {timeRemaining <= 10 && " Time running out - first option will be auto-selected!"}
+                {timeRemaining <= 10 &&
+                  " Time running out - first option will be auto-selected!"}
               </span>
             </div>
           </div>
@@ -279,13 +305,8 @@ export function CrisisEventModal({ isOpen, event, onClose, onResponse }: CrisisE
 
 // Crisis Manager Hook
 export function useCrisisManager() {
-  const { 
-    updateResources, 
-    resources, 
-    xenomorphs,
-    addStatusMessage,
-    day
-  } = useGameStore();
+  const { updateResources, resources, xenomorphs, addStatusMessage, day } =
+    useGameStore();
 
   const [activeCrisis, setActiveCrisis] = useState<ActiveCrisis | null>(null);
   const [lastCrisisDay, setLastCrisisDay] = useState(0);
@@ -299,8 +320,8 @@ export function useCrisisManager() {
     baseProbability += xenomorphs.length * 0.05;
 
     // Increase probability based on low security
-    if (resources.security === 'Low') baseProbability += 0.2;
-    else if (resources.security === 'Medium') baseProbability += 0.1;
+    if (resources.security === "Low") baseProbability += 0.2;
+    else if (resources.security === "Medium") baseProbability += 0.1;
 
     // Increase probability based on power shortage
     if (resources.power < resources.maxPower * 0.3) baseProbability += 0.3;
@@ -309,7 +330,14 @@ export function useCrisisManager() {
     if (day - lastCrisisDay < 3) baseProbability *= 0.5;
 
     return Math.min(baseProbability, 0.8); // Cap at 80%
-  }, [xenomorphs.length, resources.security, resources.power, resources.maxPower, day, lastCrisisDay]);
+  }, [
+    xenomorphs.length,
+    resources.security,
+    resources.power,
+    resources.maxPower,
+    day,
+    lastCrisisDay,
+  ]);
 
   // Trigger crisis check
   const checkForCrisis = useCallback(() => {
@@ -318,66 +346,84 @@ export function useCrisisManager() {
     const probability = calculateCrisisProbability();
     if (Math.random() < probability) {
       // Select random crisis event
-      const availableEvents = extendedCrisisEvents.filter(event => 
-        !crisisHistory.includes(event.name) || crisisHistory.length >= extendedCrisisEvents.length
+      const availableEvents = extendedCrisisEvents.filter(
+        (event) =>
+          !crisisHistory.includes(event.name) ||
+          crisisHistory.length >= extendedCrisisEvents.length,
       );
-      
-      const selectedEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
-      
+
+      const selectedEvent =
+        availableEvents[Math.floor(Math.random() * availableEvents.length)];
+
       setActiveCrisis({
         event: selectedEvent,
         timeRemaining: 30,
         consequences: [],
-        resolved: false
+        resolved: false,
       });
 
       setLastCrisisDay(day);
-      addStatusMessage(`🚨 Crisis Event: ${selectedEvent.name}`, 'error');
+      addStatusMessage(`🚨 Crisis Event: ${selectedEvent.name}`, "error");
     }
-  }, [activeCrisis, calculateCrisisProbability, crisisHistory, day, addStatusMessage]);
+  }, [
+    activeCrisis,
+    calculateCrisisProbability,
+    crisisHistory,
+    day,
+    addStatusMessage,
+  ]);
 
   // Handle crisis response
-  const handleCrisisResponse = useCallback((response: string) => {
-    if (!activeCrisis) return;
+  const handleCrisisResponse = useCallback(
+    (response: string) => {
+      if (!activeCrisis) return;
 
-    const consequences = applyCrisisConsequences(activeCrisis.event, response);
-    
-    setActiveCrisis(null);
-    setCrisisHistory(prev => [...prev, activeCrisis.event.name]);
-    
-    // Apply consequences
-    consequences.forEach(consequence => {
-      addStatusMessage(consequence, 'warning');
-    });
+      const consequences = applyCrisisConsequences(
+        activeCrisis.event,
+        response,
+      );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCrisis, addStatusMessage]);
+      setActiveCrisis(null);
+      setCrisisHistory((prev) => [...prev, activeCrisis.event.name]);
 
-  const applyCrisisConsequences = (event: CrisisEvent, response: string): string[] => {
+      // Apply consequences
+      consequences.forEach((consequence) => {
+        addStatusMessage(consequence, "warning");
+      });
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [activeCrisis, addStatusMessage],
+  );
+
+  const applyCrisisConsequences = (
+    event: CrisisEvent,
+    response: string,
+  ): string[] => {
     const consequences: string[] = [];
-    
+
     // Parse response for consequences
-    if (response.includes('-20 visitors')) {
+    if (response.includes("-20 visitors")) {
       updateResources({ visitors: Math.max(0, resources.visitors - 20) });
-      consequences.push('Visitor count decreased by 20');
-    }
-    
-    if (response.includes('+10 security')) {
-      // Would need to implement security level changes
-      consequences.push('Security level increased');
-    }
-    
-    if (response.includes('-50% visitors')) {
-      updateResources({ visitors: Math.floor(resources.visitors * 0.5) });
-      consequences.push('Visitor count reduced by 50%');
-    }
-    
-    if (response.includes('-50% power')) {
-      updateResources({ power: Math.floor(resources.power * 0.5) });
-      consequences.push('Power reduced by 50% for emergency protocols');
+      consequences.push("Visitor count decreased by 20");
     }
 
-    if (response.includes('-credits')) {
+    if (response.includes("+10 security")) {
+      // Would need to implement security level changes
+      consequences.push("Security level increased");
+    }
+
+    if (response.includes("-50% visitors")) {
+      updateResources({ visitors: Math.floor(resources.visitors * 0.5) });
+      consequences.push("Visitor count reduced by 50%");
+    }
+
+    if (response.includes("-50% power")) {
+      updateResources({ power: Math.floor(resources.power * 0.5) });
+      consequences.push("Power reduced by 50% for emergency protocols");
+    }
+
+    if (response.includes("-credits")) {
       const cost = Math.floor(resources.credits * 0.2);
       updateResources({ credits: Math.max(0, resources.credits - cost) });
       consequences.push(`Emergency response cost: ${cost} credits`);
@@ -391,13 +437,19 @@ export function useCrisisManager() {
     checkForCrisis,
     handleCrisisResponse,
     crisisHistory,
-    CrisisModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+    CrisisModal: ({
+      isOpen,
+      onClose,
+    }: {
+      isOpen: boolean;
+      onClose: () => void;
+    }) => (
       <CrisisEventModal
         isOpen={isOpen && !!activeCrisis}
         event={activeCrisis?.event || null}
         onClose={onClose}
         onResponse={handleCrisisResponse}
       />
-    )
+    ),
   };
 }

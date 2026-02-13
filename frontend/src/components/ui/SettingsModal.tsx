@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Modal } from './Modal';
-import { Button } from './Button';
-import { useGameStore } from '../../stores/gameStore';
-import { saveManager } from '../../utils/saveManager';
+import { useState, useEffect } from "react";
+import { Modal } from "./Modal";
+import { Button } from "./Button";
+import { useGameStore } from "../../stores/gameStore";
+import { saveManager } from "../../utils/saveManager";
 
 interface GameSettings {
   autoSave: boolean;
   autoSaveInterval: number;
-  gridSize: 'small' | 'medium' | 'large';
+  gridSize: "small" | "medium" | "large";
   animations: boolean;
   soundEffects: boolean;
   notifications: boolean;
-  theme: 'dark' | 'light' | 'high-contrast';
-  language: 'en' | 'es' | 'fr' | 'de';
+  theme: "dark" | "light" | "high-contrast";
+  language: "en" | "es" | "fr" | "de";
 }
 
 interface SettingsModalProps {
@@ -23,28 +23,30 @@ interface SettingsModalProps {
 const defaultSettings: GameSettings = {
   autoSave: true,
   autoSaveInterval: 30,
-  gridSize: 'medium',
+  gridSize: "medium",
   animations: true,
   soundEffects: true,
   notifications: true,
-  theme: 'dark',
-  language: 'en'
+  theme: "dark",
+  language: "en",
 };
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [settings, setSettings] = useState<GameSettings>(defaultSettings);
-  const [activeTab, setActiveTab] = useState<'game' | 'display' | 'audio' | 'saves'>('game');
+  const [activeTab, setActiveTab] = useState<
+    "game" | "display" | "audio" | "saves"
+  >("game");
   const { addStatusMessage, loadGame } = useGameStore();
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem('xenomorph-park-settings');
+    const savedSettings = localStorage.getItem("xenomorph-park-settings");
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
         setSettings({ ...defaultSettings, ...parsed });
       } catch (error) {
-        console.error('Failed to load settings:', error);
+        console.error("Failed to load settings:", error);
       }
     }
   }, []);
@@ -52,32 +54,35 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   // Save settings to localStorage
   const saveSettings = (newSettings: GameSettings) => {
     setSettings(newSettings);
-    localStorage.setItem('xenomorph-park-settings', JSON.stringify(newSettings));
-    addStatusMessage('Settings saved', 'success');
+    localStorage.setItem(
+      "xenomorph-park-settings",
+      JSON.stringify(newSettings),
+    );
+    addStatusMessage("Settings saved", "success");
   };
 
   const handleSettingChange = <K extends keyof GameSettings>(
     key: K,
-    value: GameSettings[K]
+    value: GameSettings[K],
   ) => {
     const newSettings = { ...settings, [key]: value };
     saveSettings(newSettings);
   };
 
   const resetSettings = () => {
-    if (confirm('Reset all settings to default values?')) {
+    if (confirm("Reset all settings to default values?")) {
       saveSettings(defaultSettings);
     }
   };
 
   const exportSettings = () => {
     const dataStr = JSON.stringify(settings, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'xenomorph-park-settings.json';
+    link.download = "xenomorph-park-settings.json";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -93,9 +98,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       try {
         const imported = JSON.parse(e.target?.result as string);
         saveSettings({ ...defaultSettings, ...imported });
-        addStatusMessage('Settings imported successfully', 'success');
+        addStatusMessage("Settings imported successfully", "success");
       } catch {
-        addStatusMessage('Failed to import settings', 'error');
+        addStatusMessage("Failed to import settings", "error");
       }
     };
     reader.readAsText(file);
@@ -105,10 +110,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const storageInfo = saveManager.getStorageUsage();
 
   const tabs = [
-    { id: 'game' as const, label: '🎮 Game', icon: '🎮' },
-    { id: 'display' as const, label: '🖥️ Display', icon: '🖥️' },
-    { id: 'audio' as const, label: '🔊 Audio', icon: '🔊' },
-    { id: 'saves' as const, label: '💾 Saves', icon: '💾' }
+    { id: "game" as const, label: "🎮 Game", icon: "🎮" },
+    { id: "display" as const, label: "🖥️ Display", icon: "🖥️" },
+    { id: "audio" as const, label: "🔊 Audio", icon: "🔊" },
+    { id: "saves" as const, label: "💾 Saves", icon: "💾" },
   ];
 
   return (
@@ -122,8 +127,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'text-green-400 border-b-2 border-green-400'
-                  : 'text-slate-400 hover:text-slate-300'
+                  ? "text-green-400 border-b-2 border-green-400"
+                  : "text-slate-400 hover:text-slate-300"
               }`}
             >
               {tab.label}
@@ -132,26 +137,35 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Game Settings Tab */}
-        {activeTab === 'game' && (
+        {activeTab === "game" && (
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-green-400">Gameplay</h3>
-              
+
               <div className="flex items-center justify-between">
                 <label className="text-slate-300">Auto Save</label>
                 <input
                   type="checkbox"
                   checked={settings.autoSave}
-                  onChange={(e) => handleSettingChange('autoSave', e.target.checked)}
+                  onChange={(e) =>
+                    handleSettingChange("autoSave", e.target.checked)
+                  }
                   className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="text-slate-300">Auto Save Interval (seconds)</label>
+                <label className="text-slate-300">
+                  Auto Save Interval (seconds)
+                </label>
                 <select
                   value={settings.autoSaveInterval}
-                  onChange={(e) => handleSettingChange('autoSaveInterval', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "autoSaveInterval",
+                      parseInt(e.target.value),
+                    )
+                  }
                   className="bg-slate-700 border border-slate-600 text-slate-300 rounded px-2 py-1"
                   disabled={!settings.autoSave}
                 >
@@ -166,7 +180,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <label className="text-slate-300">Grid Size</label>
                 <select
                   value={settings.gridSize}
-                  onChange={(e) => handleSettingChange('gridSize', e.target.value as GameSettings['gridSize'])}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "gridSize",
+                      e.target.value as GameSettings["gridSize"],
+                    )
+                  }
                   className="bg-slate-700 border border-slate-600 text-slate-300 rounded px-2 py-1"
                 >
                   <option value="small">Small (6x6)</option>
@@ -179,7 +198,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <label className="text-slate-300">Language</label>
                 <select
                   value={settings.language}
-                  onChange={(e) => handleSettingChange('language', e.target.value as GameSettings['language'])}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "language",
+                      e.target.value as GameSettings["language"],
+                    )
+                  }
                   className="bg-slate-700 border border-slate-600 text-slate-300 rounded px-2 py-1"
                 >
                   <option value="en">English</option>
@@ -193,16 +217,21 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         )}
 
         {/* Display Settings Tab */}
-        {activeTab === 'display' && (
+        {activeTab === "display" && (
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-green-400">Visual</h3>
-              
+
               <div className="flex items-center justify-between">
                 <label className="text-slate-300">Theme</label>
                 <select
                   value={settings.theme}
-                  onChange={(e) => handleSettingChange('theme', e.target.value as GameSettings['theme'])}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "theme",
+                      e.target.value as GameSettings["theme"],
+                    )
+                  }
                   className="bg-slate-700 border border-slate-600 text-slate-300 rounded px-2 py-1"
                 >
                   <option value="dark">Dark</option>
@@ -216,7 +245,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <input
                   type="checkbox"
                   checked={settings.animations}
-                  onChange={(e) => handleSettingChange('animations', e.target.checked)}
+                  onChange={(e) =>
+                    handleSettingChange("animations", e.target.checked)
+                  }
                   className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
                 />
               </div>
@@ -226,7 +257,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <input
                   type="checkbox"
                   checked={settings.notifications}
-                  onChange={(e) => handleSettingChange('notifications', e.target.checked)}
+                  onChange={(e) =>
+                    handleSettingChange("notifications", e.target.checked)
+                  }
                   className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
                 />
               </div>
@@ -235,53 +268,68 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         )}
 
         {/* Audio Settings Tab */}
-        {activeTab === 'audio' && (
+        {activeTab === "audio" && (
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-green-400">Sound</h3>
-              
+
               <div className="flex items-center justify-between">
                 <label className="text-slate-300">Sound Effects</label>
                 <input
                   type="checkbox"
                   checked={settings.soundEffects}
-                  onChange={(e) => handleSettingChange('soundEffects', e.target.checked)}
+                  onChange={(e) =>
+                    handleSettingChange("soundEffects", e.target.checked)
+                  }
                   className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
                 />
               </div>
 
               <div className="text-sm text-slate-400">
                 <p>🔊 Sound system integration coming soon</p>
-                <p>This will include ambient sounds, UI feedback, and alert sounds</p>
+                <p>
+                  This will include ambient sounds, UI feedback, and alert
+                  sounds
+                </p>
               </div>
             </div>
           </div>
         )}
 
         {/* Save Management Tab */}
-        {activeTab === 'saves' && (
+        {activeTab === "saves" && (
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-green-400">Save Management</h3>
-              
+              <h3 className="text-lg font-semibold text-green-400">
+                Save Management
+              </h3>
+
               <div className="bg-slate-800 rounded p-3">
                 <p className="text-sm text-slate-300 mb-2">Storage Usage</p>
                 <div className="w-full bg-slate-700 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-green-400 h-2 rounded-full transition-all"
-                    style={{ width: `${Math.min(storageInfo.percentage, 100)}%` }}
+                    style={{
+                      width: `${Math.min(storageInfo.percentage, 100)}%`,
+                    }}
                   />
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  {(storageInfo.used / 1024).toFixed(1)}KB / {(storageInfo.available / 1024).toFixed(0)}KB
+                  {(storageInfo.used / 1024).toFixed(1)}KB /{" "}
+                  {(storageInfo.available / 1024).toFixed(0)}KB
                 </p>
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm text-slate-300">Available Save Slots ({getAllSaves().length})</p>
+                <p className="text-sm text-slate-300">
+                  Available Save Slots ({getAllSaves().length})
+                </p>
                 <div className="max-h-32 overflow-y-auto space-y-1">
                   {getAllSaves().map((save) => (
-                    <div key={save.id} className="flex items-center justify-between bg-slate-800 rounded p-2">
+                    <div
+                      key={save.id}
+                      className="flex items-center justify-between bg-slate-800 rounded p-2"
+                    >
                       <div>
                         <p className="text-sm text-slate-300">{save.name}</p>
                         <p className="text-xs text-slate-400">
@@ -327,10 +375,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 >
                   🧹 Cleanup Old Saves
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={exportSettings}
-                >
+                <Button variant="outline" onClick={exportSettings}>
                   📤 Export Settings
                 </Button>
                 <label className="cursor-pointer">

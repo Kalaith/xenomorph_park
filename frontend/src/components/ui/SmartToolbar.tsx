@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button } from './Button';
+import { useState } from "react";
+import { Button } from "./Button";
 
 interface ToolbarGroup {
   id: string;
@@ -23,7 +23,7 @@ interface SmartToolbarProps {
   className?: string;
 }
 
-export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
+export function SmartToolbar({ groups, className = "" }: SmartToolbarProps) {
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   const toggleGroup = (groupId: string) => {
@@ -35,13 +35,15 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
   };
 
   return (
-    <div className={`bg-slate-900/95 border border-green-400/30 rounded-lg ${className}`}>
+    <div
+      className={`bg-slate-900/95 border border-green-400/30 rounded-lg ${className}`}
+    >
       {/* Main Toolbar */}
       <div className="flex items-center gap-1 p-2">
         {groups.map((group) => (
           <div key={group.id} className="relative">
             <Button
-              variant={activeGroup === group.id ? 'primary' : 'outline'}
+              variant={activeGroup === group.id ? "primary" : "outline"}
               size="sm"
               onClick={() => toggleGroup(group.id)}
               className="relative flex items-center gap-2 min-w-[80px]"
@@ -62,7 +64,7 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
       {activeGroup && (
         <div className="border-t border-green-400/30 p-3 bg-slate-800/50">
           {(() => {
-            const group = groups.find(g => g.id === activeGroup);
+            const group = groups.find((g) => g.id === activeGroup);
             if (!group) return null;
 
             return (
@@ -109,36 +111,43 @@ export function useMainToolbar(startTutorial?: () => void) {
 
   const groups: ToolbarGroup[] = [
     {
-      id: 'help',
-      label: 'Help',
-      icon: '❓',
+      id: "help",
+      label: "Help",
+      icon: "❓",
       items: [
         {
-          id: 'tutorial',
-          label: 'Tutorial',
-          icon: '📚',
-          onClick: () => startTutorial?.()
+          id: "tutorial",
+          label: "Tutorial",
+          icon: "📚",
+          onClick: () => startTutorial?.(),
         },
         {
-          id: 'settings',
-          label: 'Settings',
-          icon: '⚙️',
-          onClick: () => setShowSettings(true)
-        }
-      ]
-    }
+          id: "settings",
+          label: "Settings",
+          icon: "⚙️",
+          onClick: () => setShowSettings(true),
+        },
+      ],
+    },
   ];
 
   return {
     groups,
     modals: {
-      showCampaign, setShowCampaign,
-      showCampaignStats, setShowCampaignStats,
-      showHistorical, setShowHistorical,
-      showAchievements, setShowAchievements,
-      showResearchTree, setShowResearchTree,
-      showGeneticLab, setShowGeneticLab,
-      showSettings, setShowSettings
-    }
+      showCampaign,
+      setShowCampaign,
+      showCampaignStats,
+      setShowCampaignStats,
+      showHistorical,
+      setShowHistorical,
+      showAchievements,
+      setShowAchievements,
+      showResearchTree,
+      setShowResearchTree,
+      showGeneticLab,
+      setShowGeneticLab,
+      showSettings,
+      setShowSettings,
+    },
   };
 }
