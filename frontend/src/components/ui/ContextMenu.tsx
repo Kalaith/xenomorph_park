@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 interface ContextMenuItem {
   id: string;
@@ -16,12 +16,7 @@ interface ContextMenuProps {
   onClose: () => void;
 }
 
-export function ContextMenu({
-  isOpen,
-  position,
-  items,
-  onClose,
-}: ContextMenuProps) {
+export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,19 +27,19 @@ export function ContextMenu({
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
 
@@ -91,7 +86,7 @@ export function ContextMenu({
           top: finalPosition.y,
         }}
       >
-        {items.map((item) => (
+        {items.map(item => (
           <button
             key={item.id}
             onClick={() => {
@@ -106,16 +101,14 @@ export function ContextMenu({
               flex items-center gap-3
               ${
                 item.disabled
-                  ? "text-slate-500 cursor-not-allowed"
+                  ? 'text-slate-500 cursor-not-allowed'
                   : item.destructive
-                    ? "text-red-400 hover:bg-red-400/10"
-                    : "text-slate-200 hover:bg-slate-700"
+                    ? 'text-red-400 hover:bg-red-400/10'
+                    : 'text-slate-200 hover:bg-slate-700'
               }
             `}
           >
-            {item.icon && (
-              <span className="text-lg leading-none">{item.icon}</span>
-            )}
+            {item.icon && <span className="text-lg leading-none">{item.icon}</span>}
             <span>{item.label}</span>
           </button>
         ))}

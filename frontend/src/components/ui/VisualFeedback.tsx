@@ -1,17 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 interface FloatingNumberProps {
   value: number;
   x: number;
   y: number;
-  type: "credits" | "power" | "research" | "damage";
+  type: 'credits' | 'power' | 'research' | 'damage';
   onComplete: () => void;
 }
 
 interface PulseEffectProps {
   children: React.ReactNode;
   pulse: boolean;
-  color?: "green" | "red" | "blue" | "yellow";
+  color?: 'green' | 'red' | 'blue' | 'yellow';
 }
 
 interface ShakeEffectProps {
@@ -20,13 +20,7 @@ interface ShakeEffectProps {
 }
 
 // Floating number animation for resource changes
-export function FloatingNumber({
-  value,
-  x,
-  y,
-  type,
-  onComplete,
-}: FloatingNumberProps) {
+export function FloatingNumber({ value, x, y, type, onComplete }: FloatingNumberProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -40,21 +34,21 @@ export function FloatingNumber({
 
   const getTypeStyles = () => {
     switch (type) {
-      case "credits":
-        return "text-yellow-400";
-      case "power":
-        return "text-blue-400";
-      case "research":
-        return "text-purple-400";
-      case "damage":
-        return "text-red-400";
+      case 'credits':
+        return 'text-yellow-400';
+      case 'power':
+        return 'text-blue-400';
+      case 'research':
+        return 'text-purple-400';
+      case 'damage':
+        return 'text-red-400';
       default:
-        return "text-green-400";
+        return 'text-green-400';
     }
   };
 
   const formatValue = () => {
-    const prefix = value > 0 ? "+" : "";
+    const prefix = value > 0 ? '+' : '';
     return `${prefix}${value}`;
   };
 
@@ -64,16 +58,12 @@ export function FloatingNumber({
         fixed pointer-events-none z-50 font-bold text-lg
         transition-all duration-1500 ease-out
         ${getTypeStyles()}
-        ${
-          isVisible
-            ? "opacity-100 transform translate-y-0"
-            : "opacity-0 transform -translate-y-8"
-        }
+        ${isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-8'}
       `}
       style={{
         left: x,
         top: y,
-        textShadow: "0 0 10px currentColor",
+        textShadow: '0 0 10px currentColor',
       }}
     >
       {formatValue()}
@@ -82,21 +72,17 @@ export function FloatingNumber({
 }
 
 // Pulse effect for highlighting elements
-export function PulseEffect({
-  children,
-  pulse,
-  color = "green",
-}: PulseEffectProps) {
+export function PulseEffect({ children, pulse, color = 'green' }: PulseEffectProps) {
   const getColorClass = () => {
     switch (color) {
-      case "red":
-        return "shadow-red-400/50";
-      case "blue":
-        return "shadow-blue-400/50";
-      case "yellow":
-        return "shadow-yellow-400/50";
+      case 'red':
+        return 'shadow-red-400/50';
+      case 'blue':
+        return 'shadow-blue-400/50';
+      case 'yellow':
+        return 'shadow-yellow-400/50';
       default:
-        return "shadow-green-400/50";
+        return 'shadow-green-400/50';
     }
   };
 
@@ -104,7 +90,7 @@ export function PulseEffect({
     <div
       className={`
         transition-all duration-500
-        ${pulse ? `animate-pulse shadow-lg ${getColorClass()}` : ""}
+        ${pulse ? `animate-pulse shadow-lg ${getColorClass()}` : ''}
       `}
     >
       {children}
@@ -118,7 +104,7 @@ export function ShakeEffect({ children, shake }: ShakeEffectProps) {
     <div
       className={`
         transition-transform duration-200
-        ${shake ? "animate-shake" : ""}
+        ${shake ? 'animate-shake' : ''}
       `}
     >
       {children}
@@ -128,33 +114,33 @@ export function ShakeEffect({ children, shake }: ShakeEffectProps) {
 
 // Loading spinner component
 export function LoadingSpinner({
-  size = "md",
-  color = "green",
+  size = 'md',
+  color = 'green',
 }: {
-  size?: "sm" | "md" | "lg";
-  color?: "green" | "blue" | "red" | "yellow";
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'green' | 'blue' | 'red' | 'yellow';
 }) {
   const getSizeClass = () => {
     switch (size) {
-      case "sm":
-        return "w-4 h-4";
-      case "lg":
-        return "w-8 h-8";
+      case 'sm':
+        return 'w-4 h-4';
+      case 'lg':
+        return 'w-8 h-8';
       default:
-        return "w-6 h-6";
+        return 'w-6 h-6';
     }
   };
 
   const getColorClass = () => {
     switch (color) {
-      case "blue":
-        return "border-blue-400";
-      case "red":
-        return "border-red-400";
-      case "yellow":
-        return "border-yellow-400";
+      case 'blue':
+        return 'border-blue-400';
+      case 'red':
+        return 'border-red-400';
+      case 'yellow':
+        return 'border-yellow-400';
       default:
-        return "border-green-400";
+        return 'border-green-400';
     }
   };
 
@@ -173,13 +159,13 @@ export function LoadingSpinner({
 export function AnimatedProgressBar({
   value,
   max,
-  color = "green",
+  color = 'green',
   label,
   showPercentage = true,
 }: {
   value: number;
   max: number;
-  color?: "green" | "blue" | "red" | "yellow";
+  color?: 'green' | 'blue' | 'red' | 'yellow';
   label?: string;
   showPercentage?: boolean;
 }) {
@@ -187,25 +173,25 @@ export function AnimatedProgressBar({
 
   const getColorClasses = () => {
     switch (color) {
-      case "blue":
+      case 'blue':
         return {
-          bg: "bg-blue-400",
-          glow: "shadow-blue-400/30",
+          bg: 'bg-blue-400',
+          glow: 'shadow-blue-400/30',
         };
-      case "red":
+      case 'red':
         return {
-          bg: "bg-red-400",
-          glow: "shadow-red-400/30",
+          bg: 'bg-red-400',
+          glow: 'shadow-red-400/30',
         };
-      case "yellow":
+      case 'yellow':
         return {
-          bg: "bg-yellow-400",
-          glow: "shadow-yellow-400/30",
+          bg: 'bg-yellow-400',
+          glow: 'shadow-yellow-400/30',
         };
       default:
         return {
-          bg: "bg-green-400",
-          glow: "shadow-green-400/30",
+          bg: 'bg-green-400',
+          glow: 'shadow-green-400/30',
         };
     }
   };
@@ -238,19 +224,16 @@ export function AnimatedProgressBar({
 export function FeedbackButton({
   children,
   onClick,
-  variant = "primary",
+  variant = 'primary',
   loading = false,
   success = false,
   error = false,
   disabled = false,
   ...props
-}: Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "onClick" | "disabled"
-> & {
+}: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> & {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: "primary" | "secondary" | "danger";
+  variant?: 'primary' | 'secondary' | 'danger';
   loading?: boolean;
   success?: boolean;
   error?: boolean;
@@ -269,22 +252,22 @@ export function FeedbackButton({
 
   const getVariantClasses = () => {
     if (success) {
-      return "bg-green-500 hover:bg-green-600 text-white border-green-400";
+      return 'bg-green-500 hover:bg-green-600 text-white border-green-400';
     }
     if (error) {
-      return "bg-red-500 hover:bg-red-600 text-white border-red-400";
+      return 'bg-red-500 hover:bg-red-600 text-white border-red-400';
     }
     if (disabled || loading) {
-      return "bg-slate-600 text-slate-400 border-slate-500 cursor-not-allowed";
+      return 'bg-slate-600 text-slate-400 border-slate-500 cursor-not-allowed';
     }
 
     switch (variant) {
-      case "secondary":
-        return "bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600";
-      case "danger":
-        return "bg-red-600 hover:bg-red-700 text-white border-red-500";
+      case 'secondary':
+        return 'bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600';
+      case 'danger':
+        return 'bg-red-600 hover:bg-red-700 text-white border-red-500';
       default:
-        return "bg-green-600 hover:bg-green-700 text-white border-green-500";
+        return 'bg-green-600 hover:bg-green-700 text-white border-green-500';
     }
   };
 
@@ -296,10 +279,10 @@ export function FeedbackButton({
       className={`
         px-4 py-2 rounded border transition-all duration-200
         ${getVariantClasses()}
-        ${isClicked ? "transform scale-95" : "transform scale-100"}
-        ${loading ? "animate-pulse" : ""}
+        ${isClicked ? 'transform scale-95' : 'transform scale-100'}
+        ${loading ? 'animate-pulse' : ''}
         hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-opacity-50
-        ${variant === "primary" ? "focus:ring-green-400" : "focus:ring-slate-400"}
+        ${variant === 'primary' ? 'focus:ring-green-400' : 'focus:ring-slate-400'}
       `}
     >
       <div className="flex items-center gap-2">
@@ -320,30 +303,25 @@ export function useFloatingNumbers() {
       value: number;
       x: number;
       y: number;
-      type: "credits" | "power" | "research" | "damage";
+      type: 'credits' | 'power' | 'research' | 'damage';
     }>
   >([]);
 
   const addFloatingNumber = useCallback(
-    (
-      value: number,
-      x: number,
-      y: number,
-      type: "credits" | "power" | "research" | "damage",
-    ) => {
+    (value: number, x: number, y: number, type: 'credits' | 'power' | 'research' | 'damage') => {
       const id = `floating-${Date.now()}-${Math.random()}`;
-      setFloatingNumbers((prev) => [...prev, { id, value, x, y, type }]);
+      setFloatingNumbers(prev => [...prev, { id, value, x, y, type }]);
     },
-    [],
+    []
   );
 
   const removeFloatingNumber = useCallback((id: string) => {
-    setFloatingNumbers((prev) => prev.filter((num) => num.id !== id));
+    setFloatingNumbers(prev => prev.filter(num => num.id !== id));
   }, []);
 
   const FloatingNumbersRenderer = () => (
     <>
-      {floatingNumbers.map((num) => (
+      {floatingNumbers.map(num => (
         <FloatingNumber
           key={num.id}
           value={num.value}

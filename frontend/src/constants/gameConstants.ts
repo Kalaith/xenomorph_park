@@ -8,7 +8,7 @@ export const gameConstants = {
   STARTING_POWER: 10,
   STARTING_MAX_POWER: 10,
   STARTING_RESEARCH: 0,
-  STARTING_SECURITY: "High" as const,
+  STARTING_SECURITY: 'High' as const,
   STARTING_VISITORS: 0,
 
   // Game mechanics
@@ -48,24 +48,24 @@ export const gameConstants = {
 } as const;
 
 export const dangerLevelColors = {
-  1: "text-green-400",
-  2: "text-green-400",
-  3: "text-yellow-400",
-  4: "text-yellow-400",
-  5: "text-red-400",
-  6: "text-red-600",
+  1: 'text-green-400',
+  2: 'text-green-400',
+  3: 'text-yellow-400',
+  4: 'text-yellow-400',
+  5: 'text-red-400',
+  6: 'text-red-600',
 } as const;
 
 export const securityColors = {
-  Low: "text-red-400",
-  Medium: "text-yellow-400",
-  High: "text-green-400",
-  Maximum: "text-blue-400",
+  Low: 'text-red-400',
+  Medium: 'text-yellow-400',
+  High: 'text-green-400',
+  Maximum: 'text-blue-400',
 } as const;
 
 export const severityColors = {
-  Low: "text-green-400",
-  Medium: "text-yellow-400",
-  High: "text-red-400",
-  Critical: "text-red-600",
+  Low: 'text-green-400',
+  Medium: 'text-yellow-400',
+  High: 'text-red-400',
+  Critical: 'text-red-600',
 } as const;

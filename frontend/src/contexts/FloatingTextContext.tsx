@@ -1,17 +1,13 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from 'react';
 
 interface FloatingTextContextType {
-  addResourceChange: (
-    resource: string,
-    amount: number,
-    element?: HTMLElement,
-  ) => void;
+  addResourceChange: (resource: string, amount: number, element?: HTMLElement) => void;
   addFloatingText: (
     text: string,
     position: { x: number; y: number },
     color?: string,
     duration?: number,
-    size?: "sm" | "md" | "lg",
+    size?: 'sm' | 'md' | 'lg'
   ) => void;
 }
 
@@ -36,9 +32,5 @@ export function FloatingTextProvider({
   children: ReactNode;
   value: FloatingTextContextType;
 }) {
-  return (
-    <FloatingTextContext.Provider value={value}>
-      {children}
-    </FloatingTextContext.Provider>
-  );
+  return <FloatingTextContext.Provider value={value}>{children}</FloatingTextContext.Provider>;
 }

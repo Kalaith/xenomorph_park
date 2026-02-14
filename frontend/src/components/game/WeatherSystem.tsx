@@ -1,28 +1,22 @@
-import { useState, useEffect } from "react";
-import { useGameStore } from "../../stores/gameStore";
+import { useState, useEffect } from 'react';
+import { useGameStore } from '../../stores/gameStore';
 
-export type Weather =
-  | "clear"
-  | "fog"
-  | "rain"
-  | "storm"
-  | "toxic_fog"
-  | "alien_mist";
+export type Weather = 'clear' | 'fog' | 'rain' | 'storm' | 'toxic_fog' | 'alien_mist';
 export type TimeOfDay =
-  | "dawn"
-  | "morning"
-  | "noon"
-  | "afternoon"
-  | "evening"
-  | "night"
-  | "midnight";
+  | 'dawn'
+  | 'morning'
+  | 'noon'
+  | 'afternoon'
+  | 'evening'
+  | 'night'
+  | 'midnight';
 
 interface WeatherEffects {
   visibility: number; // 0-1
-  mood: "calm" | "tense" | "dangerous" | "ominous";
+  mood: 'calm' | 'tense' | 'dangerous' | 'ominous';
   cssFilter: string;
   particles?: {
-    type: "rain" | "fog" | "sparks" | "mist";
+    type: 'rain' | 'fog' | 'sparks' | 'mist';
     intensity: number;
   };
 }
@@ -30,65 +24,60 @@ interface WeatherEffects {
 const weatherEffects: Record<Weather, WeatherEffects> = {
   clear: {
     visibility: 1,
-    mood: "calm",
-    cssFilter: "brightness(1) contrast(1) saturate(1)",
+    mood: 'calm',
+    cssFilter: 'brightness(1) contrast(1) saturate(1)',
   },
   fog: {
     visibility: 0.6,
-    mood: "tense",
-    cssFilter: "brightness(0.8) contrast(0.7) saturate(0.8) blur(1px)",
-    particles: { type: "fog", intensity: 0.3 },
+    mood: 'tense',
+    cssFilter: 'brightness(0.8) contrast(0.7) saturate(0.8) blur(1px)',
+    particles: { type: 'fog', intensity: 0.3 },
   },
   rain: {
     visibility: 0.7,
-    mood: "tense",
-    cssFilter: "brightness(0.6) contrast(1.2) saturate(0.9) hue-rotate(10deg)",
-    particles: { type: "rain", intensity: 0.8 },
+    mood: 'tense',
+    cssFilter: 'brightness(0.6) contrast(1.2) saturate(0.9) hue-rotate(10deg)',
+    particles: { type: 'rain', intensity: 0.8 },
   },
   storm: {
     visibility: 0.4,
-    mood: "dangerous",
-    cssFilter: "brightness(0.4) contrast(1.5) saturate(0.6) hue-rotate(240deg)",
-    particles: { type: "rain", intensity: 1 },
+    mood: 'dangerous',
+    cssFilter: 'brightness(0.4) contrast(1.5) saturate(0.6) hue-rotate(240deg)',
+    particles: { type: 'rain', intensity: 1 },
   },
   toxic_fog: {
     visibility: 0.3,
-    mood: "dangerous",
-    cssFilter:
-      "brightness(0.5) contrast(1.3) saturate(1.5) hue-rotate(90deg) sepia(0.3)",
-    particles: { type: "mist", intensity: 0.7 },
+    mood: 'dangerous',
+    cssFilter: 'brightness(0.5) contrast(1.3) saturate(1.5) hue-rotate(90deg) sepia(0.3)',
+    particles: { type: 'mist', intensity: 0.7 },
   },
   alien_mist: {
     visibility: 0.2,
-    mood: "ominous",
-    cssFilter:
-      "brightness(0.3) contrast(1.8) saturate(2) hue-rotate(270deg) sepia(0.5)",
-    particles: { type: "sparks", intensity: 0.4 },
+    mood: 'ominous',
+    cssFilter: 'brightness(0.3) contrast(1.8) saturate(2) hue-rotate(270deg) sepia(0.5)',
+    particles: { type: 'sparks', intensity: 0.4 },
   },
 };
 
-const timeEffects: Record<
-  TimeOfDay,
-  { brightness: number; hue: number; filter: string }
-> = {
-  dawn: { brightness: 0.7, hue: 30, filter: "sepia(0.3) saturate(1.2)" },
-  morning: { brightness: 1, hue: 0, filter: "brightness(1.1) saturate(1.1)" },
-  noon: { brightness: 1.2, hue: 0, filter: "brightness(1.2) contrast(1.1)" },
-  afternoon: { brightness: 1, hue: 15, filter: "sepia(0.1) saturate(1.1)" },
+const timeEffects: Record<TimeOfDay, { brightness: number; hue: number; filter: string }> = {
+  dawn: { brightness: 0.7, hue: 30, filter: 'sepia(0.3) saturate(1.2)' },
+  morning: { brightness: 1, hue: 0, filter: 'brightness(1.1) saturate(1.1)' },
+  noon: { brightness: 1.2, hue: 0, filter: 'brightness(1.2) contrast(1.1)' },
+  afternoon: { brightness: 1, hue: 15, filter: 'sepia(0.1) saturate(1.1)' },
   evening: {
     brightness: 0.8,
     hue: 45,
-    filter: "sepia(0.4) saturate(1.3) hue-rotate(20deg)",
+    filter: 'sepia(0.4) saturate(1.3) hue-rotate(20deg)',
   },
   night: {
     brightness: 0.4,
     hue: 240,
-    filter: "brightness(0.4) contrast(1.2) saturate(0.8) hue-rotate(240deg)",
+    filter: 'brightness(0.4) contrast(1.2) saturate(0.8) hue-rotate(240deg)',
   },
   midnight: {
     brightness: 0.2,
     hue: 270,
-    filter: "brightness(0.2) contrast(1.5) saturate(0.6) hue-rotate(270deg)",
+    filter: 'brightness(0.2) contrast(1.5) saturate(0.6) hue-rotate(270deg)',
   },
 };
 
@@ -98,18 +87,18 @@ interface WeatherSystemProps {
 
 export function WeatherSystem({ children }: WeatherSystemProps) {
   const { hour, day } = useGameStore();
-  const [currentWeather, setCurrentWeather] = useState<Weather>("clear");
+  const [currentWeather, setCurrentWeather] = useState<Weather>('clear');
   const [weatherTransition, setWeatherTransition] = useState(false);
 
   // Determine time of day
   const getTimeOfDay = (hour: number): TimeOfDay => {
-    if (hour >= 5 && hour < 7) return "dawn";
-    if (hour >= 7 && hour < 11) return "morning";
-    if (hour >= 11 && hour < 13) return "noon";
-    if (hour >= 13 && hour < 17) return "afternoon";
-    if (hour >= 17 && hour < 19) return "evening";
-    if (hour >= 19 && hour < 23) return "night";
-    return "midnight";
+    if (hour >= 5 && hour < 7) return 'dawn';
+    if (hour >= 7 && hour < 11) return 'morning';
+    if (hour >= 11 && hour < 13) return 'noon';
+    if (hour >= 13 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 19) return 'evening';
+    if (hour >= 19 && hour < 23) return 'night';
+    return 'midnight';
   };
 
   // Weather change logic
@@ -117,14 +106,7 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
     const weatherChangeChance = 0.1; // 10% chance per hour
 
     if (Math.random() < weatherChangeChance) {
-      const weathers: Weather[] = [
-        "clear",
-        "fog",
-        "rain",
-        "storm",
-        "toxic_fog",
-        "alien_mist",
-      ];
+      const weathers: Weather[] = ['clear', 'fog', 'rain', 'storm', 'toxic_fog', 'alien_mist'];
 
       // Weight the weather based on danger level and day
       let weatherWeights = [0.4, 0.2, 0.2, 0.1, 0.05, 0.05]; // Base weights
@@ -136,11 +118,8 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
       weatherWeights[5] *= dangerMultiplier; // alien_mist
 
       // Normalize weights
-      const totalWeight = weatherWeights.reduce(
-        (sum, weight) => sum + weight,
-        0,
-      );
-      weatherWeights = weatherWeights.map((weight) => weight / totalWeight);
+      const totalWeight = weatherWeights.reduce((sum, weight) => sum + weight, 0);
+      weatherWeights = weatherWeights.map(weight => weight / totalWeight);
 
       // Select weather based on weights
       const random = Math.random();
@@ -170,10 +149,10 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
   const combinedFilter = [
     timeEffect.filter,
     weatherEffect.cssFilter,
-    weatherTransition ? "blur(2px)" : "",
+    weatherTransition ? 'blur(2px)' : '',
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     <div className="relative">
@@ -187,42 +166,31 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
 
       {/* Weather Information Display */}
       <div className="fixed top-4 right-4 z-50 bg-slate-900/80 border border-slate-600 rounded-lg p-3 text-sm">
-        <div className="text-green-400 font-semibold mb-1">
-          Environmental Status
-        </div>
+        <div className="text-green-400 font-semibold mb-1">Environmental Status</div>
         <div className="space-y-1 text-slate-300">
           <div>
-            🌤️ Weather:{" "}
-            <span className="capitalize">
-              {currentWeather.replace("_", " ")}
-            </span>
+            🌤️ Weather: <span className="capitalize">{currentWeather.replace('_', ' ')}</span>
           </div>
           <div>
             🕐 Time: <span className="capitalize">{timeOfDay}</span> ({hour}:00)
           </div>
           <div>
-            👁️ Visibility:{" "}
-            <span
-              className={
-                weatherEffect.visibility < 0.5
-                  ? "text-red-400"
-                  : "text-green-400"
-              }
-            >
+            👁️ Visibility:{' '}
+            <span className={weatherEffect.visibility < 0.5 ? 'text-red-400' : 'text-green-400'}>
               {Math.round(weatherEffect.visibility * 100)}%
             </span>
           </div>
           <div>
-            😨 Mood:{" "}
+            😨 Mood:{' '}
             <span
               className={
-                weatherEffect.mood === "calm"
-                  ? "text-green-400"
-                  : weatherEffect.mood === "tense"
-                    ? "text-yellow-400"
-                    : weatherEffect.mood === "dangerous"
-                      ? "text-red-400"
-                      : "text-purple-400"
+                weatherEffect.mood === 'calm'
+                  ? 'text-green-400'
+                  : weatherEffect.mood === 'tense'
+                    ? 'text-yellow-400'
+                    : weatherEffect.mood === 'dangerous'
+                      ? 'text-red-400'
+                      : 'text-purple-400'
               }
             >
               {weatherEffect.mood}
@@ -232,11 +200,11 @@ export function WeatherSystem({ children }: WeatherSystemProps) {
       </div>
 
       {/* Lightning Effect for Storms */}
-      {currentWeather === "storm" && <LightningEffect />}
+      {currentWeather === 'storm' && <LightningEffect />}
 
       {/* Main Content with Weather/Time Filters */}
       <div
-        className={`transition-all duration-2000 ${weatherTransition ? "animate-pulse" : ""}`}
+        className={`transition-all duration-2000 ${weatherTransition ? 'animate-pulse' : ''}`}
         style={{
           filter: combinedFilter,
           opacity: weatherTransition ? 0.7 : 1,
@@ -252,7 +220,7 @@ function WeatherParticles({
   type,
   intensity,
 }: {
-  type: "rain" | "fog" | "sparks" | "mist";
+  type: 'rain' | 'fog' | 'sparks' | 'mist';
   intensity: number;
 }) {
   const particleCount = Math.floor(50 * intensity);
@@ -270,7 +238,7 @@ function WeatherParticle({
   type,
   delay,
 }: {
-  type: "rain" | "fog" | "sparks" | "mist";
+  type: 'rain' | 'fog' | 'sparks' | 'mist';
   delay: number;
 }) {
   const [position, setPosition] = useState({
@@ -280,13 +248,13 @@ function WeatherParticle({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPosition((prev) => {
-        let newY = prev.y + (type === "rain" ? 5 : 1);
+      setPosition(prev => {
+        let newY = prev.y + (type === 'rain' ? 5 : 1);
         let newX = prev.x;
 
-        if (type === "rain") {
+        if (type === 'rain') {
           newX += (Math.random() - 0.5) * 2; // Wind effect
-        } else if (type === "sparks") {
+        } else if (type === 'sparks') {
           newX += (Math.random() - 0.5) * 4;
           newY += Math.random() * 3;
         }
@@ -308,41 +276,41 @@ function WeatherParticle({
 
   const getParticleStyle = () => {
     const baseStyle = {
-      position: "absolute" as const,
+      position: 'absolute' as const,
       left: position.x,
       top: position.y,
     };
 
     switch (type) {
-      case "rain":
+      case 'rain':
         return {
           ...baseStyle,
-          width: "2px",
-          height: "10px",
+          width: '2px',
+          height: '10px',
           background:
-            "linear-gradient(to bottom, rgba(173, 216, 230, 0.8), rgba(173, 216, 230, 0.2))",
-          borderRadius: "1px",
+            'linear-gradient(to bottom, rgba(173, 216, 230, 0.8), rgba(173, 216, 230, 0.2))',
+          borderRadius: '1px',
         };
-      case "fog":
-      case "mist":
+      case 'fog':
+      case 'mist':
         return {
           ...baseStyle,
-          width: "20px",
-          height: "20px",
+          width: '20px',
+          height: '20px',
           background:
-            type === "fog"
-              ? "radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent)"
-              : "radial-gradient(circle, rgba(0, 255, 65, 0.1), transparent)",
-          borderRadius: "50%",
+            type === 'fog'
+              ? 'radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent)'
+              : 'radial-gradient(circle, rgba(0, 255, 65, 0.1), transparent)',
+          borderRadius: '50%',
         };
-      case "sparks":
+      case 'sparks':
         return {
           ...baseStyle,
-          width: "3px",
-          height: "3px",
-          background: "#00ff41",
-          borderRadius: "50%",
-          boxShadow: "0 0 4px #00ff41",
+          width: '3px',
+          height: '3px',
+          background: '#00ff41',
+          borderRadius: '50%',
+          boxShadow: '0 0 4px #00ff41',
         };
       default:
         return baseStyle;

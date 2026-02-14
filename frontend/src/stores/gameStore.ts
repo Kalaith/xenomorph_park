@@ -1,17 +1,12 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
-import {
-  GameStore,
-  GameState,
-  PlacedFacility,
-  PlacedXenomorph,
-} from "../types";
-import { gameConstants } from "../constants/gameConstants";
-import { researchTree } from "../data/researchTree";
-import { saveManager } from "../utils/saveManager";
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
+import { gameConstants } from '../constants/gameConstants';
+import { researchTree } from '../data/researchTree';
+import { saveManager } from '../utils/saveManager';
 
 const initialState: GameState = {
-  mode: "building",
+  mode: 'building',
   paused: false,
   day: 1,
   hour: 9,
@@ -35,7 +30,7 @@ const initialState: GameState = {
     completed: [], // No research completed at start
     inProgress: null,
     points: 0,
-    available: ["Drone"], // Drone is available from start but not "researched"
+    available: ['Drone'], // Drone is available from start but not "researched"
     researchTree: {}, // Research tree progress tracking
   },
   economics: {
@@ -60,12 +55,12 @@ export const useGameStore = create<GameStore>()(
         ...initialState,
 
         // Game management
-        setMode: (mode) => set({ mode }),
-        togglePause: () => set((state) => ({ paused: !state.paused })),
+        setMode: mode => set({ mode }),
+        togglePause: () => set(state => ({ paused: !state.paused })),
 
         // Resource management
-        updateResources: (resources) =>
-          set((state) => ({
+        updateResources: resources =>
+          set(state => ({
             resources: { ...state.resources, ...resources },
           })),
 
@@ -82,14 +77,10 @@ export const useGameStore = create<GameStore>()(
           // Check if position is available
           const isOccupied =
             state.facilities.some(
-              (f) =>
-                f.position.row === position.row &&
-                f.position.col === position.col,
+              f => f.position.row === position.row && f.position.col === position.col
             ) ||
             state.xenomorphs.some(
-              (x) =>
-                x.position.row === position.row &&
-                x.position.col === position.col,
+              x => x.position.row === position.row && x.position.col === position.col
             );
 
           if (isOccupied) {
@@ -106,7 +97,7 @@ export const useGameStore = create<GameStore>()(
           };
 
           // Calculate new max power if it's a power generator
-          const powerIncrease = facility.name === "Power Generator" ? 10 : 0;
+          const powerIncrease = facility.name === 'Power Generator' ? 10 : 0;
 
           // Store previous state for undo
           const previousState = {
@@ -122,13 +113,13 @@ export const useGameStore = create<GameStore>()(
 
           // Add to history
           get().addToHistory({
-            type: "PLACE_FACILITY",
+            type: 'PLACE_FACILITY',
             timestamp: Date.now(),
             data: { facility: newFacility, resourceChanges },
             previousState,
           });
 
-          set((state) => ({
+          set(state => ({
             facilities: [...state.facilities, newFacility],
             resources: {
               ...state.resources,
@@ -154,14 +145,10 @@ export const useGameStore = create<GameStore>()(
           // Check if position is available
           const isOccupied =
             state.facilities.some(
-              (f) =>
-                f.position.row === position.row &&
-                f.position.col === position.col,
+              f => f.position.row === position.row && f.position.col === position.col
             ) ||
             state.xenomorphs.some(
-              (x) =>
-                x.position.row === position.row &&
-                x.position.col === position.col,
+              x => x.position.row === position.row && x.position.col === position.col
             );
 
           if (isOccupied) {
@@ -182,22 +169,22 @@ export const useGameStore = create<GameStore>()(
 
           // Add to history
           get().addToHistory({
-            type: "PLACE_XENOMORPH",
+            type: 'PLACE_XENOMORPH',
             timestamp: Date.now(),
             data: { xenomorph: newXenomorph },
             previousState,
           });
 
-          set((state) => ({
+          set(state => ({
             xenomorphs: [...state.xenomorphs, newXenomorph],
             selectedSpecies: null,
           }));
         },
 
         // Remove facilities and xenomorphs
-        removeFacility: (facilityId) => {
+        removeFacility: facilityId => {
           const state = get();
-          const facility = state.facilities.find((f) => f.id === facilityId);
+          const facility = state.facilities.find(f => f.id === facilityId);
           if (!facility) return;
 
           // Store previous state for undo
@@ -209,11 +196,11 @@ export const useGameStore = create<GameStore>()(
           // Calculate resource refund (partial)
           const refundAmount = Math.floor(facility.cost * 0.5); // 50% refund
           const powerReturn = facility.powerRequirement;
-          const maxPowerDecrease = facility.name === "Power Generator" ? 10 : 0;
+          const maxPowerDecrease = facility.name === 'Power Generator' ? 10 : 0;
 
           // Add to history
           get().addToHistory({
-            type: "REMOVE_FACILITY",
+            type: 'REMOVE_FACILITY',
             timestamp: Date.now(),
             data: {
               facility,
@@ -224,8 +211,8 @@ export const useGameStore = create<GameStore>()(
             previousState,
           });
 
-          set((state) => ({
-            facilities: state.facilities.filter((f) => f.id !== facilityId),
+          set(state => ({
+            facilities: state.facilities.filter(f => f.id !== facilityId),
             resources: {
               ...state.resources,
               credits: state.resources.credits + refundAmount,
@@ -235,9 +222,9 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
-        removeXenomorph: (xenomorphId) => {
+        removeXenomorph: xenomorphId => {
           const state = get();
-          const xenomorph = state.xenomorphs.find((x) => x.id === xenomorphId);
+          const xenomorph = state.xenomorphs.find(x => x.id === xenomorphId);
           if (!xenomorph) return;
 
           // Store previous state for undo
@@ -247,34 +234,29 @@ export const useGameStore = create<GameStore>()(
 
           // Add to history
           get().addToHistory({
-            type: "REMOVE_XENOMORPH",
+            type: 'REMOVE_XENOMORPH',
             timestamp: Date.now(),
             data: { xenomorph },
             previousState,
           });
 
-          set((state) => ({
-            xenomorphs: state.xenomorphs.filter((x) => x.id !== xenomorphId),
+          set(state => ({
+            xenomorphs: state.xenomorphs.filter(x => x.id !== xenomorphId),
           }));
         },
 
         // Selection management
-        selectFacility: (facility) =>
-          set({ selectedFacility: facility, selectedSpecies: null }),
-        selectSpecies: (species) =>
-          set({ selectedSpecies: species, selectedFacility: null }),
+        selectFacility: facility => set({ selectedFacility: facility, selectedSpecies: null }),
+        selectSpecies: species => set({ selectedSpecies: species, selectedFacility: null }),
 
         // Research management
-        startResearch: (species) => {
+        startResearch: species => {
           const state = get();
-          if (
-            state.research.inProgress ||
-            state.research.completed.includes(species)
-          ) {
+          if (state.research.inProgress || state.research.completed.includes(species)) {
             return;
           }
 
-          set((state) => ({
+          set(state => ({
             research: {
               ...state.research,
               inProgress: species,
@@ -282,13 +264,13 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
-        completeResearch: (species) =>
-          set((state) => ({
+        completeResearch: species =>
+          set(state => ({
             research: {
               ...state.research,
               completed: [...state.research.completed, species],
               inProgress: null,
-              available: state.research.available.filter((s) => s !== species),
+              available: state.research.available.filter(s => s !== species),
             },
           })),
 
@@ -311,11 +293,11 @@ export const useGameStore = create<GameStore>()(
           const success = saveManager.saveGame(state, slotId, name);
           if (success) {
             state.addStatusMessage(
-              `Game saved successfully${name ? ` as "${name}"` : ""}`,
-              "success",
+              `Game saved successfully${name ? ` as "${name}"` : ''}`,
+              'success'
             );
           } else {
-            state.addStatusMessage("Failed to save game", "error");
+            state.addStatusMessage('Failed to save game', 'error');
           }
           return success;
         },
@@ -324,10 +306,10 @@ export const useGameStore = create<GameStore>()(
           const saveData = saveManager.loadGame(slotId);
           if (saveData) {
             set({ ...initialState, ...saveData.gameState });
-            get().addStatusMessage("Game loaded successfully", "success");
+            get().addStatusMessage('Game loaded successfully', 'success');
             return true;
           } else {
-            get().addStatusMessage("Failed to load game", "error");
+            get().addStatusMessage('Failed to load game', 'error');
             return false;
           }
         },
@@ -336,9 +318,9 @@ export const useGameStore = create<GameStore>()(
           const state = get();
           const success = saveManager.quickSave(state);
           if (success) {
-            state.addStatusMessage("Quick save completed", "success");
+            state.addStatusMessage('Quick save completed', 'success');
           } else {
-            state.addStatusMessage("Quick save failed", "error");
+            state.addStatusMessage('Quick save failed', 'error');
           }
           return success;
         },
@@ -347,17 +329,17 @@ export const useGameStore = create<GameStore>()(
           const saveData = saveManager.quickLoad();
           if (saveData) {
             set({ ...initialState, ...saveData.gameState });
-            get().addStatusMessage("Quick load completed", "success");
+            get().addStatusMessage('Quick load completed', 'success');
             return true;
           } else {
-            get().addStatusMessage("No quick save found", "warning");
+            get().addStatusMessage('No quick save found', 'warning');
             return false;
           }
         },
 
         // Game mechanics
         updateTime: () =>
-          set((state) => {
+          set(state => {
             let newTick = state.tick + 1;
             let newHour = state.hour;
             let newDay = state.day;
@@ -383,9 +365,7 @@ export const useGameStore = create<GameStore>()(
                   },
                   economics: {
                     ...state.economics,
-                    lastDayProfit:
-                      state.resources.dailyRevenue -
-                      state.resources.dailyExpenses,
+                    lastDayProfit: state.resources.dailyRevenue - state.resources.dailyExpenses,
                   },
                 };
               }
@@ -395,13 +375,11 @@ export const useGameStore = create<GameStore>()(
           }),
 
         processEconomics: () =>
-          set((state) => {
-            const visitorCenters = state.facilities.filter(
-              (f) => f.name === "Visitor Center",
-            ).length;
+          set(state => {
+            const visitorCenters = state.facilities.filter(f => f.name === 'Visitor Center').length;
             const totalAttractionValue = state.xenomorphs.reduce(
               (sum, x) => sum + x.species.dangerLevel,
-              0,
+              0
             );
 
             // Calculate visitor flow based on time of day
@@ -414,30 +392,24 @@ export const useGameStore = create<GameStore>()(
               flowMultiplier = gameConstants.VISITOR_FLOW_EVENING;
 
             // Calculate new visitors
-            const maxNewVisitors = Math.floor(
-              gameConstants.MAX_VISITORS_PER_TICK * flowMultiplier,
-            );
-            const baseVisitorCapacity =
-              visitorCenters * gameConstants.VISITORS_PER_FACILITY + 10;
+            const maxNewVisitors = Math.floor(gameConstants.MAX_VISITORS_PER_TICK * flowMultiplier);
+            const baseVisitorCapacity = visitorCenters * gameConstants.VISITORS_PER_FACILITY + 10;
             const attractionBonus = Math.floor(totalAttractionValue * 0.5);
             const newVisitorCount = Math.min(
               state.resources.visitors + Math.random() * maxNewVisitors,
-              baseVisitorCapacity + attractionBonus,
+              baseVisitorCapacity + attractionBonus
             );
 
             // Calculate revenue
             const admissionRevenue =
-              (newVisitorCount - state.resources.visitors) *
-              gameConstants.BASE_ADMISSION_PRICE;
-            const attractionRevenue =
-              state.resources.visitors * totalAttractionValue * 0.1;
+              (newVisitorCount - state.resources.visitors) * gameConstants.BASE_ADMISSION_PRICE;
+            const attractionRevenue = state.resources.visitors * totalAttractionValue * 0.1;
             const totalRevenue = admissionRevenue + attractionRevenue;
 
             // Calculate expenses
             const facilityMaintenance =
               state.facilities.length * gameConstants.FACILITY_MAINTENANCE_COST;
-            const xenomorphFeeding =
-              state.xenomorphs.length * gameConstants.XENOMORPH_FOOD_COST;
+            const xenomorphFeeding = state.xenomorphs.length * gameConstants.XENOMORPH_FOOD_COST;
             const totalExpenses = facilityMaintenance + xenomorphFeeding;
 
             return {
@@ -457,8 +429,7 @@ export const useGameStore = create<GameStore>()(
                 attractionValue: totalAttractionValue,
                 profitMargin:
                   state.economics.totalRevenue > 0
-                    ? ((state.economics.totalRevenue -
-                        state.economics.totalExpenses) /
+                    ? ((state.economics.totalRevenue - state.economics.totalExpenses) /
                         state.economics.totalRevenue) *
                       100
                     : 0,
@@ -476,9 +447,9 @@ export const useGameStore = create<GameStore>()(
         },
 
         // Research tree management
-        startResearchNode: (nodeId) =>
-          set((state) => {
-            const nodeData = researchTree.find((n) => n.id === nodeId);
+        startResearchNode: nodeId =>
+          set(state => {
+            const nodeData = researchTree.find(n => n.id === nodeId);
 
             if (!nodeData) return state;
 
@@ -493,11 +464,7 @@ export const useGameStore = create<GameStore>()(
               state.resources.credits >= nodeData.cost.credits &&
               state.resources.research >= nodeData.cost.research;
 
-            if (
-              !currentNodeState.completed &&
-              !currentNodeState.inProgress &&
-              canAfford
-            ) {
+            if (!currentNodeState.completed && !currentNodeState.inProgress && canAfford) {
               return {
                 ...state,
                 resources: {
@@ -521,8 +488,8 @@ export const useGameStore = create<GameStore>()(
             return state;
           }),
 
-        completeResearchNode: (nodeId) =>
-          set((state) => {
+        completeResearchNode: nodeId =>
+          set(state => {
             const node = state.research.researchTree[nodeId];
             if (node && node.inProgress) {
               return {
@@ -545,28 +512,24 @@ export const useGameStore = create<GameStore>()(
           }),
 
         updateResearchProgress: () =>
-          set((state) => {
+          set(state => {
             const updatedTree = { ...state.research.researchTree };
             let hasChanges = false;
             let newResearchPoints = state.research.points;
 
             // Generate research points from research labs
-            const researchLabs = state.facilities.filter(
-              (f) => f.name === "Research Lab",
-            ).length;
-            newResearchPoints +=
-              researchLabs * gameConstants.RESEARCH_POINTS_PER_TICK;
+            const researchLabs = state.facilities.filter(f => f.name === 'Research Lab').length;
+            newResearchPoints += researchLabs * gameConstants.RESEARCH_POINTS_PER_TICK;
 
             Object.entries(updatedTree).forEach(([nodeId, nodeData]) => {
               if (nodeData.inProgress && nodeData.startedAt) {
-                const nodeConfig = researchTree.find((n) => n.id === nodeId);
+                const nodeConfig = researchTree.find(n => n.id === nodeId);
                 if (!nodeConfig) return;
 
                 // Calculate progress based on time
                 const timeElapsed = Date.now() - nodeData.startedAt;
                 const hoursElapsed = timeElapsed / (1000 * 60 * 60); // Convert to hours
-                const expectedProgress =
-                  (hoursElapsed / nodeConfig.cost.time) * 100;
+                const expectedProgress = (hoursElapsed / nodeConfig.cost.time) * 100;
                 const newProgress = Math.min(100, expectedProgress);
 
                 if (newProgress !== nodeData.progress) {
@@ -609,8 +572,8 @@ export const useGameStore = create<GameStore>()(
           }),
 
         // Undo/Redo functionality
-        addToHistory: (action) =>
-          set((state) => {
+        addToHistory: action =>
+          set(state => {
             const newHistory = [...state.undoRedo.history];
 
             // Remove any actions after current index (when user made new action after undo)
@@ -637,11 +600,10 @@ export const useGameStore = create<GameStore>()(
           }),
 
         undo: () =>
-          set((state) => {
+          set(state => {
             if (state.undoRedo.currentIndex < 0) return state;
 
-            const currentAction =
-              state.undoRedo.history[state.undoRedo.currentIndex];
+            const currentAction = state.undoRedo.history[state.undoRedo.currentIndex];
             if (!currentAction.previousState) return state;
 
             // Apply previous state
@@ -656,12 +618,8 @@ export const useGameStore = create<GameStore>()(
           }),
 
         redo: () =>
-          set((state) => {
-            if (
-              state.undoRedo.currentIndex >=
-              state.undoRedo.history.length - 1
-            )
-              return state;
+          set(state => {
+            if (state.undoRedo.currentIndex >= state.undoRedo.history.length - 1) return state;
 
             const nextIndex = state.undoRedo.currentIndex + 1;
             const nextAction = state.undoRedo.history[nextIndex];
@@ -669,34 +627,27 @@ export const useGameStore = create<GameStore>()(
             // Reapply the action
             const newState = { ...state };
 
-            if (nextAction.type === "PLACE_FACILITY") {
-              newState.facilities = [
-                ...state.facilities,
-                nextAction.data.facility,
-              ];
+            if (nextAction.type === 'PLACE_FACILITY') {
+              newState.facilities = [...state.facilities, nextAction.data.facility];
               newState.resources = {
                 ...state.resources,
                 ...nextAction.data.resourceChanges,
               };
-            } else if (nextAction.type === "PLACE_XENOMORPH") {
-              newState.xenomorphs = [
-                ...state.xenomorphs,
-                nextAction.data.xenomorph,
-              ];
-            } else if (nextAction.type === "REMOVE_FACILITY") {
+            } else if (nextAction.type === 'PLACE_XENOMORPH') {
+              newState.xenomorphs = [...state.xenomorphs, nextAction.data.xenomorph];
+            } else if (nextAction.type === 'REMOVE_FACILITY') {
               newState.facilities = state.facilities.filter(
-                (f) => f.id !== nextAction.data.facility.id,
+                f => f.id !== nextAction.data.facility.id
               );
               newState.resources = {
                 ...state.resources,
                 credits: state.resources.credits + nextAction.data.refund,
                 power: state.resources.power + nextAction.data.powerReturn,
-                maxPower:
-                  state.resources.maxPower - nextAction.data.maxPowerDecrease,
+                maxPower: state.resources.maxPower - nextAction.data.maxPowerDecrease,
               };
-            } else if (nextAction.type === "REMOVE_XENOMORPH") {
+            } else if (nextAction.type === 'REMOVE_XENOMORPH') {
               newState.xenomorphs = state.xenomorphs.filter(
-                (x) => x.id !== nextAction.data.xenomorph.id,
+                x => x.id !== nextAction.data.xenomorph.id
               );
             }
 
@@ -715,21 +666,18 @@ export const useGameStore = create<GameStore>()(
 
         canRedo: () => {
           const state = get();
-          return (
-            state.undoRedo.currentIndex < state.undoRedo.history.length - 1
-          );
+          return state.undoRedo.currentIndex < state.undoRedo.history.length - 1;
         },
 
         // Reset game
         reset: () => set(initialState),
       }),
       {
-        name: "xenomorph-park-game",
+        name: 'xenomorph-park-game',
         version: 1,
         migrate: (persistedState: unknown) => {
           // Handle migration for research.available field
-          if (!persistedState || typeof persistedState !== "object")
-            return persistedState;
+          if (!persistedState || typeof persistedState !== 'object') return persistedState;
 
           type PersistedState = Record<string, unknown> & {
             research?: {
@@ -741,7 +689,7 @@ export const useGameStore = create<GameStore>()(
           const next = persistedState as PersistedState;
           if (next.research) {
             if (!next.research.available) {
-              next.research.available = ["Drone"];
+              next.research.available = ['Drone'];
             }
             if (!next.research.researchTree) {
               next.research.researchTree = {};
@@ -749,7 +697,7 @@ export const useGameStore = create<GameStore>()(
           }
           return next;
         },
-        partialize: (state) => ({
+        partialize: state => ({
           // Only persist certain parts of the state
           day: state.day,
           hour: state.hour,
@@ -766,8 +714,8 @@ export const useGameStore = create<GameStore>()(
           },
           economics: state.economics,
         }),
-      },
+      }
     ),
-    { name: "xenomorph-park-store" },
-  ),
+    { name: 'xenomorph-park-store' }
+  )
 );

@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
-import { useGameStore } from "../../stores/gameStore";
-import {
-  campaignEventManager,
-  CampaignEvent,
-  EventChoice,
-} from "../../utils/campaignEvents";
+import { useState, useEffect } from 'react';
+import { useGameStore } from '../../stores/gameStore';
+import { campaignEventManager, CampaignEvent, EventChoice } from '../../utils/campaignEvents';
 
 interface CampaignEventModalProps {
   isOpen: boolean;
@@ -47,31 +43,31 @@ export function CampaignEventModal({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "critical":
-        return "border-red-500 bg-red-500/10";
-      case "high":
-        return "border-orange-500 bg-orange-500/10";
-      case "medium":
-        return "border-yellow-500 bg-yellow-500/10";
-      case "low":
-        return "border-blue-500 bg-blue-500/10";
+      case 'critical':
+        return 'border-red-500 bg-red-500/10';
+      case 'high':
+        return 'border-orange-500 bg-orange-500/10';
+      case 'medium':
+        return 'border-yellow-500 bg-yellow-500/10';
+      case 'low':
+        return 'border-blue-500 bg-blue-500/10';
       default:
-        return "border-slate-500 bg-slate-500/10";
+        return 'border-slate-500 bg-slate-500/10';
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case "critical":
-        return "🚨";
-      case "high":
-        return "⚠️";
-      case "medium":
-        return "📋";
-      case "low":
-        return "ℹ️";
+      case 'critical':
+        return '🚨';
+      case 'high':
+        return '⚠️';
+      case 'medium':
+        return '📋';
+      case 'low':
+        return 'ℹ️';
       default:
-        return "📄";
+        return '📄';
     }
   };
 
@@ -87,13 +83,13 @@ export function CampaignEventModal({
             <h2 className="text-xl font-bold text-green-400">{event.name}</h2>
             <span
               className={`px-2 py-1 rounded text-xs font-semibold uppercase ${
-                event.priority === "critical"
-                  ? "bg-red-500/20 text-red-400"
-                  : event.priority === "high"
-                    ? "bg-orange-500/20 text-orange-400"
-                    : event.priority === "medium"
-                      ? "bg-yellow-500/20 text-yellow-400"
-                      : "bg-blue-500/20 text-blue-400"
+                event.priority === 'critical'
+                  ? 'bg-red-500/20 text-red-400'
+                  : event.priority === 'high'
+                    ? 'bg-orange-500/20 text-orange-400'
+                    : event.priority === 'medium'
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-blue-500/20 text-blue-400'
               }`}
             >
               {event.priority}
@@ -109,95 +105,78 @@ export function CampaignEventModal({
               <span className="text-cyan-400">📖</span>
               <span className="font-semibold text-cyan-400">Story</span>
             </div>
-            <p className="text-slate-300 leading-relaxed italic">
-              {event.storyText}
-            </p>
+            <p className="text-slate-300 leading-relaxed italic">{event.storyText}</p>
           </div>
 
           {/* Choices */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-slate-200 mb-4">
-              Choose your response:
-            </h3>
-            {event.choices.map((choice) => {
-              const isAvailable = campaignEventManager.isChoiceAvailable(
-                choice,
-                gameState,
-              );
+            <h3 className="text-lg font-semibold text-slate-200 mb-4">Choose your response:</h3>
+            {event.choices.map(choice => {
+              const isAvailable = campaignEventManager.isChoiceAvailable(choice, gameState);
               const isSelected = selectedChoice === choice.id;
 
               return (
                 <button
                   key={choice.id}
-                  onClick={() =>
-                    !isProcessing && isAvailable && handleChoiceSelect(choice)
-                  }
+                  onClick={() => !isProcessing && isAvailable && handleChoiceSelect(choice)}
                   disabled={!isAvailable || isProcessing}
                   className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
                     isSelected
-                      ? "border-green-400 bg-green-400/20"
+                      ? 'border-green-400 bg-green-400/20'
                       : isAvailable
-                        ? "border-slate-600 bg-slate-800/50 hover:border-green-400 hover:bg-green-400/10"
-                        : "border-slate-700 bg-slate-800/30 opacity-50 cursor-not-allowed"
+                        ? 'border-slate-600 bg-slate-800/50 hover:border-green-400 hover:bg-green-400/10'
+                        : 'border-slate-700 bg-slate-800/30 opacity-50 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-xl mt-1">
-                      {isSelected ? "✅" : isAvailable ? "👆" : "🚫"}
+                      {isSelected ? '✅' : isAvailable ? '👆' : '🚫'}
                     </span>
                     <div className="flex-1">
                       <h4
                         className={`font-semibold mb-1 ${
-                          isAvailable ? "text-slate-200" : "text-slate-500"
+                          isAvailable ? 'text-slate-200' : 'text-slate-500'
                         }`}
                       >
                         {choice.text}
                       </h4>
                       <p
                         className={`text-sm mb-2 ${
-                          isAvailable ? "text-slate-400" : "text-slate-600"
+                          isAvailable ? 'text-slate-400' : 'text-slate-600'
                         }`}
                       >
                         {choice.description}
                       </p>
 
                       {/* Requirements */}
-                      {choice.requirements &&
-                        choice.requirements.length > 0 && (
-                          <div className="text-xs text-slate-500 mb-2">
-                            <strong>Requirements:</strong>
-                            <ul className="list-disc list-inside ml-2">
-                              {choice.requirements.map((req, index) => (
-                                <li key={index}>
-                                  {req.type === "resource" &&
-                                    Object.entries(req.condition)
-                                      .map(
-                                        ([resource, value]) =>
-                                          `${resource}: ${value}`,
-                                      )
-                                      .join(", ")}
-                                  {req.type === "facility" &&
-                                    req.condition.hasType &&
-                                    `Facility: ${req.condition.hasType}`}
-                                  {req.type === "research" &&
-                                    req.condition.completed &&
-                                    `Research: ${req.condition.completed.join(", ")}`}
-                                  {req.type === "species" &&
-                                    req.condition.minSpecies &&
-                                    `Minimum species: ${req.condition.minSpecies}`}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                      {choice.requirements && choice.requirements.length > 0 && (
+                        <div className="text-xs text-slate-500 mb-2">
+                          <strong>Requirements:</strong>
+                          <ul className="list-disc list-inside ml-2">
+                            {choice.requirements.map((req, index) => (
+                              <li key={index}>
+                                {req.type === 'resource' &&
+                                  Object.entries(req.condition)
+                                    .map(([resource, value]) => `${resource}: ${value}`)
+                                    .join(', ')}
+                                {req.type === 'facility' &&
+                                  req.condition.hasType &&
+                                  `Facility: ${req.condition.hasType}`}
+                                {req.type === 'research' &&
+                                  req.condition.completed &&
+                                  `Research: ${req.condition.completed.join(', ')}`}
+                                {req.type === 'species' &&
+                                  req.condition.minSpecies &&
+                                  `Minimum species: ${req.condition.minSpecies}`}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
                       {/* Consequences Preview */}
                       <div className="text-xs">
-                        <strong
-                          className={
-                            isAvailable ? "text-slate-400" : "text-slate-600"
-                          }
-                        >
+                        <strong className={isAvailable ? 'text-slate-400' : 'text-slate-600'}>
                           Consequences:
                         </strong>
                         <ul className="list-disc list-inside ml-2 text-slate-500">
@@ -227,8 +206,8 @@ export function CampaignEventModal({
         {/* Footer */}
         <div className="p-4 border-t border-slate-700 bg-slate-800/50">
           <div className="flex justify-between items-center text-xs text-slate-500">
-            <span>{event.oneTime ? "One-time event" : "Recurring event"}</span>
-            <span>Scenario: {event.scenarioId || "Universal"}</span>
+            <span>{event.oneTime ? 'One-time event' : 'Recurring event'}</span>
+            <span>Scenario: {event.scenarioId || 'Universal'}</span>
           </div>
         </div>
       </div>
@@ -243,9 +222,7 @@ export function useCampaignEvents() {
 
   useEffect(() => {
     // Only check for events if we're in a campaign
-    const isCampaignActive = !!localStorage.getItem(
-      "current-campaign-scenario",
-    );
+    const isCampaignActive = !!localStorage.getItem('current-campaign-scenario');
     if (!isCampaignActive) return;
 
     const checkInterval = setInterval(() => {

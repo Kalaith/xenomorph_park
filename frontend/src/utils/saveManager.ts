@@ -1,4 +1,4 @@
-import { GameState } from "../types";
+import { GameState } from '../types';
 
 export interface SaveData {
   gameState: Partial<GameState>;
@@ -14,8 +14,8 @@ export interface SaveSlot {
   isAutoSave: boolean;
 }
 
-const saveKeyPrefix = "xenomorph-park-save";
-const currentVersion = "1.0.0";
+const saveKeyPrefix = 'xenomorph-park-save';
+const currentVersion = '1.0.0';
 const maxSaveSlots = 5;
 const autoSaveInterval = 30000; // 30 seconds
 
@@ -38,16 +38,13 @@ export class SaveManager {
         id: slotId,
         name: name || `Save ${new Date().toLocaleString()}`,
         data: saveData,
-        isAutoSave: slotId === "autosave",
+        isAutoSave: slotId === 'autosave',
       };
 
-      localStorage.setItem(
-        `${saveKeyPrefix}-${slotId}`,
-        JSON.stringify(saveSlot),
-      );
+      localStorage.setItem(`${saveKeyPrefix}-${slotId}`, JSON.stringify(saveSlot));
       return true;
     } catch (error) {
-      console.error("Failed to save game:", error);
+      console.error('Failed to save game:', error);
       return false;
     }
   }
@@ -62,16 +59,14 @@ export class SaveManager {
 
       // Version compatibility check
       if (saveSlot.data.version !== currentVersion) {
-        console.warn(
-          `Save version mismatch: ${saveSlot.data.version} vs ${currentVersion}`,
-        );
+        console.warn(`Save version mismatch: ${saveSlot.data.version} vs ${currentVersion}`);
         // Could implement migration logic here
       }
 
       this.playStartTime = Date.now() - saveSlot.data.playTime;
       return saveSlot.data;
     } catch (error) {
-      console.error("Failed to load game:", error);
+      console.error('Failed to load game:', error);
       return null;
     }
   }
@@ -104,7 +99,7 @@ export class SaveManager {
       localStorage.removeItem(`${saveKeyPrefix}-${slotId}`);
       return true;
     } catch (error) {
-      console.error("Failed to delete save:", error);
+      console.error('Failed to delete save:', error);
       return false;
     }
   }
@@ -113,7 +108,7 @@ export class SaveManager {
   startAutoSave(getGameState: () => Partial<GameState>): void {
     this.stopAutoSave();
     this.autoSaveTimer = setInterval(() => {
-      this.saveGame(getGameState(), "autosave", "Auto Save");
+      this.saveGame(getGameState(), 'autosave', 'Auto Save');
     }, autoSaveInterval);
   }
 
@@ -126,25 +121,25 @@ export class SaveManager {
 
   // Quick save/load
   quickSave(state: Partial<GameState>): boolean {
-    return this.saveGame(state, "quicksave", "Quick Save");
+    return this.saveGame(state, 'quicksave', 'Quick Save');
   }
 
   quickLoad(): SaveData | null {
-    return this.loadGame("quicksave");
+    return this.loadGame('quicksave');
   }
 
   // Export save data as JSON file
   exportSave(slotId: string): void {
-    const saveSlot = this.getAllSaves().find((save) => save.id === slotId);
+    const saveSlot = this.getAllSaves().find(save => save.id === slotId);
     if (!saveSlot) return;
 
     const dataStr = JSON.stringify(saveSlot, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-    link.download = `xenomorph-park-${saveSlot.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.json`;
+    link.download = `xenomorph-park-${saveSlot.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -153,9 +148,9 @@ export class SaveManager {
 
   // Import save data from JSON file
   importSave(file: File): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const saveSlot: SaveSlot = JSON.parse(e.target?.result as string);
 
@@ -164,13 +159,10 @@ export class SaveManager {
           saveSlot.id = newId;
           saveSlot.name = `Imported - ${saveSlot.name}`;
 
-          localStorage.setItem(
-            `${saveKeyPrefix}-${newId}`,
-            JSON.stringify(saveSlot),
-          );
+          localStorage.setItem(`${saveKeyPrefix}-${newId}`, JSON.stringify(saveSlot));
           resolve(true);
         } catch (error) {
-          console.error("Failed to import save:", error);
+          console.error('Failed to import save:', error);
           resolve(false);
         }
       };
@@ -213,10 +205,10 @@ export class SaveManager {
 
   // Clean up old saves if storage is getting full
   cleanupOldSaves(): void {
-    const saves = this.getAllSaves().filter((save) => !save.isAutoSave);
+    const saves = this.getAllSaves().filter(save => !save.isAutoSave);
     if (saves.length > maxSaveSlots) {
       const toDelete = saves.slice(maxSaveSlots);
-      toDelete.forEach((save) => this.deleteSave(save.id));
+      toDelete.forEach(save => this.deleteSave(save.id));
     }
   }
 }

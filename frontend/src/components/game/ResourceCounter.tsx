@@ -1,6 +1,6 @@
-import { useGameStore } from "../../stores/gameStore";
-import { securityColors } from "../../constants/gameConstants";
-import { Tooltip, TooltipContent } from "../ui/Tooltip";
+import { useGameStore } from '../../stores/gameStore';
+import { securityColors } from '../../constants/gameConstants';
+import { Tooltip, TooltipContent } from '../ui/Tooltip';
 
 export function ResourceCounter() {
   const { resources } = useGameStore();
@@ -21,19 +21,19 @@ export function ResourceCounter() {
               description="Primary currency used to build facilities and purchase upgrades"
               stats={[
                 {
-                  label: "Current",
+                  label: 'Current',
                   value: resources.credits.toLocaleString(),
-                  color: "text-green-400",
+                  color: 'text-green-400',
                 },
                 {
-                  label: "Daily Revenue",
+                  label: 'Daily Revenue',
                   value: `+${resources.dailyRevenue.toLocaleString()}`,
-                  color: "text-green-400",
+                  color: 'text-green-400',
                 },
                 {
-                  label: "Daily Expenses",
+                  label: 'Daily Expenses',
                   value: `-${resources.dailyExpenses.toLocaleString()}`,
-                  color: "text-red-400",
+                  color: 'text-red-400',
                 },
               ]}
             />
@@ -45,9 +45,7 @@ export function ResourceCounter() {
             <span className="text-green-400 text-lg">💰</span>
             <div>
               <div className="text-green-400 font-mono">Credits</div>
-              <div className="text-white font-bold">
-                {formatNumber(resources.credits)}
-              </div>
+              <div className="text-white font-bold">{formatNumber(resources.credits)}</div>
             </div>
           </div>
         </Tooltip>
@@ -59,21 +57,16 @@ export function ResourceCounter() {
               description="Required to operate facilities. Generate more with Power Generators."
               stats={[
                 {
-                  label: "Used",
+                  label: 'Used',
                   value: `${resources.power}/${resources.maxPower}`,
-                  color:
-                    resources.power >= resources.maxPower
-                      ? "text-red-400"
-                      : "text-yellow-400",
+                  color: resources.power >= resources.maxPower ? 'text-red-400' : 'text-yellow-400',
                 },
                 {
-                  label: "Utilization",
+                  label: 'Utilization',
                   value: `${Math.round((resources.power / resources.maxPower) * 100)}%`,
                 },
               ]}
-              actions={[
-                { label: "Build Power Generator to increase capacity" },
-              ]}
+              actions={[{ label: 'Build Power Generator to increase capacity' }]}
             />
           }
           rich={true}
@@ -97,12 +90,12 @@ export function ResourceCounter() {
               description="Used to unlock new xenomorph species and facility upgrades"
               stats={[
                 {
-                  label: "Available",
+                  label: 'Available',
                   value: resources.research,
-                  color: "text-blue-400",
+                  color: 'text-blue-400',
                 },
               ]}
-              actions={[{ label: "Build Research Labs to generate more" }]}
+              actions={[{ label: 'Build Research Labs to generate more' }]}
             />
           }
           rich={true}
@@ -124,19 +117,19 @@ export function ResourceCounter() {
               description="Determines containment effectiveness and emergency response capabilities"
               stats={[
                 {
-                  label: "Current Level",
+                  label: 'Current Level',
                   value: resources.security,
                   color: securityColors[resources.security],
                 },
                 {
-                  label: "Status",
+                  label: 'Status',
                   value:
-                    resources.security === "Maximum"
-                      ? "All systems operational"
-                      : "Can be improved",
+                    resources.security === 'Maximum'
+                      ? 'All systems operational'
+                      : 'Can be improved',
                 },
               ]}
-              actions={[{ label: "Build Security Stations to increase" }]}
+              actions={[{ label: 'Build Security Stations to increase' }]}
             />
           }
           rich={true}
@@ -146,9 +139,7 @@ export function ResourceCounter() {
             <span className="text-orange-400 text-lg">🛡️</span>
             <div>
               <div className="text-green-400 font-mono">Security</div>
-              <div
-                className={`font-bold ${securityColors[resources.security]}`}
-              >
+              <div className={`font-bold ${securityColors[resources.security]}`}>
                 {resources.security}
               </div>
             </div>
@@ -162,18 +153,16 @@ export function ResourceCounter() {
               description="Guests visiting your park. They generate revenue but require safety measures."
               stats={[
                 {
-                  label: "Current",
+                  label: 'Current',
                   value: `${resources.visitors}/${resources.maxVisitors}`,
-                  color: "text-purple-400",
+                  color: 'text-purple-400',
                 },
                 {
-                  label: "Capacity",
+                  label: 'Capacity',
                   value: `${Math.round((resources.visitors / resources.maxVisitors) * 100)}%`,
                 },
               ]}
-              actions={[
-                { label: "Build Visitor Centers to increase capacity" },
-              ]}
+              actions={[{ label: 'Build Visitor Centers to increase capacity' }]}
             />
           }
           rich={true}
@@ -197,22 +186,22 @@ export function ResourceCounter() {
               description="Net daily income from operations"
               stats={[
                 {
-                  label: "Revenue",
+                  label: 'Revenue',
                   value: `+$${resources.dailyRevenue.toLocaleString()}`,
-                  color: "text-green-400",
+                  color: 'text-green-400',
                 },
                 {
-                  label: "Expenses",
+                  label: 'Expenses',
                   value: `-$${resources.dailyExpenses.toLocaleString()}`,
-                  color: "text-red-400",
+                  color: 'text-red-400',
                 },
                 {
-                  label: "Net",
+                  label: 'Net',
                   value: `$${(resources.dailyRevenue - resources.dailyExpenses).toLocaleString()}`,
                   color:
                     resources.dailyRevenue - resources.dailyExpenses >= 0
-                      ? "text-green-400"
-                      : "text-red-400",
+                      ? 'text-green-400'
+                      : 'text-red-400',
                 },
               ]}
             />
@@ -225,7 +214,7 @@ export function ResourceCounter() {
             <div>
               <div className="text-green-400 font-mono">Daily P&L</div>
               <div
-                className={`font-bold ${resources.dailyRevenue - resources.dailyExpenses >= 0 ? "text-green-400" : "text-red-400"}`}
+                className={`font-bold ${resources.dailyRevenue - resources.dailyExpenses >= 0 ? 'text-green-400' : 'text-red-400'}`}
               >
                 {formatNumber(resources.dailyRevenue - resources.dailyExpenses)}
               </div>

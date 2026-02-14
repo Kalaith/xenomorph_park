@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
-import { useGameStore } from "../../stores/gameStore";
-import { Button } from "../ui/Button";
+import { useState, useEffect } from 'react';
+import { useGameStore } from '../../stores/gameStore';
+import { Button } from '../ui/Button';
 
 interface TutorialStep {
   id: string;
   title: string;
   content: string;
   target?: string; // CSS selector for element to highlight
-  position: "top" | "bottom" | "left" | "right" | "center";
+  position: 'top' | 'bottom' | 'left' | 'right' | 'center';
   action?: {
-    type: "click" | "wait" | "condition";
+    type: 'click' | 'wait' | 'condition';
     target?: string;
     condition?: () => boolean;
     description: string;
@@ -19,159 +19,158 @@ interface TutorialStep {
 
 const tutorialSteps: TutorialStep[] = [
   {
-    id: "welcome",
-    title: "Welcome to Xenomorph Park!",
+    id: 'welcome',
+    title: 'Welcome to Xenomorph Park!',
     content:
-      "Welcome to your new xenomorph park management adventure! This tutorial will guide you through the basics of building and managing your park.",
-    position: "center",
+      'Welcome to your new xenomorph park management adventure! This tutorial will guide you through the basics of building and managing your park.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "resources",
-    title: "Understanding Resources",
+    id: 'resources',
+    title: 'Understanding Resources',
     content:
-      "At the top, you can see your current resources: Credits (💰), Power (⚡), Research points (🔬), and Visitors (👥). These are essential for building and maintaining your park.",
-    target: ".resource-counter",
-    position: "bottom",
+      'At the top, you can see your current resources: Credits (💰), Power (⚡), Research points (🔬), and Visitors (👥). These are essential for building and maintaining your park.',
+    target: '.resource-counter',
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "time",
-    title: "Time Progression",
+    id: 'time',
+    title: 'Time Progression',
     content:
-      "Time passes automatically in the game. You can see the current day and hour. Different times of day affect visitor flow and park atmosphere.",
-    target: ".time-display",
-    position: "bottom",
+      'Time passes automatically in the game. You can see the current day and hour. Different times of day affect visitor flow and park atmosphere.',
+    target: '.time-display',
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "game_controls",
-    title: "Game Controls",
-    content:
-      "Use these controls to pause the game and access undo/redo functions.",
-    target: ".game-controls",
-    position: "bottom",
+    id: 'game_controls',
+    title: 'Game Controls',
+    content: 'Use these controls to pause the game and access undo/redo functions.',
+    target: '.game-controls',
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "facilities",
-    title: "Building Facilities",
+    id: 'facilities',
+    title: 'Building Facilities',
     content:
-      "Click on a facility to select it, then click on the grid to place it. Different facilities have different costs and power requirements.",
-    target: ".facility-panel",
-    position: "right",
+      'Click on a facility to select it, then click on the grid to place it. Different facilities have different costs and power requirements.',
+    target: '.facility-panel',
+    position: 'right',
     action: {
-      type: "condition",
+      type: 'condition',
       condition: () => useGameStore.getState().selectedFacility !== null,
-      description: "Select a facility from the panel",
+      description: 'Select a facility from the panel',
     },
     skippable: true,
   },
   {
-    id: "placing_facility",
-    title: "Placing Your First Facility",
+    id: 'placing_facility',
+    title: 'Placing Your First Facility',
     content:
-      "Great! Now click on any empty cell in the grid to place your selected facility. Green highlights show where you can place it.",
-    target: ".game-grid",
-    position: "left",
+      'Great! Now click on any empty cell in the grid to place your selected facility. Green highlights show where you can place it.',
+    target: '.game-grid',
+    position: 'left',
     action: {
-      type: "condition",
+      type: 'condition',
       condition: () => useGameStore.getState().facilities.length > 0,
-      description: "Place a facility on the grid",
+      description: 'Place a facility on the grid',
     },
     skippable: true,
   },
   {
-    id: "power_generator",
-    title: "Power Management",
+    id: 'power_generator',
+    title: 'Power Management',
     content:
-      "Build Power Generators to increase your maximum power capacity. Most facilities require power to operate.",
-    position: "center",
+      'Build Power Generators to increase your maximum power capacity. Most facilities require power to operate.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "research_lab",
-    title: "Research and Development",
+    id: 'research_lab',
+    title: 'Research and Development',
     content:
-      "Research Labs generate research points over time. You need research points to unlock new xenomorph species and technologies.",
-    position: "center",
+      'Research Labs generate research points over time. You need research points to unlock new xenomorph species and technologies.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "species_panel",
-    title: "Xenomorph Species",
+    id: 'species_panel',
+    title: 'Xenomorph Species',
     content:
-      "Here you can see available xenomorph species. You need to research most species before you can place them in your park.",
-    target: ".species-panel",
-    position: "left",
+      'Here you can see available xenomorph species. You need to research most species before you can place them in your park.',
+    target: '.species-panel',
+    position: 'left',
     skippable: true,
   },
   {
-    id: "research_tree",
-    title: "Research Tree",
+    id: 'research_tree',
+    title: 'Research Tree',
     content:
-      "Click the 🔬 button in the header to open the research tree and unlock new technologies and species.",
+      'Click the 🔬 button in the header to open the research tree and unlock new technologies and species.',
     target: 'button[title*="Research Tree"]',
-    position: "bottom",
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "genetic_modification",
-    title: "Genetic Modification",
+    id: 'genetic_modification',
+    title: 'Genetic Modification',
     content:
-      "Once you have researched species, you can use the Gene Lab to create modified xenomorphs with enhanced abilities!",
+      'Once you have researched species, you can use the Gene Lab to create modified xenomorphs with enhanced abilities!',
     target: 'button:contains("🧬 Gene Lab")',
-    position: "left",
+    position: 'left',
     skippable: true,
   },
   {
-    id: "camera_controls",
-    title: "Camera Controls",
+    id: 'camera_controls',
+    title: 'Camera Controls',
     content:
-      "Use the zoom controls to get a better view of your park. You can also pan by holding Ctrl and dragging, or use the mouse wheel to zoom.",
-    target: ".camera-controls",
-    position: "bottom",
+      'Use the zoom controls to get a better view of your park. You can also pan by holding Ctrl and dragging, or use the mouse wheel to zoom.',
+    target: '.camera-controls',
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "right_click",
-    title: "Context Actions",
+    id: 'right_click',
+    title: 'Context Actions',
     content:
-      "Right-click on placed facilities and xenomorphs to see available actions like inspection, upgrades, and removal.",
-    position: "center",
+      'Right-click on placed facilities and xenomorphs to see available actions like inspection, upgrades, and removal.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "visitor_management",
-    title: "Visitor Management",
+    id: 'visitor_management',
+    title: 'Visitor Management',
     content:
-      "Build Visitor Centers to accommodate more guests. More dangerous xenomorphs attract more visitors but are harder to contain.",
-    position: "center",
+      'Build Visitor Centers to accommodate more guests. More dangerous xenomorphs attract more visitors but are harder to contain.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "achievements",
-    title: "Achievements & Progress",
+    id: 'achievements',
+    title: 'Achievements & Progress',
     content:
-      "Click the 🏆 button to view achievements and track your progress. Complete objectives to unlock rewards!",
+      'Click the 🏆 button to view achievements and track your progress. Complete objectives to unlock rewards!',
     target: 'button[title="Achievements"]',
-    position: "bottom",
+    position: 'bottom',
     skippable: true,
   },
   {
-    id: "keyboard_shortcuts",
-    title: "Keyboard Shortcuts",
+    id: 'keyboard_shortcuts',
+    title: 'Keyboard Shortcuts',
     content:
-      "Press H to view all available keyboard shortcuts. Many actions can be performed quickly using hotkeys.",
-    position: "center",
+      'Press H to view all available keyboard shortcuts. Many actions can be performed quickly using hotkeys.',
+    position: 'center',
     skippable: true,
   },
   {
-    id: "conclusion",
-    title: "Tutorial Complete!",
+    id: 'conclusion',
+    title: 'Tutorial Complete!',
     content:
       "You're ready to build your xenomorph park! Remember: balance visitor satisfaction with containment security. Good luck, and have fun!",
-    position: "center",
+    position: 'center',
     skippable: false,
   },
 ];
@@ -184,9 +183,7 @@ interface TutorialModeProps {
 export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isWaitingForAction, setIsWaitingForAction] = useState(false);
-  const [highlightedElement, setHighlightedElement] = useState<Element | null>(
-    null,
-  );
+  const [highlightedElement, setHighlightedElement] = useState<Element | null>(null);
 
   const currentStep = tutorialSteps[currentStepIndex];
   const isLastStep = currentStepIndex === tutorialSteps.length - 1;
@@ -201,18 +198,13 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
     const element = document.querySelector(currentStep.target);
     if (element) {
       setHighlightedElement(element);
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [isOpen, currentStep.target]);
 
   // Handle action conditions
   useEffect(() => {
-    if (
-      !isOpen ||
-      !currentStep.action ||
-      currentStep.action.type !== "condition"
-    )
-      return;
+    if (!isOpen || !currentStep.action || currentStep.action.type !== 'condition') return;
 
     setIsWaitingForAction(true);
 
@@ -232,14 +224,14 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
     if (isLastStep) {
       onClose();
     } else {
-      setCurrentStepIndex((prev) => prev + 1);
+      setCurrentStepIndex(prev => prev + 1);
       setIsWaitingForAction(false);
     }
   };
 
   const prevStep = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
+      setCurrentStepIndex(prev => prev - 1);
       setIsWaitingForAction(false);
     }
   };
@@ -250,7 +242,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
 
   const getStepPosition = () => {
     if (!currentStep.target || !highlightedElement) {
-      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
 
     const rect = highlightedElement.getBoundingClientRect();
@@ -258,28 +250,28 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
     const modalHeight = 300; // Approximate modal height
 
     switch (currentStep.position) {
-      case "top":
+      case 'top':
         return {
           top: rect.top - modalHeight - 20,
           left: rect.left + rect.width / 2 - modalWidth / 2,
         };
-      case "bottom":
+      case 'bottom':
         return {
           top: rect.bottom + 20,
           left: rect.left + rect.width / 2 - modalWidth / 2,
         };
-      case "left":
+      case 'left':
         return {
           top: rect.top + rect.height / 2 - modalHeight / 2,
           left: rect.left - modalWidth - 20,
         };
-      case "right":
+      case 'right':
         return {
           top: rect.top + rect.height / 2 - modalHeight / 2,
           left: rect.right + 20,
         };
       default:
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
     }
   };
 
@@ -301,7 +293,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
               left: highlightedElement.getBoundingClientRect().left - 8,
               width: highlightedElement.getBoundingClientRect().width + 16,
               height: highlightedElement.getBoundingClientRect().height + 16,
-              boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.6)",
+              boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)',
             }}
           />
         )}
@@ -315,9 +307,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
         {/* Header */}
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-xl font-bold text-green-400">
-              {currentStep.title}
-            </h3>
+            <h3 className="text-xl font-bold text-green-400">{currentStep.title}</h3>
             <div className="text-sm text-slate-400 mt-1">
               Step {currentStepIndex + 1} of {tutorialSteps.length}
             </div>
@@ -342,19 +332,13 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
         </div>
 
         {/* Content */}
-        <div className="text-slate-200 mb-6 leading-relaxed">
-          {currentStep.content}
-        </div>
+        <div className="text-slate-200 mb-6 leading-relaxed">{currentStep.content}</div>
 
         {/* Action Instruction */}
         {currentStep.action && isWaitingForAction && (
           <div className="bg-blue-900/30 border border-blue-400/50 rounded p-3 mb-4">
-            <div className="text-blue-400 text-sm font-semibold mb-1">
-              Action Required:
-            </div>
-            <div className="text-blue-200 text-sm">
-              {currentStep.action.description}
-            </div>
+            <div className="text-blue-400 text-sm font-semibold mb-1">Action Required:</div>
+            <div className="text-blue-200 text-sm">{currentStep.action.description}</div>
           </div>
         )}
 
@@ -371,11 +355,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
 
           <div className="flex gap-2">
             {currentStep.skippable && (
-              <Button
-                variant="outline"
-                onClick={skipTutorial}
-                className="text-sm"
-              >
+              <Button variant="outline" onClick={skipTutorial} className="text-sm">
                 Skip Tutorial
               </Button>
             )}
@@ -386,7 +366,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
               disabled={isWaitingForAction}
               className="text-sm"
             >
-              {isLastStep ? "Finish" : "Next →"}
+              {isLastStep ? 'Finish' : 'Next →'}
             </Button>
           </div>
         </div>
@@ -399,7 +379,7 @@ export function TutorialMode({ isOpen, onClose }: TutorialModeProps) {
 export function useTutorial() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(() => {
-    return localStorage.getItem("xenomorph-park-tutorial-seen") === "true";
+    return localStorage.getItem('xenomorph-park-tutorial-seen') === 'true';
   });
 
   const startTutorial = () => {
@@ -409,12 +389,12 @@ export function useTutorial() {
   const endTutorial = () => {
     setShowTutorial(false);
     setHasSeenTutorial(true);
-    localStorage.setItem("xenomorph-park-tutorial-seen", "true");
+    localStorage.setItem('xenomorph-park-tutorial-seen', 'true');
   };
 
   const resetTutorial = () => {
     setHasSeenTutorial(false);
-    localStorage.removeItem("xenomorph-park-tutorial-seen");
+    localStorage.removeItem('xenomorph-park-tutorial-seen');
   };
 
   // Auto-start tutorial for new players
@@ -434,8 +414,6 @@ export function useTutorial() {
     startTutorial,
     endTutorial,
     resetTutorial,
-    TutorialComponent: () => (
-      <TutorialMode isOpen={showTutorial} onClose={endTutorial} />
-    ),
+    TutorialComponent: () => <TutorialMode isOpen={showTutorial} onClose={endTutorial} />,
   };
 }

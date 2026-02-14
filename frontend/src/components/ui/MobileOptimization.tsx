@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, PanInfo } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, PanInfo } from 'framer-motion';
 
 // Touch controls for mobile devices
 interface TouchControlsProps {
-  onMove?: (direction: "up" | "down" | "left" | "right") => void;
+  onMove?: (direction: 'up' | 'down' | 'left' | 'right') => void;
   onAction?: () => void;
   onSecondaryAction?: () => void;
   className?: string;
@@ -13,7 +13,7 @@ export function TouchControls({
   onMove,
   onAction,
   onSecondaryAction,
-  className = "",
+  className = '',
 }: TouchControlsProps) {
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
   const joystickRef = useRef<HTMLDivElement>(null);
@@ -38,13 +38,13 @@ export function TouchControls({
       const degrees = (angle * 180) / Math.PI;
 
       if (degrees >= -45 && degrees <= 45) {
-        onMove("right");
+        onMove('right');
       } else if (degrees >= 45 && degrees <= 135) {
-        onMove("down");
+        onMove('down');
       } else if (degrees >= -135 && degrees <= -45) {
-        onMove("up");
+        onMove('up');
       } else {
-        onMove("left");
+        onMove('left');
       }
     }
   };
@@ -124,17 +124,14 @@ export function SwipeGesture({
   onSwipeUp,
   onSwipeDown,
   children,
-  className = "",
+  className = '',
 }: SwipeGestureProps) {
   const handleDragEnd = (_event: unknown, info: PanInfo) => {
     const { offset, velocity } = info;
     const swipeThreshold = 50;
     const velocityThreshold = 500;
 
-    if (
-      Math.abs(offset.x) > swipeThreshold ||
-      Math.abs(velocity.x) > velocityThreshold
-    ) {
+    if (Math.abs(offset.x) > swipeThreshold || Math.abs(velocity.x) > velocityThreshold) {
       if (offset.x > 0 && onSwipeRight) {
         onSwipeRight();
       } else if (offset.x < 0 && onSwipeLeft) {
@@ -142,10 +139,7 @@ export function SwipeGesture({
       }
     }
 
-    if (
-      Math.abs(offset.y) > swipeThreshold ||
-      Math.abs(velocity.y) > velocityThreshold
-    ) {
+    if (Math.abs(offset.y) > swipeThreshold || Math.abs(velocity.y) > velocityThreshold) {
       if (offset.y > 0 && onSwipeDown) {
         onSwipeDown();
       } else if (offset.y < 0 && onSwipeUp) {
@@ -175,12 +169,7 @@ interface MobileModalProps {
   children: React.ReactNode;
 }
 
-export function MobileModal({
-  isOpen,
-  onClose,
-  title,
-  children,
-}: MobileModalProps) {
+export function MobileModal({ isOpen, onClose, title, children }: MobileModalProps) {
   const [startY, setStartY] = useState(0);
   const [currentY, setCurrentY] = useState(0);
 
@@ -205,10 +194,10 @@ export function MobileModal({
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-end lg:items-center lg:justify-center">
       <motion.div
-        initial={{ y: "100%" }}
+        initial={{ y: '100%' }}
         animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 500 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 500 }}
         className="w-full max-h-[90vh] bg-slate-900 rounded-t-2xl lg:rounded-lg lg:max-w-2xl lg:max-h-[80vh] overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -222,18 +211,13 @@ export function MobileModal({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
           <h2 className="text-lg font-bold text-green-400">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-300 text-xl p-2"
-          >
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-300 text-xl p-2">
             ×
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">
-          {children}
-        </div>
+        <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
       </motion.div>
     </div>
   );
@@ -246,17 +230,13 @@ interface TouchGridProps {
   className?: string;
 }
 
-export function TouchGrid({
-  items,
-  columns = 2,
-  className = "",
-}: TouchGridProps) {
+export function TouchGrid({ items, columns = 2, className = '' }: TouchGridProps) {
   return (
     <div
       className={`grid gap-4 ${className}`}
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {items.map((item) => (
+      {items.map(item => (
         <motion.div
           key={item.id}
           className="bg-slate-800 rounded-lg p-4 border border-slate-600 min-h-[120px] flex items-center justify-center cursor-pointer"
@@ -277,11 +257,7 @@ interface PullToRefreshProps {
   className?: string;
 }
 
-export function PullToRefresh({
-  onRefresh,
-  children,
-  className = "",
-}: PullToRefreshProps) {
+export function PullToRefresh({ onRefresh, children, className = '' }: PullToRefreshProps) {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [startY, setStartY] = useState(0);
@@ -329,7 +305,7 @@ export function PullToRefresh({
           height: pullDistance,
           opacity: pullDistance > 0 ? 1 : 0,
         }}
-        transition={{ type: "spring", damping: 25, stiffness: 500 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 500 }}
       >
         {isRefreshing ? (
           <div className="animate-spin text-xl">🔄</div>
@@ -353,26 +329,21 @@ interface MobileTabsProps {
   className?: string;
 }
 
-export function MobileTabs({
-  tabs,
-  activeTab,
-  onTabChange,
-  className = "",
-}: MobileTabsProps) {
+export function MobileTabs({ tabs, activeTab, onTabChange, className = '' }: MobileTabsProps) {
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 z-40 lg:hidden ${className}`}
     >
       <div className="grid grid-cols-4 gap-1">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <motion.button
             key={tab.id}
             className={`
               flex flex-col items-center justify-center py-3 px-2 text-xs font-medium transition-colors
               ${
                 activeTab === tab.id
-                  ? "text-green-400 bg-green-400/10"
-                  : "text-slate-400 hover:text-slate-300"
+                  ? 'text-green-400 bg-green-400/10'
+                  : 'text-slate-400 hover:text-slate-300'
               }
             `}
             whileTap={{ scale: 0.95 }}
@@ -382,7 +353,7 @@ export function MobileTabs({
               <span className="text-lg">{tab.icon}</span>
               {tab.badge && tab.badge > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {tab.badge > 99 ? "99+" : tab.badge}
+                  {tab.badge > 99 ? '99+' : tab.badge}
                 </span>
               )}
             </div>
@@ -396,26 +367,24 @@ export function MobileTabs({
 
 // Device orientation handler
 export function useDeviceOrientation() {
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">(
-    "portrait",
-  );
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
 
   useEffect(() => {
     const handleOrientationChange = () => {
       if (window.innerHeight > window.innerWidth) {
-        setOrientation("portrait");
+        setOrientation('portrait');
       } else {
-        setOrientation("landscape");
+        setOrientation('landscape');
       }
     };
 
     handleOrientationChange();
-    window.addEventListener("resize", handleOrientationChange);
-    window.addEventListener("orientationchange", handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
 
     return () => {
-      window.removeEventListener("resize", handleOrientationChange);
-      window.removeEventListener("orientationchange", handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, []);
 
@@ -424,18 +393,16 @@ export function useDeviceOrientation() {
 
 // Touch feedback hook
 export function useTouchFeedback() {
-  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(
-    null,
-  );
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
     setTouchStart({ x: touch.clientX, y: touch.clientY });
 
     // Add touch feedback
-    const ripple = document.createElement("div");
+    const ripple = document.createElement('div');
     ripple.className =
-      "fixed w-4 h-4 bg-green-400/30 rounded-full pointer-events-none z-50 animate-ping";
+      'fixed w-4 h-4 bg-green-400/30 rounded-full pointer-events-none z-50 animate-ping';
     ripple.style.left = `${touch.clientX - 8}px`;
     ripple.style.top = `${touch.clientY - 8}px`;
     document.body.appendChild(ripple);
@@ -450,12 +417,12 @@ export function useTouchFeedback() {
   }, []);
 
   useEffect(() => {
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchend", handleTouchEnd);
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchend', handleTouchEnd);
 
     return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [handleTouchStart, handleTouchEnd]);
 
@@ -480,8 +447,8 @@ export function useMobileViewport() {
     const viewport = document.querySelector('meta[name="viewport"]');
     if (viewport) {
       viewport.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
       );
     }
 
@@ -492,18 +459,18 @@ export function useMobileViewport() {
       }
     };
 
-    document.addEventListener("touchend", preventZoom, { passive: false });
-    document.body.addEventListener("touchstart", preventPullToRefresh, {
+    document.addEventListener('touchend', preventZoom, { passive: false });
+    document.body.addEventListener('touchstart', preventPullToRefresh, {
       passive: false,
     });
-    document.body.addEventListener("touchmove", preventPullToRefresh, {
+    document.body.addEventListener('touchmove', preventPullToRefresh, {
       passive: false,
     });
 
     return () => {
-      document.removeEventListener("touchend", preventZoom);
-      document.body.removeEventListener("touchstart", preventPullToRefresh);
-      document.body.removeEventListener("touchmove", preventPullToRefresh);
+      document.removeEventListener('touchend', preventZoom);
+      document.body.removeEventListener('touchstart', preventPullToRefresh);
+      document.body.removeEventListener('touchmove', preventPullToRefresh);
     };
   }, []);
 }

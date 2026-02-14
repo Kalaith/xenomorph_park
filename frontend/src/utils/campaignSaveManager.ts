@@ -1,5 +1,5 @@
-import { GameState } from "../types";
-import { CampaignScenario } from "../components/game/CampaignMode";
+import { GameState } from '../types';
+import { CampaignScenario } from '../components/game/CampaignMode';
 
 export interface CampaignSaveData {
   id: string;
@@ -65,10 +65,7 @@ class CampaignSaveManager {
     return `xenomorph-park-campaign-quicksave-${scenarioId}`;
   }
 
-  public startCampaignSession(
-    scenario: CampaignScenario,
-    gameState: GameState,
-  ): void {
+  public startCampaignSession(scenario: CampaignScenario, gameState: GameState): void {
     // Initialize session tracking
     const sessionData = {
       startTime: Date.now(),
@@ -81,18 +78,18 @@ class CampaignSaveManager {
 
     // Store current session info
     localStorage.setItem(
-      "current-campaign-session",
+      'current-campaign-session',
       JSON.stringify({
         scenarioId: scenario.id,
         sessionData,
-      }),
+      })
     );
 
     // Start auto-save timer
     this.startAutoSave(scenario.id);
 
     // Create initial checkpoint
-    this.createCheckpoint(scenario.id, gameState, "Campaign started", true);
+    this.createCheckpoint(scenario.id, gameState, 'Campaign started', true);
   }
 
   public endCampaignSession(): void {
@@ -103,7 +100,7 @@ class CampaignSaveManager {
     }
 
     // Clear session data
-    localStorage.removeItem("current-campaign-session");
+    localStorage.removeItem('current-campaign-session');
   }
 
   private startAutoSave(scenarioId: string): void {
@@ -121,10 +118,10 @@ class CampaignSaveManager {
       // Get current game state (this would need to be passed from the game)
       const currentState = this.getCurrentGameState();
       if (currentState) {
-        this.quickSave(scenarioId, currentState, "Auto-save");
+        this.quickSave(scenarioId, currentState, 'Auto-save');
       }
     } catch (error) {
-      console.warn("Auto-save failed:", error);
+      console.warn('Auto-save failed:', error);
     }
   }
 
@@ -138,8 +135,8 @@ class CampaignSaveManager {
   public saveCampaign(
     scenarioId: string,
     gameState: GameState,
-    objectives: CampaignSaveData["objectives"],
-    playerNotes?: string,
+    objectives: CampaignSaveData['objectives'],
+    playerNotes?: string
   ): boolean {
     try {
       const scenario = this.getCurrentScenario();
@@ -174,36 +171,26 @@ class CampaignSaveManager {
         .slice(0, this.MAX_SAVES_PER_SCENARIO);
 
       // Save to localStorage
-      localStorage.setItem(
-        this.getStorageKey(scenarioId),
-        JSON.stringify(trimmedSaves),
-      );
+      localStorage.setItem(this.getStorageKey(scenarioId), JSON.stringify(trimmedSaves));
 
       return true;
     } catch (error) {
-      console.error("Failed to save campaign:", error);
+      console.error('Failed to save campaign:', error);
       return false;
     }
   }
 
-  public loadCampaign(
-    saveId: string,
-    scenarioId: string,
-  ): CampaignSaveData | null {
+  public loadCampaign(saveId: string, scenarioId: string): CampaignSaveData | null {
     try {
       const saves = this.getCampaignSaves(scenarioId);
-      return saves.find((save) => save.id === saveId) || null;
+      return saves.find(save => save.id === saveId) || null;
     } catch (error) {
-      console.error("Failed to load campaign:", error);
+      console.error('Failed to load campaign:', error);
       return null;
     }
   }
 
-  public quickSave(
-    scenarioId: string,
-    gameState: GameState,
-    description?: string,
-  ): boolean {
+  public quickSave(scenarioId: string, gameState: GameState, description?: string): boolean {
     try {
       const scenario = this.getCurrentScenario();
       if (!scenario) return false;
@@ -222,17 +209,14 @@ class CampaignSaveManager {
         metadata: {
           difficulty: scenario.difficulty,
           biome: scenario.biome,
-          playerNotes: description || "Quick save",
+          playerNotes: description || 'Quick save',
         },
       };
 
-      localStorage.setItem(
-        this.getQuickSaveKey(scenarioId),
-        JSON.stringify(saveData),
-      );
+      localStorage.setItem(this.getQuickSaveKey(scenarioId), JSON.stringify(saveData));
       return true;
     } catch (error) {
-      console.error("Failed to quick save:", error);
+      console.error('Failed to quick save:', error);
       return false;
     }
   }
@@ -242,7 +226,7 @@ class CampaignSaveManager {
       const saveData = localStorage.getItem(this.getQuickSaveKey(scenarioId));
       return saveData ? JSON.parse(saveData) : null;
     } catch (error) {
-      console.error("Failed to quick load:", error);
+      console.error('Failed to quick load:', error);
       return null;
     }
   }
@@ -252,7 +236,7 @@ class CampaignSaveManager {
       const savesData = localStorage.getItem(this.getStorageKey(scenarioId));
       return savesData ? JSON.parse(savesData) : [];
     } catch (error) {
-      console.error("Failed to get campaign saves:", error);
+      console.error('Failed to get campaign saves:', error);
       return [];
     }
   }
@@ -260,15 +244,12 @@ class CampaignSaveManager {
   public deleteCampaignSave(saveId: string, scenarioId: string): boolean {
     try {
       const saves = this.getCampaignSaves(scenarioId);
-      const filteredSaves = saves.filter((save) => save.id !== saveId);
+      const filteredSaves = saves.filter(save => save.id !== saveId);
 
-      localStorage.setItem(
-        this.getStorageKey(scenarioId),
-        JSON.stringify(filteredSaves),
-      );
+      localStorage.setItem(this.getStorageKey(scenarioId), JSON.stringify(filteredSaves));
       return true;
     } catch (error) {
-      console.error("Failed to delete campaign save:", error);
+      console.error('Failed to delete campaign save:', error);
       return false;
     }
   }
@@ -277,10 +258,10 @@ class CampaignSaveManager {
     scenarioId: string,
     gameState: GameState,
     description: string,
-    automatic: boolean = false,
+    automatic: boolean = false
   ): void {
     try {
-      const sessionString = localStorage.getItem("current-campaign-session");
+      const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) return;
 
       const sessionInfo = JSON.parse(sessionString);
@@ -305,22 +286,18 @@ class CampaignSaveManager {
 
       // Keep only the last 10 checkpoints
       if (sessionInfo.sessionData.checkpoints.length > 10) {
-        sessionInfo.sessionData.checkpoints =
-          sessionInfo.sessionData.checkpoints.slice(-10);
+        sessionInfo.sessionData.checkpoints = sessionInfo.sessionData.checkpoints.slice(-10);
       }
 
-      localStorage.setItem(
-        "current-campaign-session",
-        JSON.stringify(sessionInfo),
-      );
+      localStorage.setItem('current-campaign-session', JSON.stringify(sessionInfo));
     } catch (error) {
-      console.error("Failed to create checkpoint:", error);
+      console.error('Failed to create checkpoint:', error);
     }
   }
 
   public getCheckpoints(scenarioId: string): CampaignCheckpoint[] {
     try {
-      const sessionString = localStorage.getItem("current-campaign-session");
+      const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) return [];
 
       const sessionInfo = JSON.parse(sessionString);
@@ -328,53 +305,49 @@ class CampaignSaveManager {
 
       return sessionInfo.sessionData.checkpoints || [];
     } catch (error) {
-      console.error("Failed to get checkpoints:", error);
+      console.error('Failed to get checkpoints:', error);
       return [];
     }
   }
 
   public restoreCheckpoint(checkpointId: string): CampaignCheckpoint | null {
     try {
-      const sessionString = localStorage.getItem("current-campaign-session");
+      const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) return null;
 
       const sessionInfo = JSON.parse(sessionString);
       const checkpoint = sessionInfo.sessionData.checkpoints.find(
-        (cp: CampaignCheckpoint) => cp.id === checkpointId,
+        (cp: CampaignCheckpoint) => cp.id === checkpointId
       );
 
       return checkpoint || null;
     } catch (error) {
-      console.error("Failed to restore checkpoint:", error);
+      console.error('Failed to restore checkpoint:', error);
       return null;
     }
   }
 
   private getCurrentScenario(): CampaignScenario | null {
     try {
-      const scenarioData = localStorage.getItem("current-campaign-scenario");
-      return scenarioData
-        ? (JSON.parse(scenarioData) as CampaignScenario)
-        : null;
+      const scenarioData = localStorage.getItem('current-campaign-scenario');
+      return scenarioData ? (JSON.parse(scenarioData) as CampaignScenario) : null;
     } catch {
       return null;
     }
   }
 
-  private getCurrentObjectiveProgress(): CampaignSaveData["objectives"] {
+  private getCurrentObjectiveProgress(): CampaignSaveData['objectives'] {
     try {
-      const progressData = localStorage.getItem("campaign-objective-progress");
-      return progressData
-        ? (JSON.parse(progressData) as CampaignSaveData["objectives"])
-        : {};
+      const progressData = localStorage.getItem('campaign-objective-progress');
+      return progressData ? (JSON.parse(progressData) as CampaignSaveData['objectives']) : {};
     } catch {
       return {};
     }
   }
 
-  private getCurrentSessionData(): CampaignSaveData["sessionData"] {
+  private getCurrentSessionData(): CampaignSaveData['sessionData'] {
     try {
-      const sessionString = localStorage.getItem("current-campaign-session");
+      const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) {
         return {
           startTime: Date.now(),
@@ -406,7 +379,7 @@ class CampaignSaveManager {
     crisisesHandled?: number;
   }): void {
     try {
-      const sessionString = localStorage.getItem("current-campaign-session");
+      const sessionString = localStorage.getItem('current-campaign-session');
       if (!sessionString) return;
 
       const sessionInfo = JSON.parse(sessionString);
@@ -424,39 +397,33 @@ class CampaignSaveManager {
       }
 
       // Update elapsed time
-      sessionInfo.sessionData.elapsedTime =
-        Date.now() - sessionInfo.sessionData.startTime;
+      sessionInfo.sessionData.elapsedTime = Date.now() - sessionInfo.sessionData.startTime;
 
-      localStorage.setItem(
-        "current-campaign-session",
-        JSON.stringify(sessionInfo),
-      );
+      localStorage.setItem('current-campaign-session', JSON.stringify(sessionInfo));
     } catch (error) {
-      console.error("Failed to update session stats:", error);
+      console.error('Failed to update session stats:', error);
     }
   }
 
   public exportCampaignProgress(): string {
     try {
       const allData = {
-        campaignProgress: localStorage.getItem(
-          "xenomorph-park-campaign-full-progress",
-        ),
+        campaignProgress: localStorage.getItem('xenomorph-park-campaign-full-progress'),
         scenarios: Object.keys(localStorage)
-          .filter((key) => key.startsWith("xenomorph-park-campaign-saves-"))
+          .filter(key => key.startsWith('xenomorph-park-campaign-saves-'))
           .reduce(
             (acc, key) => {
               acc[key] = localStorage.getItem(key);
               return acc;
             },
-            {} as Record<string, string | null>,
+            {} as Record<string, string | null>
           ),
       };
 
       return JSON.stringify(allData, null, 2);
     } catch (error) {
-      console.error("Failed to export campaign progress:", error);
-      return "";
+      console.error('Failed to export campaign progress:', error);
+      return '';
     }
   }
 
@@ -465,15 +432,12 @@ class CampaignSaveManager {
       const importData = JSON.parse(data);
 
       if (importData.campaignProgress) {
-        localStorage.setItem(
-          "xenomorph-park-campaign-full-progress",
-          importData.campaignProgress,
-        );
+        localStorage.setItem('xenomorph-park-campaign-full-progress', importData.campaignProgress);
       }
 
       if (importData.scenarios) {
         Object.entries(importData.scenarios).forEach(([key, value]) => {
-          if (value && typeof value === "string") {
+          if (value && typeof value === 'string') {
             localStorage.setItem(key, value);
           }
         });
@@ -481,7 +445,7 @@ class CampaignSaveManager {
 
       return true;
     } catch (error) {
-      console.error("Failed to import campaign progress:", error);
+      console.error('Failed to import campaign progress:', error);
       return false;
     }
   }
@@ -489,8 +453,8 @@ class CampaignSaveManager {
   public clearAllCampaignData(): void {
     // Clear all campaign-related localStorage
     Object.keys(localStorage)
-      .filter((key) => key.startsWith("xenomorph-park-campaign-"))
-      .forEach((key) => localStorage.removeItem(key));
+      .filter(key => key.startsWith('xenomorph-park-campaign-'))
+      .forEach(key => localStorage.removeItem(key));
 
     // Stop auto-save timer
     if (this.autoSaveTimer) {

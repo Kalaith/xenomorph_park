@@ -1,9 +1,9 @@
-import { useGameStore } from "../stores/gameStore";
-import { CampaignScenario } from "../components/game/CampaignMode";
+import { useGameStore } from '../stores/gameStore';
+import { CampaignScenario } from '../components/game/CampaignMode';
 
 export interface CampaignUnlock {
   id: string;
-  type: "species" | "facility" | "achievement" | "technology";
+  type: 'species' | 'facility' | 'achievement' | 'technology';
   name: string;
   description: string;
   unlockedBy: string; // scenario ID
@@ -45,7 +45,7 @@ class CampaignRewardManager {
   }
 
   public getProgress(): CampaignProgress {
-    const saved = localStorage.getItem("xenomorph-park-campaign-full-progress");
+    const saved = localStorage.getItem('xenomorph-park-campaign-full-progress');
     if (saved) {
       return JSON.parse(saved);
     }
@@ -71,10 +71,7 @@ class CampaignRewardManager {
   }
 
   private saveProgress(progress: CampaignProgress): void {
-    localStorage.setItem(
-      "xenomorph-park-campaign-full-progress",
-      JSON.stringify(progress),
-    );
+    localStorage.setItem('xenomorph-park-campaign-full-progress', JSON.stringify(progress));
   }
 
   public completeScenario(
@@ -82,7 +79,7 @@ class CampaignRewardManager {
     completionTime: number,
     objectivesCompleted: number,
     totalObjectives: number,
-    isPerfectRun: boolean,
+    isPerfectRun: boolean
   ): void {
     const progress = this.getProgress();
     const gameStore = useGameStore.getState();
@@ -137,15 +134,12 @@ class CampaignRewardManager {
     this.notifyUnlocks(scenario);
   }
 
-  private processUnlocks(
-    scenario: CampaignScenario,
-    progress: CampaignProgress,
-  ): void {
+  private processUnlocks(scenario: CampaignScenario, progress: CampaignProgress): void {
     const gameStore = useGameStore.getState();
 
     // Unlock species
     if (scenario.rewards.unlockedSpecies) {
-      scenario.rewards.unlockedSpecies.forEach((speciesName) => {
+      scenario.rewards.unlockedSpecies.forEach(speciesName => {
         // Add to research completed if not already there
         if (!gameStore.research.completed.includes(speciesName)) {
           gameStore.research.completed.push(speciesName);
@@ -153,8 +147,8 @@ class CampaignRewardManager {
 
         // Create unlock record
         const unlock: CampaignUnlock = {
-          id: `species_${speciesName.toLowerCase().replace(/\s+/g, "_")}`,
-          type: "species",
+          id: `species_${speciesName.toLowerCase().replace(/\s+/g, '_')}`,
+          type: 'species',
           name: speciesName,
           description: `Unlocked ${speciesName} xenomorph species`,
           unlockedBy: scenario.id,
@@ -162,7 +156,7 @@ class CampaignRewardManager {
         };
 
         // Add if not already unlocked
-        if (!progress.unlocks.some((u) => u.id === unlock.id)) {
+        if (!progress.unlocks.some(u => u.id === unlock.id)) {
           progress.unlocks.push(unlock);
         }
       });
@@ -170,17 +164,17 @@ class CampaignRewardManager {
 
     // Unlock facilities
     if (scenario.rewards.unlockedFacilities) {
-      scenario.rewards.unlockedFacilities.forEach((facilityName) => {
+      scenario.rewards.unlockedFacilities.forEach(facilityName => {
         const unlock: CampaignUnlock = {
-          id: `facility_${facilityName.toLowerCase().replace(/\s+/g, "_")}`,
-          type: "facility",
+          id: `facility_${facilityName.toLowerCase().replace(/\s+/g, '_')}`,
+          type: 'facility',
           name: facilityName,
           description: `Unlocked ${facilityName} facility`,
           unlockedBy: scenario.id,
           dateUnlocked: Date.now(),
         };
 
-        if (!progress.unlocks.some((u) => u.id === unlock.id)) {
+        if (!progress.unlocks.some(u => u.id === unlock.id)) {
           progress.unlocks.push(unlock);
         }
       });
@@ -190,42 +184,39 @@ class CampaignRewardManager {
     this.createAchievementUnlocks(scenario, progress);
   }
 
-  private createAchievementUnlocks(
-    scenario: CampaignScenario,
-    progress: CampaignProgress,
-  ): void {
+  private createAchievementUnlocks(scenario: CampaignScenario, progress: CampaignProgress): void {
     const achievements: CampaignUnlock[] = [];
 
     // Scenario-specific achievements
     switch (scenario.id) {
-      case "tutorial_first_park":
+      case 'tutorial_first_park':
         achievements.push({
-          id: "achievement_first_park_manager",
-          type: "achievement",
-          name: "Park Manager",
-          description: "Successfully completed your first xenomorph park",
+          id: 'achievement_first_park_manager',
+          type: 'achievement',
+          name: 'Park Manager',
+          description: 'Successfully completed your first xenomorph park',
           unlockedBy: scenario.id,
           dateUnlocked: Date.now(),
         });
         break;
 
-      case "hadleys_hope":
+      case 'hadleys_hope':
         achievements.push({
-          id: "achievement_terraformer",
-          type: "achievement",
-          name: "Terraformer",
+          id: 'achievement_terraformer',
+          type: 'achievement',
+          name: 'Terraformer',
           description: "Successfully managed Hadley's Hope colony operations",
           unlockedBy: scenario.id,
           dateUnlocked: Date.now(),
         });
         break;
 
-      case "alien_homeworld":
+      case 'alien_homeworld':
         achievements.push({
-          id: "achievement_xenomorph_expert",
-          type: "achievement",
-          name: "Xenomorph Expert",
-          description: "Survived on the alien homeworld",
+          id: 'achievement_xenomorph_expert',
+          type: 'achievement',
+          name: 'Xenomorph Expert',
+          description: 'Survived on the alien homeworld',
           unlockedBy: scenario.id,
           dateUnlocked: Date.now(),
         });
@@ -235,10 +226,10 @@ class CampaignRewardManager {
     // Milestone achievements
     if (progress.completedScenarios.length === 3) {
       achievements.push({
-        id: "achievement_experienced_manager",
-        type: "achievement",
-        name: "Experienced Manager",
-        description: "Completed 3 campaign scenarios",
+        id: 'achievement_experienced_manager',
+        type: 'achievement',
+        name: 'Experienced Manager',
+        description: 'Completed 3 campaign scenarios',
         unlockedBy: scenario.id,
         dateUnlocked: Date.now(),
       });
@@ -246,18 +237,18 @@ class CampaignRewardManager {
 
     if (progress.completedScenarios.length === 6) {
       achievements.push({
-        id: "achievement_campaign_master",
-        type: "achievement",
-        name: "Campaign Master",
-        description: "Completed all campaign scenarios",
+        id: 'achievement_campaign_master',
+        type: 'achievement',
+        name: 'Campaign Master',
+        description: 'Completed all campaign scenarios',
         unlockedBy: scenario.id,
         dateUnlocked: Date.now(),
       });
     }
 
     // Add new achievements
-    achievements.forEach((achievement) => {
-      if (!progress.unlocks.some((u) => u.id === achievement.id)) {
+    achievements.forEach(achievement => {
+      if (!progress.unlocks.some(u => u.id === achievement.id)) {
         progress.unlocks.push(achievement);
       }
     });
@@ -268,37 +259,27 @@ class CampaignRewardManager {
 
     // Notify species unlocks
     if (scenario.rewards.unlockedSpecies) {
-      scenario.rewards.unlockedSpecies.forEach((species) => {
-        gameStore.addStatusMessage(
-          `🧬 Species Unlocked: ${species}`,
-          "success",
-        );
+      scenario.rewards.unlockedSpecies.forEach(species => {
+        gameStore.addStatusMessage(`🧬 Species Unlocked: ${species}`, 'success');
       });
     }
 
     // Notify facility unlocks
     if (scenario.rewards.unlockedFacilities) {
-      scenario.rewards.unlockedFacilities.forEach((facility) => {
-        gameStore.addStatusMessage(
-          `🏗️ Facility Unlocked: ${facility}`,
-          "success",
-        );
+      scenario.rewards.unlockedFacilities.forEach(facility => {
+        gameStore.addStatusMessage(`🏗️ Facility Unlocked: ${facility}`, 'success');
       });
     }
   }
 
   public getUnlockedSpecies(): string[] {
     const progress = this.getProgress();
-    return progress.unlocks
-      .filter((unlock) => unlock.type === "species")
-      .map((unlock) => unlock.name);
+    return progress.unlocks.filter(unlock => unlock.type === 'species').map(unlock => unlock.name);
   }
 
   public getUnlockedFacilities(): string[] {
     const progress = this.getProgress();
-    return progress.unlocks
-      .filter((unlock) => unlock.type === "facility")
-      .map((unlock) => unlock.name);
+    return progress.unlocks.filter(unlock => unlock.type === 'facility').map(unlock => unlock.name);
   }
 
   public isSpeciesUnlocked(speciesName: string): boolean {
@@ -311,7 +292,7 @@ class CampaignRewardManager {
 
   public getAchievements(): CampaignUnlock[] {
     const progress = this.getProgress();
-    return progress.unlocks.filter((unlock) => unlock.type === "achievement");
+    return progress.unlocks.filter(unlock => unlock.type === 'achievement');
   }
 
   public getStatistics(): CampaignStatistics {
@@ -331,13 +312,10 @@ class CampaignRewardManager {
     this.saveProgress(progress);
 
     // Store start time for this session
-    localStorage.setItem("campaign-session-start", Date.now().toString());
+    localStorage.setItem('campaign-session-start', Date.now().toString());
   }
 
-  public updateSessionStats(
-    facilitiesBuilt: number,
-    speciesContained: number,
-  ): void {
+  public updateSessionStats(facilitiesBuilt: number, speciesContained: number): void {
     const progress = this.getProgress();
     progress.statistics.facilitiesBuilt += facilitiesBuilt;
     progress.statistics.speciesContained += speciesContained;
@@ -345,8 +323,8 @@ class CampaignRewardManager {
   }
 
   public resetProgress(): void {
-    localStorage.removeItem("xenomorph-park-campaign-full-progress");
-    localStorage.removeItem("xenomorph-park-campaign-progress");
+    localStorage.removeItem('xenomorph-park-campaign-full-progress');
+    localStorage.removeItem('xenomorph-park-campaign-progress');
   }
 }
 

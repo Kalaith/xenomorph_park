@@ -1,6 +1,6 @@
-import { ReactNode, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "./Button";
+import { ReactNode, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from './Button';
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,28 +10,22 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  className = "",
-}: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, className = '' }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
 

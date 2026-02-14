@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from 'react';
 
 interface ParticleContextType {
   triggerContainmentBreach: (position: { x: number; y: number }) => void;
@@ -30,9 +30,5 @@ export function ParticleProvider({
   children: ReactNode;
   value: ParticleContextType;
 }) {
-  return (
-    <ParticleContext.Provider value={value}>
-      {children}
-    </ParticleContext.Provider>
-  );
+  return <ParticleContext.Provider value={value}>{children}</ParticleContext.Provider>;
 }

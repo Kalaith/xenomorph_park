@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useMemo } from "react";
-import { useGameStore } from "../../stores/gameStore";
+import { useEffect, useCallback, useMemo } from 'react';
+import { useGameStore } from '../../stores/gameStore';
 
 interface KeyboardShortcut {
   key: string;
@@ -8,7 +8,7 @@ interface KeyboardShortcut {
   altKey?: boolean;
   action: () => void;
   description: string;
-  category: "game" | "navigation" | "building";
+  category: 'game' | 'navigation' | 'building';
 }
 
 export function KeyboardShortcuts() {
@@ -37,28 +37,25 @@ export function KeyboardShortcuts() {
         acc[shortcut.category].push(shortcut);
         return acc;
       },
-      {} as Record<string, KeyboardShortcut[]>,
+      {} as Record<string, KeyboardShortcut[]>
     );
 
     const formatKey = (shortcut: KeyboardShortcut) => {
       const parts = [];
-      if (shortcut.ctrlKey) parts.push("Ctrl");
-      if (shortcut.shiftKey) parts.push("Shift");
-      if (shortcut.altKey) parts.push("Alt");
-      parts.push(shortcut.key === " " ? "Space" : shortcut.key.toUpperCase());
-      return parts.join(" + ");
+      if (shortcut.ctrlKey) parts.push('Ctrl');
+      if (shortcut.shiftKey) parts.push('Shift');
+      if (shortcut.altKey) parts.push('Alt');
+      parts.push(shortcut.key === ' ' ? 'Space' : shortcut.key.toUpperCase());
+      return parts.join(' + ');
     };
 
     const helpText = Object.entries(helpContent)
       .map(([category, shortcuts]) => {
-        const categoryName =
-          category.charAt(0).toUpperCase() + category.slice(1);
-        const shortcutList = shortcuts
-          .map((s) => `  ${formatKey(s)} - ${s.description}`)
-          .join("\n");
+        const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+        const shortcutList = shortcuts.map(s => `  ${formatKey(s)} - ${s.description}`).join('\n');
         return `${categoryName}:\n${shortcutList}`;
       })
-      .join("\n\n");
+      .join('\n\n');
 
     alert(`Keyboard Shortcuts:\n\n${helpText}`);
   }, []);
@@ -67,125 +64,119 @@ export function KeyboardShortcuts() {
     () => [
       // Game Controls
       {
-        key: " ",
+        key: ' ',
         action: () => togglePause(),
-        description: "Toggle Pause",
-        category: "game",
+        description: 'Toggle Pause',
+        category: 'game',
       },
       {
-        key: "r",
+        key: 'r',
         ctrlKey: true,
         action: () => {
-          if (confirm("Reset game? All progress will be lost.")) {
+          if (confirm('Reset game? All progress will be lost.')) {
             reset();
           }
         },
-        description: "Reset Game",
-        category: "game",
+        description: 'Reset Game',
+        category: 'game',
       },
 
       // Save/Load
       {
-        key: "s",
+        key: 's',
         ctrlKey: true,
         action: () => quickSave(),
-        description: "Quick Save",
-        category: "game",
+        description: 'Quick Save',
+        category: 'game',
       },
       {
-        key: "l",
+        key: 'l',
         ctrlKey: true,
         action: () => quickLoad(),
-        description: "Quick Load",
-        category: "game",
+        description: 'Quick Load',
+        category: 'game',
       },
 
       // Undo/Redo
       {
-        key: "z",
+        key: 'z',
         ctrlKey: true,
         action: () => {
           if (canUndo()) {
             undo();
-            addStatusMessage("Action undone", "info");
+            addStatusMessage('Action undone', 'info');
           }
         },
-        description: "Undo",
-        category: "building",
+        description: 'Undo',
+        category: 'building',
       },
       {
-        key: "y",
+        key: 'y',
         ctrlKey: true,
         action: () => {
           if (canRedo()) {
             redo();
-            addStatusMessage("Action redone", "info");
+            addStatusMessage('Action redone', 'info');
           }
         },
-        description: "Redo",
-        category: "building",
+        description: 'Redo',
+        category: 'building',
       },
 
       // Building Mode
       {
-        key: "Escape",
+        key: 'Escape',
         action: () => {
           if (selectedFacility || selectedSpecies) {
             selectFacility(null);
             selectSpecies(null);
-            addStatusMessage("Selection cleared", "info");
+            addStatusMessage('Selection cleared', 'info');
           }
         },
-        description: "Clear Selection",
-        category: "building",
+        description: 'Clear Selection',
+        category: 'building',
       },
 
       // Number keys for quick facility selection
       {
-        key: "1",
+        key: '1',
         action: () => {
           // Will be implemented with facility quick select
-          addStatusMessage(
-            "Quick select: Research Lab (Not implemented)",
-            "info",
-          );
+          addStatusMessage('Quick select: Research Lab (Not implemented)', 'info');
         },
-        description: "Quick Select Research Lab",
-        category: "building",
+        description: 'Quick Select Research Lab',
+        category: 'building',
       },
       {
-        key: "2",
+        key: '2',
         action: () => {
-          addStatusMessage("Quick select: Hatchery (Not implemented)", "info");
+          addStatusMessage('Quick select: Hatchery (Not implemented)', 'info');
         },
-        description: "Quick Select Hatchery",
-        category: "building",
+        description: 'Quick Select Hatchery',
+        category: 'building',
       },
       {
-        key: "3",
+        key: '3',
         action: () => {
-          addStatusMessage(
-            "Quick select: Containment Unit (Not implemented)",
-            "info",
-          );
+          addStatusMessage('Quick select: Containment Unit (Not implemented)', 'info');
         },
-        description: "Quick Select Containment Unit",
-        category: "building",
+        description: 'Quick Select Containment Unit',
+        category: 'building',
       },
 
       // Help
       {
-        key: "h",
+        key: 'h',
         action: () => showHelpDialog(shortcuts),
-        description: "Show Help",
-        category: "navigation",
+        description: 'Show Help',
+        category: 'navigation',
       },
       {
-        key: "?",
+        key: '?',
         shiftKey: true,
         action: () => showHelpDialog(shortcuts),
-        description: "Show Help",
-        category: "navigation",
+        description: 'Show Help',
+        category: 'navigation',
       },
     ],
     [
@@ -203,7 +194,7 @@ export function KeyboardShortcuts() {
       showHelpDialog,
       togglePause,
       undo,
-    ],
+    ]
   );
 
   const handleKeyDown = useCallback(
@@ -217,7 +208,7 @@ export function KeyboardShortcuts() {
         return;
       }
 
-      const matchingShortcut = shortcuts.find((shortcut) => {
+      const matchingShortcut = shortcuts.find(shortcut => {
         return (
           shortcut.key.toLowerCase() === event.key.toLowerCase() &&
           !!shortcut.ctrlKey === event.ctrlKey &&
@@ -232,13 +223,13 @@ export function KeyboardShortcuts() {
         matchingShortcut.action();
       }
     },
-    [shortcuts],
+    [shortcuts]
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
 
@@ -255,14 +246,9 @@ export function useKeyboardShortcut(
     shiftKey?: boolean;
     altKey?: boolean;
     enabled?: boolean;
-  } = {},
+  } = {}
 ) {
-  const {
-    enabled = true,
-    ctrlKey = false,
-    shiftKey = false,
-    altKey = false,
-  } = options;
+  const { enabled = true, ctrlKey = false, shiftKey = false, altKey = false } = options;
 
   useEffect(() => {
     if (!enabled) return;
@@ -289,9 +275,9 @@ export function useKeyboardShortcut(
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [key, action, enabled, ctrlKey, shiftKey, altKey]);
 }
