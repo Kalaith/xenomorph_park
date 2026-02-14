@@ -21,7 +21,7 @@ export function ScreenReaderAnnouncement({
 // Skip navigation links
 export function SkipNavigation() {
   return (
-    <div className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 z-50">
+    <div className="sr-only skip-nav-container z-50">
       <a
         href="#main-content"
         className="bg-green-400 text-black px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-600"

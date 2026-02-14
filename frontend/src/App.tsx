@@ -26,7 +26,6 @@ import { useFloatingText } from './components/ui/useFloatingText';
 import { FloatingTextProvider } from './contexts/FloatingTextContext';
 import { useParticles } from './components/ui/useParticles';
 import { ParticleProvider } from './contexts/ParticleContext';
-import { WeatherSystem } from './components/game/WeatherSystem';
 import { useTutorial } from './components/game/useTutorial';
 import { CampaignMode } from './components/game/CampaignMode';
 import { BiomeSystem, BiomeDisplay } from './components/game/BiomeSystem';
@@ -104,12 +103,11 @@ function App() {
     >
       <FloatingTextProvider value={{ addResourceChange, addFloatingText }}>
         <BiomeSystem>
-          <WeatherSystem>
-            <SwipeGesture
-              onSwipeLeft={() => isMobile && modals.setShowSettings(false)}
-              onSwipeRight={() => isMobile && modals.setShowSettings(true)}
-              className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400"
-            >
+          <SwipeGesture
+            onSwipeLeft={() => isMobile && modals.setShowSettings(false)}
+            onSwipeRight={() => isMobile && modals.setShowSettings(true)}
+            className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400"
+          >
               {/* Accessibility Features */}
               <SkipNavigation />
 
@@ -323,8 +321,7 @@ function App() {
                   onSecondaryAction={handleMobileSecondaryAction}
                 />
               )}
-            </SwipeGesture>
-          </WeatherSystem>
+          </SwipeGesture>
         </BiomeSystem>
       </FloatingTextProvider>
     </ParticleProvider>

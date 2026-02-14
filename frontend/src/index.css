@@ -110,8 +110,10 @@ body {
   border: 0;
 }
 
-.sr-only.focus:not-sr-only {
-  position: static;
+.skip-nav-container:focus-within {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: auto;
   height: auto;
   padding: inherit;
