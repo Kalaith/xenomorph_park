@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { campaignRewardManager } from '../../utils/campaignRewards';
 import { campaignEventManager } from '../../utils/campaignEvents';
 
@@ -46,13 +46,7 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
   const perfectRuns = statistics.perfectRuns ?? 0;
   const fastestCompletion = statistics.fastestCompletion ?? Infinity;
 
-  useEffect(() => {
-    if (isOpen) {
-      loadStatistics();
-    }
-  }, [isOpen]);
-
-  const loadStatistics = () => {
+  const loadStatistics = useCallback(() => {
     const stats = campaignRewardManager.getStatistics() as CampaignStats;
     const achievementsList = campaignRewardManager.getAchievements() as CampaignAchievement[];
     const completionRate = campaignRewardManager.getCompletionRate();
@@ -64,7 +58,13 @@ export function CampaignStatistics({ isOpen, onClose }: CampaignStatisticsProps)
       totalScenarios: 6,
       completedScenarios: Math.round((completionRate / 100) * 6),
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadStatistics();
+    }
+  }, [isOpen, loadStatistics]);
 
   const formatTime = (milliseconds: number): string => {
     if (!milliseconds || milliseconds === Infinity) return 'N/A';

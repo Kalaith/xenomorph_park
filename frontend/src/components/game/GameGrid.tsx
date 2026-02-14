@@ -10,7 +10,7 @@ import type {
 } from '../../types';
 import { ContextMenu } from '../ui/ContextMenu';
 import { Tooltip, TooltipContent } from '../ui/Tooltip';
-import { useFloatingTextContext } from '../../contexts/FloatingTextContext';
+import { useFloatingTextContext } from '../../contexts/useFloatingTextContext';
 
 export function GameGrid() {
   const {

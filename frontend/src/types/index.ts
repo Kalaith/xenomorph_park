@@ -9,7 +9,7 @@ export interface GameAction {
     | 'REMOVE_XENOMORPH'
     | 'MODIFY_RESOURCES';
   timestamp: number;
-  data: any;
+  data: unknown;
   previousState?: Partial<GameState>;
 }
 

@@ -8,7 +8,8 @@ import { SpeciesPanel } from './components/game/SpeciesPanel';
 import { GroupedSpeciesPanel } from './components/game/GroupedSpeciesPanel';
 import { GameGrid } from './components/game/GameGrid';
 import { GameControls } from './components/game/GameControls';
-import { SmartToolbar, useMainToolbar } from './components/ui/SmartToolbar';
+import { SmartToolbar } from './components/ui/SmartToolbar';
+import { useMainToolbar } from './components/ui/useMainToolbar';
 import { NotificationSystem } from './components/ui/NotificationSystem';
 import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 import { SettingsModal } from './components/ui/SettingsModal';
@@ -16,26 +17,22 @@ import { ResearchTreeView } from './components/game/ResearchTreeView';
 import { AchievementSystem } from './components/game/AchievementSystem';
 import { ResourceTrends } from './components/game/ResourceTrends';
 import { FacilityUpgrade } from './components/game/FacilityUpgrade';
-import { useCrisisManager } from './components/game/CrisisEventModal';
-import {
-  SkipNavigation,
-  ScreenReaderAnnouncement,
-  useHighContrastMode,
-  useReducedMotion,
-} from './components/ui/AccessibilityFeatures';
+import { useCrisisManager } from './components/game/useCrisisManager';
+import { SkipNavigation, ScreenReaderAnnouncement } from './components/ui/AccessibilityFeatures';
+import { useHighContrastMode, useReducedMotion } from './components/ui/useAccessibilityPreferences';
 import { AnimatedBackground } from './components/ui/AdvancedAnimations';
 import { useGameLoop } from './hooks/useGameLoop';
-import { useFloatingText } from './components/ui/FloatingText';
+import { useFloatingText } from './components/ui/useFloatingText';
 import { FloatingTextProvider } from './contexts/FloatingTextContext';
-import { useParticles } from './components/ui/ParticleSystem';
+import { useParticles } from './components/ui/useParticles';
 import { ParticleProvider } from './contexts/ParticleContext';
 import { WeatherSystem } from './components/game/WeatherSystem';
-import { useTutorial } from './components/game/TutorialMode';
+import { useTutorial } from './components/game/useTutorial';
 import { CampaignMode } from './components/game/CampaignMode';
 import { BiomeSystem, BiomeDisplay } from './components/game/BiomeSystem';
 import { HistoricalScenarios } from './components/game/HistoricalScenarios';
 import { CampaignObjectiveTracker } from './components/game/CampaignObjectiveTracker';
-import { useCampaignEvents } from './components/game/CampaignEventModal';
+import { useCampaignEvents } from './components/game/useCampaignEvents';
 import { CampaignStatistics } from './components/game/CampaignStatistics';
 import { GeneticModification } from './components/game/GeneticModification';
 import { TouchControls, SwipeGesture } from './components/ui/MobileOptimization';

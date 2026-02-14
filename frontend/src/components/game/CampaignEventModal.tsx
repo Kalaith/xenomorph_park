@@ -164,7 +164,15 @@ export function CampaignEventModal({
                                   `Facility: ${req.condition.hasType}`}
                                 {req.type === 'research' &&
                                   req.condition.completed &&
-                                  `Research: ${req.condition.completed.join(', ')}`}
+                                  `Research: ${
+                                    Array.isArray(req.condition.completed)
+                                      ? req.condition.completed
+                                          .filter(
+                                            (item): item is string => typeof item === 'string'
+                                          )
+                                          .join(', ')
+                                      : ''
+                                  }`}
                                 {req.type === 'species' &&
                                   req.condition.minSpecies &&
                                   `Minimum species: ${req.condition.minSpecies}`}
@@ -213,50 +221,4 @@ export function CampaignEventModal({
       </div>
     </div>
   );
-}
-
-// Hook to manage campaign events
-export function useCampaignEvents() {
-  const [currentEvent, setCurrentEvent] = useState<CampaignEvent | null>(null);
-  const gameState = useGameStore();
-
-  useEffect(() => {
-    // Only check for events if we're in a campaign
-    const isCampaignActive = !!localStorage.getItem('current-campaign-scenario');
-    if (!isCampaignActive) return;
-
-    const checkInterval = setInterval(() => {
-      if (!currentEvent) {
-        const newEvent = campaignEventManager.checkForEvents(gameState);
-        if (newEvent) {
-          setCurrentEvent(newEvent);
-        }
-      }
-    }, 30000); // Check every 30 seconds
-
-    return () => clearInterval(checkInterval);
-  }, [gameState, currentEvent]);
-
-  const handleEventChoice = (choice: EventChoice) => {
-    void choice;
-    // This will be handled by the modal component
-  };
-
-  const closeEvent = () => {
-    setCurrentEvent(null);
-  };
-
-  return {
-    currentEvent,
-    handleEventChoice,
-    closeEvent,
-    CampaignEventModal: () => (
-      <CampaignEventModal
-        isOpen={!!currentEvent}
-        event={currentEvent}
-        onClose={closeEvent}
-        onChoiceSelected={handleEventChoice}
-      />
-    ),
-  };
 }

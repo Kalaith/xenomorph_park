@@ -48,6 +48,70 @@ const initialState: GameState = {
   },
 };
 
+type PlaceFacilityActionData = {
+  facility: PlacedFacility;
+  resourceChanges: Pick<GameState['resources'], 'credits' | 'power' | 'maxPower'>;
+};
+
+type PlaceXenomorphActionData = {
+  xenomorph: PlacedXenomorph;
+};
+
+type RemoveFacilityActionData = {
+  facility: PlacedFacility;
+  refund: number;
+  powerReturn: number;
+  maxPowerDecrease: number;
+};
+
+type RemoveXenomorphActionData = {
+  xenomorph: PlacedXenomorph;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isPlacedFacility(value: unknown): value is PlacedFacility {
+  return isRecord(value) && typeof value.id === 'string';
+}
+
+function isPlacedXenomorph(value: unknown): value is PlacedXenomorph {
+  return isRecord(value) && typeof value.id === 'string';
+}
+
+function isPlaceFacilityActionData(data: unknown): data is PlaceFacilityActionData {
+  if (!isRecord(data)) return false;
+  const { facility, resourceChanges } = data;
+  return (
+    isPlacedFacility(facility) &&
+    isRecord(resourceChanges) &&
+    typeof resourceChanges.credits === 'number' &&
+    typeof resourceChanges.power === 'number' &&
+    typeof resourceChanges.maxPower === 'number'
+  );
+}
+
+function isPlaceXenomorphActionData(data: unknown): data is PlaceXenomorphActionData {
+  if (!isRecord(data)) return false;
+  return isPlacedXenomorph(data.xenomorph);
+}
+
+function isRemoveFacilityActionData(data: unknown): data is RemoveFacilityActionData {
+  if (!isRecord(data)) return false;
+  return (
+    isPlacedFacility(data.facility) &&
+    typeof data.refund === 'number' &&
+    typeof data.powerReturn === 'number' &&
+    typeof data.maxPowerDecrease === 'number'
+  );
+}
+
+function isRemoveXenomorphActionData(data: unknown): data is RemoveXenomorphActionData {
+  if (!isRecord(data)) return false;
+  return isPlacedXenomorph(data.xenomorph);
+}
+
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
@@ -627,28 +691,40 @@ export const useGameStore = create<GameStore>()(
             // Reapply the action
             const newState = { ...state };
 
-            if (nextAction.type === 'PLACE_FACILITY') {
-              newState.facilities = [...state.facilities, nextAction.data.facility];
+            if (
+              nextAction.type === 'PLACE_FACILITY' &&
+              isPlaceFacilityActionData(nextAction.data)
+            ) {
+              const data = nextAction.data;
+              newState.facilities = [...state.facilities, data.facility];
               newState.resources = {
                 ...state.resources,
-                ...nextAction.data.resourceChanges,
+                ...data.resourceChanges,
               };
-            } else if (nextAction.type === 'PLACE_XENOMORPH') {
-              newState.xenomorphs = [...state.xenomorphs, nextAction.data.xenomorph];
-            } else if (nextAction.type === 'REMOVE_FACILITY') {
-              newState.facilities = state.facilities.filter(
-                f => f.id !== nextAction.data.facility.id
-              );
+            } else if (
+              nextAction.type === 'PLACE_XENOMORPH' &&
+              isPlaceXenomorphActionData(nextAction.data)
+            ) {
+              const data = nextAction.data;
+              newState.xenomorphs = [...state.xenomorphs, data.xenomorph];
+            } else if (
+              nextAction.type === 'REMOVE_FACILITY' &&
+              isRemoveFacilityActionData(nextAction.data)
+            ) {
+              const data = nextAction.data;
+              newState.facilities = state.facilities.filter(f => f.id !== data.facility.id);
               newState.resources = {
                 ...state.resources,
-                credits: state.resources.credits + nextAction.data.refund,
-                power: state.resources.power + nextAction.data.powerReturn,
-                maxPower: state.resources.maxPower - nextAction.data.maxPowerDecrease,
+                credits: state.resources.credits + data.refund,
+                power: state.resources.power + data.powerReturn,
+                maxPower: state.resources.maxPower - data.maxPowerDecrease,
               };
-            } else if (nextAction.type === 'REMOVE_XENOMORPH') {
-              newState.xenomorphs = state.xenomorphs.filter(
-                x => x.id !== nextAction.data.xenomorph.id
-              );
+            } else if (
+              nextAction.type === 'REMOVE_XENOMORPH' &&
+              isRemoveXenomorphActionData(nextAction.data)
+            ) {
+              const data = nextAction.data;
+              newState.xenomorphs = state.xenomorphs.filter(x => x.id !== data.xenomorph.id);
             }
 
             newState.undoRedo = {

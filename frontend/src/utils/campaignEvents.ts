@@ -14,9 +14,19 @@ export interface CampaignEvent {
   scenarioId?: string;
 }
 
+type EventDataValue =
+  | string
+  | number
+  | boolean
+  | null
+  | EventDataValue[]
+  | { [key: string]: EventDataValue };
+
+type EventData = Record<string, EventDataValue>;
+
 export interface EventTrigger {
   type: 'time' | 'resource' | 'facility' | 'species' | 'random' | 'objective';
-  condition: Record<string, any>;
+  condition: EventData;
   probability?: number;
 }
 
@@ -31,13 +41,13 @@ export interface EventChoice {
 
 export interface EventConsequence {
   type: 'resource' | 'facility' | 'species' | 'story' | 'objective' | 'crisis';
-  effect: Record<string, any>;
+  effect: EventData;
   description: string;
 }
 
 export interface EventRequirement {
   type: 'resource' | 'facility' | 'research' | 'species';
-  condition: Record<string, any>;
+  condition: EventData;
 }
 
 class CampaignEventManager {
