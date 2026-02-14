@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useGameStore } from '../../stores/gameStore';
 import { facilityDefinitions } from '../../data/gameData';
-import { FacilityDefinition } from '../../types';
-import { CollapsiblePanel } from '../ui/CollapsiblePanel';
 import { Button } from '../ui/Button';
+import { CollapsiblePanel } from '../ui/CollapsiblePanel';
+import { useGameStore } from '../../stores/gameStore';
+import { FacilityDefinition } from '../../types';
 
 type FacilityCategory =
   | 'essential'
@@ -28,35 +28,33 @@ export function GroupedFacilityPanel() {
   const categorizeFacility = (facility: FacilityDefinition): FacilityCategory => {
     const name = facility.name.toLowerCase();
 
-    // Essential operations
     if (['visitor center', 'power generator', 'containment unit'].some(key => name.includes(key))) {
       return 'essential';
     }
 
-    // Research facilities
     if (['research', 'laboratory', 'genetic', 'sequencer'].some(key => name.includes(key))) {
       return 'research';
     }
 
-    // Security and safety
     if (
       ['security', 'defense', 'bunker', 'quarantine', 'emergency'].some(key => name.includes(key))
     ) {
       return 'security';
     }
 
-    // Visitor amenities
     if (['visitor', 'executive', 'cafeteria', 'medical bay'].some(key => name.includes(key))) {
       return 'visitor';
     }
 
-    // Environmental controls
     if (['cryo', 'thermal', 'aquatic', 'atmospheric', 'zero-g'].some(key => name.includes(key))) {
       return 'environmental';
     }
 
-    // Specialized/advanced
     return 'specialized';
+  };
+
+  const canAfford = (facility: FacilityDefinition) => {
+    return resources.credits >= facility.cost && resources.power >= facility.powerRequirement;
   };
 
   const groupFacilities = (): FacilityGroup[] => {
@@ -64,82 +62,71 @@ export function GroupedFacilityPanel() {
       {
         category: 'essential',
         name: 'Essential Infrastructure',
-        icon: '🏗️',
-        description: 'Core facilities needed for basic operations',
+        icon: 'INF',
+        description: 'Core facilities needed for basic operations.',
         facilities: [],
       },
       {
         category: 'research',
-        name: 'Research & Development',
-        icon: '🔬',
-        description: 'Scientific facilities for xenomorph study',
+        name: 'Research and Development',
+        icon: 'RND',
+        description: 'Scientific facilities for xenomorph study.',
         facilities: [],
       },
       {
         category: 'security',
-        name: 'Security & Defense',
-        icon: '🛡️',
-        description: 'Containment and emergency response systems',
+        name: 'Security and Defense',
+        icon: 'SEC',
+        description: 'Containment and emergency response systems.',
         facilities: [],
       },
       {
         category: 'visitor',
         name: 'Visitor Services',
-        icon: '👥',
-        description: 'Guest amenities and comfort facilities',
+        icon: 'VIS',
+        description: 'Guest amenities and comfort facilities.',
         facilities: [],
       },
       {
         category: 'environmental',
         name: 'Environmental Controls',
-        icon: '🌡️',
-        description: 'Climate and habitat management systems',
+        icon: 'ENV',
+        description: 'Climate and habitat management systems.',
         facilities: [],
       },
       {
         category: 'specialized',
         name: 'Advanced Systems',
-        icon: '⚙️',
-        description: 'Cutting-edge specialized facilities',
+        icon: 'ADV',
+        description: 'Specialized high-tier facilities.',
         facilities: [],
       },
     ];
 
-    // Categorize all facilities
     facilityDefinitions.forEach(facility => {
       const category = categorizeFacility(facility);
-      const group = groups.find(g => g.category === category);
+      const group = groups.find(item => item.category === category);
       if (group) {
         group.facilities.push(facility);
       }
     });
 
-    // Sort facilities within each group by cost
     groups.forEach(group => {
       group.facilities.sort((a, b) => a.cost - b.cost);
+      if (filterAffordable) {
+        group.facilities = group.facilities.filter(facility => canAfford(facility));
+      }
     });
 
-    // Apply affordability filter
-    if (filterAffordable) {
-      groups.forEach(group => {
-        group.facilities = group.facilities.filter(facility => canAfford(facility));
-      });
-    }
-
-    // Filter out empty groups
     return groups.filter(group => group.facilities.length > 0);
   };
 
   const handleFacilitySelect = (facility: FacilityDefinition) => {
     if (selectedFacility?.name === facility.name) {
       selectFacility(null);
-    } else {
-      selectFacility(facility);
+      return;
     }
-  };
-
-  const canAfford = (facility: FacilityDefinition) => {
-    return resources.credits >= facility.cost && resources.power >= facility.powerRequirement;
+    selectFacility(facility);
   };
 
   const formatCost = (cost: number) => {
@@ -149,42 +136,38 @@ export function GroupedFacilityPanel() {
   };
 
   const groups = groupFacilities();
-  const totalAffordable = facilityDefinitions.filter(f => canAfford(f)).length;
+  const totalAffordable = facilityDefinitions.filter(facility => canAfford(facility)).length;
 
   return (
     <div className="space-y-3">
-      {/* Controls */}
-      <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h3 className="text-green-400 font-bold text-lg glow">
+      <div className="panel p-3">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="section-title text-lg">
             Facilities ({totalAffordable}/{facilityDefinitions.length} affordable)
           </h3>
-          <div className="flex gap-1">
-            <Button
-              variant={filterAffordable ? 'primary' : 'outline'}
-              size="sm"
-              onClick={() => setFilterAffordable(!filterAffordable)}
-              className="text-xs"
-            >
-              💰 Affordable Only
-            </Button>
-          </div>
+          <Button
+            variant={filterAffordable ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={() => setFilterAffordable(value => !value)}
+            className="border-slate-500 text-xs"
+          >
+            Affordable Only
+          </Button>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <div className="text-center p-1 bg-slate-800/30 rounded">
-            <div className="text-green-400 font-bold">{formatCost(resources.credits)}</div>
+          <div className="panel-muted p-1 text-center">
+            <div className="font-semibold text-slate-100">{formatCost(resources.credits)}</div>
             <div className="text-slate-400">Credits</div>
           </div>
-          <div className="text-center p-1 bg-slate-800/30 rounded">
-            <div className="text-yellow-400 font-bold">
+          <div className="panel-muted p-1 text-center">
+            <div className="font-semibold text-slate-100">
               {resources.power}/{resources.maxPower}
             </div>
             <div className="text-slate-400">Power</div>
           </div>
-          <div className="text-center p-1 bg-slate-800/30 rounded">
-            <div className="text-blue-400 font-bold">
+          <div className="panel-muted p-1 text-center">
+            <div className="font-semibold text-slate-100">
               {Math.round((resources.power / resources.maxPower) * 100)}%
             </div>
             <div className="text-slate-400">Usage</div>
@@ -192,9 +175,8 @@ export function GroupedFacilityPanel() {
         </div>
       </div>
 
-      {/* Facility Groups */}
       {groups.map(group => {
-        const affordableCount = group.facilities.filter(f => canAfford(f)).length;
+        const affordableCount = group.facilities.filter(facility => canAfford(facility)).length;
         const hasAffordable = affordableCount > 0;
 
         return (
@@ -207,20 +189,19 @@ export function GroupedFacilityPanel() {
             actions={[
               {
                 label: 'Quick Build',
-                icon: '⚡',
+                icon: 'Go',
                 onClick: () => {
-                  // Select cheapest affordable facility in group
-                  const cheapest = group.facilities.find(f => canAfford(f));
+                  const cheapest = group.facilities.find(facility => canAfford(facility));
                   if (cheapest) {
                     selectFacility(cheapest);
                   }
                 },
-                variant: hasAffordable ? 'primary' : 'outline',
+                variant: hasAffordable ? 'secondary' : 'outline',
               },
             ]}
           >
             <div className="mt-3">
-              <p className="text-slate-400 text-sm mb-3">{group.description}</p>
+              <p className="mb-3 text-sm text-slate-400">{group.description}</p>
               <div className="grid grid-cols-1 gap-2">
                 {group.facilities.map(facility => {
                   const isSelected = selectedFacility?.name === facility.name;
@@ -230,35 +211,30 @@ export function GroupedFacilityPanel() {
                     <button
                       key={facility.name}
                       onClick={() => handleFacilitySelect(facility)}
-                      className={`
-                        p-3 rounded-lg border-2 text-left transition-all duration-200
-                        ${
-                          isSelected
-                            ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/20'
-                            : 'border-slate-600 hover:border-slate-500'
-                        }
-                        ${!affordable ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-800/50'}
-                      `}
+                      className={`rounded-lg border p-3 text-left transition-colors duration-150 ${
+                        isSelected
+                          ? 'border-emerald-300/70 bg-emerald-300/10'
+                          : 'border-slate-600/80 hover:border-slate-500'
+                      } ${!affordable ? 'cursor-not-allowed opacity-50' : 'hover:bg-slate-800/50'}`}
                       disabled={!affordable}
                     >
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="mb-2 flex items-start justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-green-400 font-semibold">{facility.name}</span>
-                          {affordable && <span className="text-green-400 text-xs">✅</span>}
+                          <span className="font-semibold text-slate-100">{facility.name}</span>
+                          {affordable && <span className="text-xs text-emerald-300">Ready</span>}
                         </div>
                         <div className="text-right text-sm">
-                          <div className={`${affordable ? 'text-green-400' : 'text-red-400'}`}>
-                            💰 {formatCost(facility.cost)}
+                          <div className={affordable ? 'text-emerald-300' : 'text-red-300'}>
+                            {formatCost(facility.cost)}
                           </div>
-                          <div className="text-blue-400">⚡ {facility.powerRequirement}</div>
+                          <div className="text-slate-300">{facility.powerRequirement} power</div>
                         </div>
                       </div>
-                      <p className="text-slate-300 text-sm">{facility.description}</p>
+                      <p className="text-sm text-slate-300">{facility.description}</p>
 
-                      {/* Cost breakdown for expensive facilities */}
                       {facility.cost >= 50000 && (
                         <div className="mt-2 text-xs text-slate-400">
-                          <span>ROI: High-end facility with advanced capabilities</span>
+                          <span>ROI: High-end facility with advanced capabilities.</span>
                         </div>
                       )}
                     </button>

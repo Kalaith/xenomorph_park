@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { Resources } from '../../types';
 
@@ -20,7 +20,6 @@ interface ResourceTrendsProps {
   className?: string;
 }
 
-// Mini chart component using Canvas
 function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -31,7 +30,6 @@ function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChar
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size for retina displays
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -39,12 +37,10 @@ function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChar
     canvas.style.height = `${height}px`;
     ctx.scale(dpr, dpr);
 
-    // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
-    // Get values for this metric
-    const values = data.map(d => {
-      const value = d.resources[metric];
+    const values = data.map(point => {
+      const value = point.resources[metric];
       return typeof value === 'number' ? value : 0;
     });
 
@@ -52,31 +48,27 @@ function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChar
 
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
-    const range = maxValue - minValue || 1; // Prevent division by zero
+    const range = maxValue - minValue || 1;
 
-    // Draw grid lines
-    ctx.strokeStyle = '#374151';
+    ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
 
-    // Horizontal lines
-    for (let i = 0; i <= 4; i++) {
-      const y = (height / 4) * i;
+    for (let index = 0; index <= 4; index += 1) {
+      const y = (height / 4) * index;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
       ctx.stroke();
     }
 
-    // Vertical lines
-    for (let i = 0; i <= 4; i++) {
-      const x = (width / 4) * i;
+    for (let index = 0; index <= 4; index += 1) {
+      const x = (width / 4) * index;
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, height);
       ctx.stroke();
     }
 
-    // Draw trend line
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -84,7 +76,6 @@ function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChar
     values.forEach((value, index) => {
       const x = (index / (values.length - 1)) * width;
       const y = height - ((value - minValue) / range) * height;
-
       if (index === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -94,36 +85,25 @@ function TrendChart({ data, metric, color, width = 200, height = 80 }: TrendChar
 
     ctx.stroke();
 
-    // Draw data points
     ctx.fillStyle = color;
     values.forEach((value, index) => {
       const x = (index / (values.length - 1)) * width;
       const y = height - ((value - minValue) / range) * height;
-
       ctx.beginPath();
-      ctx.arc(x, y, 3, 0, 2 * Math.PI);
+      ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
       ctx.fill();
     });
-
-    // Draw current value indicator
-    if (values.length > 0) {
-      const lastValue = values[values.length - 1];
-      const x = width - 5;
-      const y = height - ((lastValue - minValue) / range) * height;
-
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(x, y, 4, 0, 2 * Math.PI);
-      ctx.fill();
-    }
-  }, [data, metric, color, width, height]);
+  }, [color, data, height, metric, width]);
 
   return (
-    <canvas ref={canvasRef} className="rounded border border-slate-600" style={{ width, height }} />
+    <canvas
+      ref={canvasRef}
+      className="rounded border border-slate-600/80"
+      style={{ width, height }}
+    />
   );
 }
 
-// Sparkline component for inline trends
 function Sparkline({
   data,
   metric,
@@ -145,7 +125,6 @@ function Sparkline({
     const width = 60;
     const height = 20;
 
-    // Set canvas size
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -155,8 +134,8 @@ function Sparkline({
 
     ctx.clearRect(0, 0, width, height);
 
-    const values = data.slice(-10).map(d => {
-      const value = d.resources[metric];
+    const values = data.slice(-10).map(point => {
+      const value = point.resources[metric];
       return typeof value === 'number' ? value : 0;
     });
 
@@ -173,7 +152,6 @@ function Sparkline({
     values.forEach((value, index) => {
       const x = (index / (values.length - 1)) * width;
       const y = height - ((value - minValue) / range) * height;
-
       if (index === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -182,7 +160,7 @@ function Sparkline({
     });
 
     ctx.stroke();
-  }, [data, metric, color]);
+  }, [color, data, metric]);
 
   return <canvas ref={canvasRef} className="inline-block" style={{ width: 60, height: 20 }} />;
 }
@@ -193,62 +171,44 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
   const [selectedMetric, setSelectedMetric] = useState<keyof Resources>('credits');
   const [showDetailed, setShowDetailed] = useState(false);
 
-  // Record resource data periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      setHistoricalData(prev => {
-        const newDataPoint: DataPoint = {
+      setHistoricalData(previous => {
+        const nextPoint: DataPoint = {
           timestamp: Date.now(),
           day,
           resources: { ...resources },
         };
-
-        // Keep last 50 data points
-        const updated = [...prev, newDataPoint].slice(-50);
-        return updated;
+        return [...previous, nextPoint].slice(-50);
       });
-    }, 2000); // Record every 2 seconds
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [resources, day]);
+  }, [day, resources]);
 
   const calculateTrend = (metric: keyof Resources): 'up' | 'down' | 'stable' => {
     if (historicalData.length < 5) return 'stable';
 
-    const recent = historicalData.slice(-5);
-    const values = recent.map(d => {
-      const value = d.resources[metric];
+    const values = historicalData.slice(-5).map(point => {
+      const value = point.resources[metric];
       return typeof value === 'number' ? value : 0;
     });
 
-    const firstValue = values[0];
-    const lastValue = values[values.length - 1];
-    const change = lastValue - firstValue;
-
+    const change = values[values.length - 1] - values[0];
     if (Math.abs(change) < 5) return 'stable';
     return change > 0 ? 'up' : 'down';
   };
 
-  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
-    switch (trend) {
-      case 'up':
-        return '📈';
-      case 'down':
-        return '📉';
-      default:
-        return '➡️';
-    }
+  const getTrendLabel = (trend: 'up' | 'down' | 'stable') => {
+    if (trend === 'up') return 'Up';
+    if (trend === 'down') return 'Down';
+    return 'Stable';
   };
 
   const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
-    switch (trend) {
-      case 'up':
-        return '#10b981';
-      case 'down':
-        return '#ef4444';
-      default:
-        return '#6b7280';
-    }
+    if (trend === 'up') return '#34d399';
+    if (trend === 'down') return '#f87171';
+    return '#94a3b8';
   };
 
   const getMetricColor = (metric: keyof Resources) => {
@@ -256,65 +216,60 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
       case 'credits':
         return '#fbbf24';
       case 'power':
-        return '#3b82f6';
-      case 'maxPower':
-        return '#8b5cf6';
+        return '#60a5fa';
       case 'research':
-        return '#a855f7';
+        return '#c084fc';
       case 'visitors':
-        return '#10b981';
+        return '#34d399';
       default:
-        return '#6b7280';
+        return '#94a3b8';
     }
   };
 
   const formatValue = (metric: keyof Resources, value: Resources[keyof Resources]) => {
-    if (typeof value === 'number') {
-      return metric === 'credits'
-        ? `💰 ${value}`
-        : metric === 'power' || metric === 'maxPower'
-          ? `⚡ ${value}`
-          : metric === 'research'
-            ? `🔬 ${value}`
-            : metric === 'visitors'
-              ? `👥 ${value}`
-              : value.toString();
-    }
-    return String(value ?? '');
+    if (typeof value !== 'number') return String(value ?? '');
+    if (metric === 'credits') return `${value} cr`;
+    if (metric === 'power' || metric === 'maxPower') return `${value} pw`;
+    if (metric === 'research') return `${value} rs`;
+    if (metric === 'visitors') return `${value} vs`;
+    return value.toString();
   };
 
   const resourceMetrics: (keyof Resources)[] = ['credits', 'power', 'research', 'visitors'];
+  const chartWidth = 520;
 
   return (
-    <div className={`bg-slate-900/80 border border-green-400/30 rounded-lg p-4 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-green-400 font-bold text-lg">Resource Trends</h3>
+    <div className={`panel p-4 ${className}`}>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="section-title text-lg">Resource Trends</h3>
         <button
-          onClick={() => setShowDetailed(!showDetailed)}
-          className="text-sm text-slate-400 hover:text-green-400 transition-colors"
+          onClick={() => setShowDetailed(value => !value)}
+          className="rounded px-2 py-1 text-sm text-slate-300 transition hover:bg-slate-700/50 hover:text-slate-100"
+          type="button"
         >
           {showDetailed ? 'Hide Details' : 'Show Details'}
         </button>
       </div>
 
-      {/* Quick Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {resourceMetrics.map(metric => {
           const trend = calculateTrend(metric);
           const value = resources[metric];
 
           return (
-            <div
+            <button
               key={metric}
-              className={`
-                bg-slate-800 rounded p-3 cursor-pointer transition-all duration-200
-                ${selectedMetric === metric ? 'ring-2 ring-green-400' : 'hover:bg-slate-700'}
-              `}
+              type="button"
+              className={`panel-muted p-3 text-left transition-colors ${
+                selectedMetric === metric ? 'border-emerald-300/70 bg-emerald-300/10' : 'hover:bg-slate-700/40'
+              }`}
               onClick={() => setSelectedMetric(metric)}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400 capitalize">{metric}</span>
-                <span>{getTrendIcon(trend)}</span>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-xs capitalize text-slate-400">{metric}</span>
+                <span className="text-xs" style={{ color: getTrendColor(trend) }}>
+                  {getTrendLabel(trend)}
+                </span>
               </div>
               <div className="text-sm font-semibold" style={{ color: getMetricColor(metric) }}>
                 {formatValue(metric, value)}
@@ -322,23 +277,22 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
               <div className="mt-1">
                 <Sparkline data={historicalData} metric={metric} color={getMetricColor(metric)} />
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
 
-      {/* Detailed Chart */}
       {showDetailed && historicalData.length > 1 && (
         <div className="space-y-4">
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="panel-muted p-4">
+            <div className="mb-3 flex items-center justify-between">
               <h4 className="font-semibold" style={{ color: getMetricColor(selectedMetric) }}>
                 {selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Trend
               </h4>
               <select
                 value={selectedMetric}
-                onChange={e => setSelectedMetric(e.target.value as keyof Resources)}
-                className="bg-slate-700 border border-slate-600 text-slate-300 rounded px-2 py-1 text-sm"
+                onChange={event => setSelectedMetric(event.target.value as keyof Resources)}
+                className="rounded border border-slate-600 bg-slate-800 px-2 py-1 text-sm text-slate-200"
               >
                 {resourceMetrics.map(metric => (
                   <option key={metric} value={metric}>
@@ -348,13 +302,17 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
               </select>
             </div>
 
-            <TrendChart
-              data={historicalData}
-              metric={selectedMetric}
-              color={getMetricColor(selectedMetric)}
-              width={400}
-              height={120}
-            />
+            <div className="overflow-x-auto">
+              <div className="min-w-[320px]">
+                <TrendChart
+                  data={historicalData}
+                  metric={selectedMetric}
+                  color={getMetricColor(selectedMetric)}
+                  width={chartWidth}
+                  height={120}
+                />
+              </div>
+            </div>
 
             <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
               <div>
@@ -363,32 +321,23 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
                   {formatValue(selectedMetric, resources[selectedMetric])}
                 </span>
               </div>
-              {historicalData.length > 0 && (
-                <>
-                  <div>
-                    <span className="text-slate-400">Trend: </span>
-                    <span
-                      style={{
-                        color: getTrendColor(calculateTrend(selectedMetric)),
-                      }}
-                    >
-                      {calculateTrend(selectedMetric)}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Data Points: </span>
-                    <span className="text-slate-300">{historicalData.length}</span>
-                  </div>
-                </>
-              )}
+              <div>
+                <span className="text-slate-400">Trend: </span>
+                <span style={{ color: getTrendColor(calculateTrend(selectedMetric)) }}>
+                  {getTrendLabel(calculateTrend(selectedMetric))}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-400">Data Points: </span>
+                <span className="text-slate-200">{historicalData.length}</span>
+              </div>
             </div>
           </div>
 
-          {/* Statistics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {resourceMetrics.map(metric => {
-              const values = historicalData.map(d => {
-                const value = d.resources[metric];
+              const values = historicalData.map(point => {
+                const value = point.resources[metric];
                 return typeof value === 'number' ? value : 0;
               });
 
@@ -396,11 +345,11 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
 
               const min = Math.min(...values);
               const max = Math.max(...values);
-              const avg = values.reduce((a, b) => a + b, 0) / values.length;
+              const avg = values.reduce((total, value) => total + value, 0) / values.length;
 
               return (
-                <div key={metric} className="bg-slate-800 rounded p-3">
-                  <div className="text-xs text-slate-400 mb-2 capitalize">{metric} Stats</div>
+                <div key={metric} className="panel-muted p-3">
+                  <div className="mb-2 text-xs capitalize text-slate-400">{metric} Stats</div>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span>Min:</span>
@@ -423,9 +372,9 @@ export function ResourceTrends({ className = '' }: ResourceTrendsProps) {
       )}
 
       {historicalData.length === 0 && (
-        <div className="text-center text-slate-400 py-8">
-          <span>📊 Collecting resource data...</span>
-          <p className="text-sm mt-2">Charts will appear once enough data is gathered</p>
+        <div className="py-8 text-center text-slate-400">
+          <span>Collecting resource data...</span>
+          <p className="mt-2 text-sm">Charts will appear once enough data is gathered.</p>
         </div>
       )}
     </div>

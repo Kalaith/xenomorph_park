@@ -1,4 +1,4 @@
-import { useState, ReactNode, MouseEvent } from 'react';
+import { MouseEvent, ReactNode, useState } from 'react';
 import { Button } from './Button';
 
 interface CollapsiblePanelProps {
@@ -28,49 +28,41 @@ export function CollapsiblePanel({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div className={`bg-slate-900/80 border border-green-400/30 rounded-lg ${className}`}>
-      {/* Header */}
+    <div className={`panel ${className}`}>
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-800/30 transition-colors"
-        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex cursor-pointer items-center justify-between p-3 transition-colors hover:bg-slate-800/30"
+        onClick={() => setIsExpanded(value => !value)}
       >
         <div className="flex items-center gap-3">
-          {icon && <span className="text-lg">{icon}</span>}
-          <h3 className="text-green-400 font-bold text-lg glow">{title}</h3>
-          {badge && (
-            <span className="bg-green-400/20 text-green-400 text-xs px-2 py-1 rounded">
-              {badge}
-            </span>
-          )}
+          {icon && <span className="text-sm font-semibold text-slate-300">{icon}</span>}
+          <h3 className="section-title text-lg">{title}</h3>
+          {badge && <span className="rounded bg-slate-700 px-2 py-1 text-xs text-slate-100">{badge}</span>}
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Action buttons */}
-          {actions.map((action, index) => (
+          {actions.map(action => (
             <Button
-              key={index}
+              key={action.label}
               variant={action.variant || 'outline'}
               size="sm"
-              onClick={e => {
-                (e as MouseEvent).stopPropagation(); // Prevent panel toggle
+              onClick={event => {
+                (event as MouseEvent).stopPropagation();
                 action.onClick();
               }}
-              className="text-xs flex items-center gap-1"
+              className="flex items-center gap-1 text-xs"
             >
               <span>{action.icon}</span>
               <span className="hidden sm:inline">{action.label}</span>
             </Button>
           ))}
 
-          {/* Expand/collapse button */}
-          <Button variant="outline" size="sm" className="text-green-400">
-            {isExpanded ? '▼' : '▶'}
+          <Button variant="outline" size="sm" className="border-slate-500 text-slate-100">
+            {isExpanded ? 'v' : '>'}
           </Button>
         </div>
       </div>
 
-      {/* Content */}
-      {isExpanded && <div className="px-3 pb-3 border-t border-green-400/20">{children}</div>}
+      {isExpanded && <div className="border-t border-slate-700/70 px-3 pb-3">{children}</div>}
     </div>
   );
 }

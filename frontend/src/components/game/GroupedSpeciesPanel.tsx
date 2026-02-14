@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useGameStore } from '../../stores/gameStore';
 import { xenomorphSpecies } from '../../data/gameData';
 import { dangerLevelColors } from '../../constants/gameConstants';
-import { XenomorphSpecies } from '../../types';
 import { CollapsiblePanel } from '../ui/CollapsiblePanel';
 import { Button } from '../ui/Button';
+import { useGameStore } from '../../stores/gameStore';
+import { XenomorphSpecies } from '../../types';
 
 type SpeciesCategory = 'basic' | 'combat' | 'specialized' | 'hybrid' | 'environmental';
 type SortMode = 'category' | 'danger' | 'research' | 'availability';
@@ -22,26 +22,19 @@ export function GroupedSpeciesPanel() {
   const [sortMode, setSortMode] = useState<SortMode>('category');
   const [filterResearched, setFilterResearched] = useState(false);
 
-  const isResearched = (species: XenomorphSpecies) => {
-    return research.completed.includes(species.name);
-  };
+  const isResearched = (species: XenomorphSpecies) => research.completed.includes(species.name);
 
-  const isAvailable = (species: XenomorphSpecies) => {
-    return research.available?.includes(species.name) || false;
-  };
+  const isAvailable = (species: XenomorphSpecies) => research.available?.includes(species.name) || false;
 
   const categorizeSpecies = (species: XenomorphSpecies): SpeciesCategory => {
-    // Basic lifecycle species
     if (['Drone', 'Facehugger', 'Chestburster'].includes(species.name)) {
       return 'basic';
     }
 
-    // Combat-oriented species
     if (['Warrior', 'Praetorian', 'Crusher', 'Berserker Xenomorph'].includes(species.name)) {
       return 'combat';
     }
 
-    // Environmental variants
     if (
       ['Aqua Xenomorph', 'Cryo Xenomorph', 'Pyro Xenomorph', 'Void Xenomorph'].includes(
         species.name
@@ -50,14 +43,12 @@ export function GroupedSpeciesPanel() {
       return 'environmental';
     }
 
-    // Hybrid/engineered species
     if (
       ['Predalien', 'Xeno-Engineer', 'Synthetic Xenomorph', 'Nano Xenomorph'].includes(species.name)
     ) {
       return 'hybrid';
     }
 
-    // Specialized/advanced species
     return 'specialized';
   };
 
@@ -66,50 +57,48 @@ export function GroupedSpeciesPanel() {
       {
         category: 'basic',
         name: 'Basic Lifecycle',
-        icon: '🥚',
-        description: 'Fundamental xenomorph forms',
+        icon: 'BSC',
+        description: 'Fundamental xenomorph forms.',
         species: [],
       },
       {
         category: 'combat',
         name: 'Combat Variants',
-        icon: '⚔️',
-        description: 'Aggressive and defensive specialists',
+        icon: 'CMB',
+        description: 'Aggressive and defensive specialists.',
         species: [],
       },
       {
         category: 'specialized',
         name: 'Specialized Forms',
-        icon: '🎯',
-        description: 'Unique adaptations and abilities',
+        icon: 'SPC',
+        description: 'Unique adaptations and abilities.',
         species: [],
       },
       {
         category: 'environmental',
         name: 'Environmental',
-        icon: '🌍',
-        description: 'Climate-adapted variants',
+        icon: 'ENV',
+        description: 'Climate-adapted variants.',
         species: [],
       },
       {
         category: 'hybrid',
-        name: 'Hybrid & Engineered',
-        icon: '🧬',
-        description: 'Advanced genetic combinations',
+        name: 'Hybrid and Engineered',
+        icon: 'HYB',
+        description: 'Advanced genetic combinations.',
         species: [],
       },
     ];
 
-    // Categorize all species
     xenomorphSpecies.forEach(species => {
       const category = categorizeSpecies(species);
-      const group = groups.find(g => g.category === category);
+      const group = groups.find(item => item.category === category);
       if (group) {
         group.species.push(species);
       }
     });
 
-    // Sort species within each group
     groups.forEach(group => {
       group.species.sort((a, b) => {
         if (sortMode === 'danger') return a.dangerLevel - b.dangerLevel;
@@ -124,13 +113,12 @@ export function GroupedSpeciesPanel() {
       });
     });
 
-    // Filter empty groups and apply research filter
     return groups
       .filter(group => group.species.length > 0)
       .map(group => ({
         ...group,
         species: filterResearched
-          ? group.species.filter(s => isResearched(s) || isAvailable(s))
+          ? group.species.filter(species => isResearched(species) || isAvailable(species))
           : group.species,
       }))
       .filter(group => group.species.length > 0);
@@ -139,9 +127,9 @@ export function GroupedSpeciesPanel() {
   const handleSpeciesSelect = (species: XenomorphSpecies) => {
     if (selectedSpecies?.name === species.name) {
       selectSpecies(null);
-    } else {
-      selectSpecies(species);
+      return;
     }
+    selectSpecies(species);
   };
 
   const getDangerLevelColor = (level: number) => {
@@ -149,60 +137,47 @@ export function GroupedSpeciesPanel() {
   };
 
   const groups = groupSpecies();
-  const totalAvailable = xenomorphSpecies.filter(s => isResearched(s) || isAvailable(s)).length;
+  const totalAvailable = xenomorphSpecies.filter(species => isResearched(species) || isAvailable(species)).length;
 
   return (
     <div className="space-y-3">
-      {/* Controls */}
-      <div className="bg-slate-900/80 border border-green-400/30 rounded-lg p-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h3 className="text-green-400 font-bold text-lg glow">
+      <div className="panel p-3">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="section-title text-lg">
             Xenomorph Species ({totalAvailable}/{xenomorphSpecies.length})
           </h3>
-          <div className="flex gap-1">
-            <Button
-              variant={filterResearched ? 'primary' : 'outline'}
-              size="sm"
-              onClick={() => setFilterResearched(!filterResearched)}
-              className="text-xs"
-            >
-              🔓 Available Only
-            </Button>
-          </div>
+          <Button
+            variant={filterResearched ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={() => setFilterResearched(value => !value)}
+            className="border-slate-500 text-xs"
+          >
+            Available Only
+          </Button>
         </div>
 
-        {/* Sort Options */}
         <div className="flex flex-wrap gap-1">
-          <span className="text-slate-400 text-xs mr-2">Sort by:</span>
+          <span className="mr-2 text-xs text-slate-400">Sort by:</span>
           {[
-            { mode: 'category' as SortMode, label: 'Category', icon: '📁' },
-            { mode: 'danger' as SortMode, label: 'Danger', icon: '⚠️' },
-            {
-              mode: 'research' as SortMode,
-              label: 'Research Cost',
-              icon: '🔬',
-            },
-            {
-              mode: 'availability' as SortMode,
-              label: 'Available First',
-              icon: '🔓',
-            },
-          ].map(({ mode, label, icon }) => (
+            { mode: 'category' as SortMode, label: 'Category' },
+            { mode: 'danger' as SortMode, label: 'Danger' },
+            { mode: 'research' as SortMode, label: 'Research Cost' },
+            { mode: 'availability' as SortMode, label: 'Available First' },
+          ].map(({ mode, label }) => (
             <Button
               key={mode}
-              variant={sortMode === mode ? 'primary' : 'outline'}
+              variant={sortMode === mode ? 'secondary' : 'outline'}
               size="sm"
               onClick={() => setSortMode(mode)}
-              className="text-xs flex items-center gap-1"
+              className="border-slate-500 text-xs"
             >
-              <span>{icon}</span>
               <span className="hidden sm:inline">{label}</span>
+              <span className="sm:hidden">{label.split(' ')[0]}</span>
             </Button>
           ))}
         </div>
       </div>
 
-      {/* Species Groups */}
       {groups.map(group => (
         <CollapsiblePanel
           key={group.category}
@@ -210,15 +185,16 @@ export function GroupedSpeciesPanel() {
           icon={group.icon}
           badge={group.species.length}
           defaultExpanded={
-            group.category === 'basic' || group.species.some(s => isResearched(s) || isAvailable(s))
+            group.category === 'basic' || group.species.some(species => isResearched(species) || isAvailable(species))
           }
           actions={[
             {
               label: 'Quick Select',
-              icon: '⚡',
+              icon: 'Go',
               onClick: () => {
-                // Select first available species in group
-                const availableSpecies = group.species.find(s => isResearched(s) || isAvailable(s));
+                const availableSpecies = group.species.find(
+                  species => isResearched(species) || isAvailable(species)
+                );
                 if (availableSpecies) {
                   selectSpecies(availableSpecies);
                 }
@@ -228,7 +204,7 @@ export function GroupedSpeciesPanel() {
           ]}
         >
           <div className="mt-3">
-            <p className="text-slate-400 text-sm mb-3">{group.description}</p>
+            <p className="mb-3 text-sm text-slate-400">{group.description}</p>
             <div className="grid grid-cols-1 gap-2">
               {group.species.map(species => {
                 const isSelected = selectedSpecies?.name === species.name;
@@ -240,44 +216,40 @@ export function GroupedSpeciesPanel() {
                   <button
                     key={species.name}
                     onClick={() => handleSpeciesSelect(species)}
-                    className={`
-                      p-3 rounded-lg border-2 text-left transition-all duration-200
-                      ${
-                        isSelected
-                          ? 'border-green-400 bg-green-400/20 shadow-lg shadow-green-400/20'
-                          : 'border-slate-600 hover:border-slate-500'
-                      }
-                      ${!canPlace ? 'opacity-30' : 'hover:bg-slate-800/50'}
-                    `}
+                    className={`rounded-lg border p-3 text-left transition-colors duration-150 ${
+                      isSelected
+                        ? 'border-emerald-300/70 bg-emerald-300/10'
+                        : 'border-slate-600/80 hover:border-slate-500'
+                    } ${!canPlace ? 'opacity-40' : 'hover:bg-slate-800/50'}`}
                     disabled={!canPlace}
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="mb-2 flex items-start justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-green-400 font-semibold">{species.name}</span>
-                        {researched && <span className="text-green-400 text-xs">✅</span>}
+                        <span className="font-semibold text-slate-100">{species.name}</span>
+                        {researched && <span className="text-xs text-emerald-300">Researched</span>}
                         {available && !researched && (
-                          <span className="text-yellow-400 text-xs">🔓</span>
+                          <span className="text-xs text-amber-300">Available</span>
                         )}
                       </div>
                       <div className="text-right text-sm">
-                        <div className={`${getDangerLevelColor(species.dangerLevel)}`}>
-                          ⚠️ {species.dangerLevel}
+                        <div className={getDangerLevelColor(species.dangerLevel)}>
+                          Danger {species.dangerLevel}
                         </div>
-                        <div className="text-yellow-400 text-xs">🔬 {species.researchCost}</div>
+                        <div className="text-xs text-slate-300">Research {species.researchCost}</div>
                       </div>
                     </div>
-                    <p className="text-slate-300 text-sm mb-2">{species.description}</p>
+                    <p className="mb-2 text-sm text-slate-300">{species.description}</p>
                     <div className="flex flex-wrap gap-1">
-                      {species.specialAbilities.slice(0, 2).map((ability, index) => (
+                      {species.specialAbilities.slice(0, 2).map(ability => (
                         <span
-                          key={index}
-                          className="px-2 py-1 bg-slate-700 rounded text-xs text-green-300"
+                          key={ability}
+                          className="rounded bg-slate-700/80 px-2 py-1 text-xs text-slate-200"
                         >
                           {ability}
                         </span>
                       ))}
                       {species.specialAbilities.length > 2 && (
-                        <span className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-400">
+                        <span className="rounded bg-slate-700/80 px-2 py-1 text-xs text-slate-400">
                           +{species.specialAbilities.length - 2} more
                         </span>
                       )}

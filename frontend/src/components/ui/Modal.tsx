@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from './Button';
 
 interface ModalProps {
@@ -12,8 +12,8 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children, className = '' }: ModalProps) {
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
@@ -32,8 +32,7 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-2 sm:items-center sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -42,32 +41,25 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
             onClick={onClose}
           />
 
-          {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`
-              relative bg-slate-900 border-2 border-green-400/30 rounded-lg shadow-2xl
-              shadow-green-400/20 max-w-md w-full mx-4 max-h-[90vh] overflow-hidden
-              ${className}
-            `}
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            className={`relative w-full max-w-2xl overflow-hidden rounded-lg border border-slate-700/80 bg-slate-900 shadow-2xl max-h-[calc(100vh-1rem)] sm:max-h-[90vh] ${className}`}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-green-400/20">
-              <h2 className="text-lg font-bold text-green-400 glow">{title}</h2>
+            <div className="flex items-center justify-between border-b border-slate-700/70 p-3 sm:p-4">
+              <h2 className="section-title text-base sm:text-lg">{title}</h2>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={onClose}
-                className="!p-1 !text-lg leading-none"
+                className="!p-1.5 leading-none text-slate-100"
               >
-                ×
+                X
               </Button>
             </div>
 
-            {/* Content */}
-            <div className="p-4 overflow-y-auto">{children}</div>
+            <div className="overflow-y-auto p-3 sm:p-4">{children}</div>
           </motion.div>
         </div>
       )}

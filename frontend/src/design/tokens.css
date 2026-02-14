@@ -1,0 +1,36 @@
+:root {
+  --xp-bg: #0e1218;
+  --xp-bg-elevated: #151c25;
+  --xp-surface: #1b2430;
+  --xp-surface-muted: #202b39;
+  --xp-border: #2e3e52;
+  --xp-text: #e8edf4;
+  --xp-text-muted: #aab7c8;
+  --xp-accent: #75e6b0;
+  --xp-danger: #f87171;
+  --xp-warning: #fbbf24;
+  --xp-success: #34d399;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+
+  --ring-focus: 0 0 0 3px color-mix(in srgb, var(--xp-accent) 45%, transparent);
+
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 260ms;
+}
+
+body {
+  color: var(--xp-text);
+}

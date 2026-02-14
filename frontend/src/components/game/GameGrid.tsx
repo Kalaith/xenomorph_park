@@ -628,62 +628,63 @@ export function GameGrid() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center p-4 border-b border-green-400/20">
-        <h3 className="text-green-400 font-bold text-lg glow">Park Layout</h3>
-        <div className="flex items-center gap-2">
-          {/* Camera Controls */}
-          <div className="flex items-center gap-1 bg-slate-800/50 rounded px-2 py-1">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="border-b border-slate-700/70 p-3 sm:p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <h3 className="section-title text-base sm:text-lg">Park Layout</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="panel-muted flex items-center gap-1 overflow-x-auto px-2 py-1">
+              <button
+                onClick={handleZoomOut}
+                disabled={zoomLevel <= minZoom}
+                className="rounded px-2 py-1 text-xs transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                title="Zoom Out (Use zoom buttons - scroll wheel disabled)"
+              >
+                Zoom -
+              </button>
+              <span className="min-w-[3rem] text-center text-xs text-slate-400">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+              <button
+                onClick={handleZoomIn}
+                disabled={zoomLevel >= maxZoom}
+                className="rounded px-2 py-1 text-xs transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                title="Zoom In (Use zoom buttons - scroll wheel disabled)"
+              >
+                Zoom +
+              </button>
+              <button
+                onClick={handleResetCamera}
+                className="rounded px-2 py-1 text-xs transition-colors hover:bg-slate-700"
+                title="Reset Camera (100% zoom, center view)"
+              >
+                Reset
+              </button>
+              <button
+                onClick={handleZoomToFit}
+                className="rounded px-2 py-1 text-xs transition-colors hover:bg-slate-700"
+                title="Fit grid to screen"
+              >
+                Fit
+              </button>
+            </div>
+
             <button
-              onClick={handleZoomOut}
-              disabled={zoomLevel <= minZoom}
-              className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Zoom Out (Use zoom buttons - scroll wheel disabled)"
+              onClick={() => setShowGridHelpers(!showGridHelpers)}
+              className={`rounded border px-2 py-1 text-xs transition-colors ${
+                showGridHelpers
+                  ? 'border-emerald-300/60 bg-emerald-300/10 text-emerald-300'
+                  : 'border-slate-600 bg-slate-700 text-slate-300'
+              }`}
+              title="Toggle grid alignment helpers"
             >
-              🔍➖
-            </button>
-            <span className="text-xs text-slate-400 min-w-[3rem] text-center">
-              {Math.round(zoomLevel * 100)}%
-            </span>
-            <button
-              onClick={handleZoomIn}
-              disabled={zoomLevel >= maxZoom}
-              className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Zoom In (Use zoom buttons - scroll wheel disabled)"
-            >
-              🔍➕
-            </button>
-            <button
-              onClick={handleResetCamera}
-              className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700"
-              title="Reset Camera (100% zoom, center view)"
-            >
-              🎯
-            </button>
-            <button
-              onClick={handleZoomToFit}
-              className="text-xs px-2 py-1 rounded transition-colors hover:bg-slate-700"
-              title="Fit grid to screen"
-            >
-              📐
+              Grid Helpers
             </button>
           </div>
-
-          <button
-            onClick={() => setShowGridHelpers(!showGridHelpers)}
-            className={`text-xs px-2 py-1 rounded transition-colors ${
-              showGridHelpers
-                ? 'bg-green-400/20 text-green-400 border border-green-400/50'
-                : 'bg-slate-700 text-slate-400 border border-slate-600'
-            }`}
-            title="Toggle grid alignment helpers"
-          >
-            📐 Grid Helpers
-          </button>
         </div>
       </div>
       <div
-        className="flex-1 overflow-hidden bg-slate-800 relative"
+        className="relative flex-1 overflow-auto bg-slate-800 lg:overflow-hidden"
         style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
         onWheel={e => {
           // Prevent wheel events from affecting zoom or page scroll
@@ -726,15 +727,15 @@ export function GameGrid() {
           {renderGrid()}
         </div>
       </div>
-      <div className="px-4 py-2 border-t border-green-400/20 bg-slate-900/50">
+      <div className="border-t border-slate-700/70 bg-slate-900/50 px-3 py-2 sm:px-4">
         {selectedFacility && (
-          <p className="text-green-400 text-sm">
-            📍 Click on the grid to place: {selectedFacility.name}
+          <p className="text-sm text-emerald-300">
+            Click on the grid to place: {selectedFacility.name}
           </p>
         )}
         {selectedSpecies && (
-          <p className="text-green-400 text-sm">
-            📍 Click on the grid to place: {selectedSpecies.name}
+          <p className="text-sm text-emerald-300">
+            Click on the grid to place: {selectedSpecies.name}
           </p>
         )}
         {!selectedFacility && !selectedSpecies && !isDragging && (
@@ -743,8 +744,8 @@ export function GameGrid() {
           </p>
         )}
         {isDragging && (
-          <p className="text-blue-400 animate-pulse text-sm">
-            🚀 Dragging... Drop on a free cell to place
+          <p className="animate-pulse text-sm text-blue-300">
+            Dragging... Drop on a free cell to place
           </p>
         )}
       </div>

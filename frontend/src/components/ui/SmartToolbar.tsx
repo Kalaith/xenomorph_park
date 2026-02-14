@@ -35,21 +35,20 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
   };
 
   return (
-    <div className={`bg-slate-900/95 border border-green-400/30 rounded-lg ${className}`}>
-      {/* Main Toolbar */}
-      <div className="flex items-center gap-1 p-2">
+    <div className={`panel ${className}`}>
+      <div className="flex flex-wrap items-center gap-2 p-2">
         {groups.map(group => (
           <div key={group.id} className="relative">
             <Button
-              variant={activeGroup === group.id ? 'primary' : 'outline'}
+              variant={activeGroup === group.id ? 'secondary' : 'outline'}
               size="sm"
               onClick={() => toggleGroup(group.id)}
-              className="relative flex items-center gap-2 min-w-[80px]"
+              className="relative flex min-w-[88px] items-center gap-2"
             >
               <span className="text-lg">{group.icon}</span>
-              <span className="hidden sm:inline text-xs">{group.label}</span>
+              <span className="hidden text-xs sm:inline">{group.label}</span>
               {group.badge && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
                   {group.badge}
                 </span>
               )}
@@ -58,15 +57,14 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
         ))}
       </div>
 
-      {/* Dropdown Panel */}
       {activeGroup && (
-        <div className="border-t border-green-400/30 p-3 bg-slate-800/50">
+        <div className="border-t border-slate-700/70 p-3">
           {(() => {
             const group = groups.find(g => g.id === activeGroup);
             if (!group) return null;
 
             return (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                 {group.items.map(item => (
                   <Button
                     key={item.id}
@@ -74,15 +72,15 @@ export function SmartToolbar({ groups, className = '' }: SmartToolbarProps) {
                     size="sm"
                     onClick={() => {
                       item.onClick();
-                      setActiveGroup(null); // Close after selection
+                      setActiveGroup(null);
                     }}
                     disabled={item.disabled}
-                    className="flex items-center justify-start gap-2 text-left"
+                    className="flex items-center justify-start gap-2 border-slate-500 text-left text-slate-200 hover:bg-slate-700/40"
                   >
                     <span>{item.icon}</span>
                     <span className="text-xs truncate">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-green-400/20 text-green-400 text-xs px-1 rounded">
+                      <span className="ml-auto rounded bg-slate-700 px-1 text-xs text-slate-200">
                         {item.badge}
                       </span>
                     )}

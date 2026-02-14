@@ -15,13 +15,11 @@ interface ButtonProps {
 }
 
 const variantClasses = {
-  primary:
-    'bg-green-600 hover:bg-green-500 text-black border-green-400 shadow-lg shadow-green-400/20',
-  secondary: 'bg-slate-700 hover:bg-slate-600 text-green-400 border-slate-500',
-  danger: 'bg-red-600 hover:bg-red-500 text-white border-red-400 shadow-lg shadow-red-400/20',
-  warning:
-    'bg-yellow-600 hover:bg-yellow-500 text-black border-yellow-400 shadow-lg shadow-yellow-400/20',
-  outline: 'bg-transparent hover:bg-green-400/10 text-green-400 border-green-400',
+  primary: 'bg-emerald-300 hover:bg-emerald-200 text-slate-950 border-emerald-200',
+  secondary: 'bg-slate-700 hover:bg-slate-600 text-slate-100 border-slate-500',
+  danger: 'bg-red-500 hover:bg-red-400 text-white border-red-300',
+  warning: 'bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-200',
+  outline: 'bg-transparent hover:bg-slate-700/40 text-slate-100 border-slate-500',
 };
 
 const sizeClasses = {
@@ -46,8 +44,8 @@ export function Button({
 
   const commonProps = {
     className: `
-      font-mono font-medium border-2 rounded-md transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-green-400/50
+      font-medium border rounded-md transition-colors duration-150
+      focus:outline-none focus:ring-2 focus:ring-emerald-300/40
       disabled:opacity-50 disabled:cursor-not-allowed
       ${variantClasses[variant]}
       ${sizeClasses[size]}

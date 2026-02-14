@@ -270,7 +270,7 @@ export function CampaignObjectiveTracker({ isActive }: ObjectiveTrackerProps) {
   if (!isActive || !currentScenario) return null;
 
   return (
-    <div className="fixed top-4 left-4 z-50 bg-slate-900/95 border border-green-400 rounded-lg p-4 max-w-sm">
+    <div className="fixed left-2 right-2 top-2 z-50 rounded-lg border border-slate-600 bg-slate-900/95 p-3 sm:left-4 sm:right-auto sm:top-4 sm:max-w-sm sm:p-4">
       <div className="text-green-400 font-bold mb-2 flex items-center gap-2">
         🎯 {currentScenario.name}
         <span className="text-xs bg-green-400/20 px-2 py-1 rounded">

@@ -8,15 +8,8 @@ import { SpeciesPanel } from './components/game/SpeciesPanel';
 import { GroupedSpeciesPanel } from './components/game/GroupedSpeciesPanel';
 import { GameGrid } from './components/game/GameGrid';
 import { GameControls } from './components/game/GameControls';
-import { SmartToolbar } from './components/ui/SmartToolbar';
 import { useMainToolbar } from './components/ui/useMainToolbar';
-import { NotificationSystem } from './components/ui/NotificationSystem';
-import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
-import { SettingsModal } from './components/ui/SettingsModal';
-import { ResearchTreeView } from './components/game/ResearchTreeView';
-import { AchievementSystem } from './components/game/AchievementSystem';
 import { ResourceTrends } from './components/game/ResourceTrends';
-import { FacilityUpgrade } from './components/game/FacilityUpgrade';
 import { useCrisisManager } from './components/game/useCrisisManager';
 import { SkipNavigation, ScreenReaderAnnouncement } from './components/ui/AccessibilityFeatures';
 import { useHighContrastMode, useReducedMotion } from './components/ui/useAccessibilityPreferences';
@@ -27,36 +20,50 @@ import { FloatingTextProvider } from './contexts/FloatingTextContext';
 import { useParticles } from './components/ui/useParticles';
 import { ParticleProvider } from './contexts/ParticleContext';
 import { useTutorial } from './components/game/useTutorial';
-import { CampaignMode } from './components/game/CampaignMode';
 import { BiomeSystem, BiomeDisplay } from './components/game/BiomeSystem';
-import { HistoricalScenarios } from './components/game/HistoricalScenarios';
-import { CampaignObjectiveTracker } from './components/game/CampaignObjectiveTracker';
 import { useCampaignEvents } from './components/game/useCampaignEvents';
-import { CampaignStatistics } from './components/game/CampaignStatistics';
-import { GeneticModification } from './components/game/GeneticModification';
-import { TouchControls, SwipeGesture } from './components/ui/MobileOptimization';
+import { SwipeGesture } from './components/ui/MobileOptimization';
+import { PlacedFacility } from './types';
+import { AppShell } from './layout/AppShell';
+import { TopBar } from './layout/TopBar';
+import { SidebarNav, NavigationItem, NavigationSectionId } from './layout/SidebarNav';
+import { ContentFrame } from './layout/ContentFrame';
+import { OperationsPage } from './features/operations/OperationsPage';
+import { OverviewPage } from './features/overview/OverviewPage';
+import { SpeciesPage } from './features/species/SpeciesPage';
+import { FacilitiesPage } from './features/facilities/FacilitiesPage';
+import { ResearchPage } from './features/research/ResearchPage';
+import { CampaignPage } from './features/campaign/CampaignPage';
+import { SystemPage } from './features/system/SystemPage';
+import { GlobalOverlays } from './features/overlays/GlobalOverlays';
+
+const navigationItems: NavigationItem[] = [
+  { id: 'overview', label: 'Reports', description: 'Resource trends, status reports, and summaries' },
+  { id: 'operations', label: 'Operations', description: 'Grid, placement, and active controls' },
+  { id: 'species', label: 'Species', description: 'Species roster and containment data' },
+  { id: 'facilities', label: 'Facilities', description: 'Buildings, upgrades, and maintenance' },
+  { id: 'research', label: 'Research', description: 'Research tree and genetic programs' },
+  { id: 'campaign', label: 'Campaign', description: 'Campaign progression and scenarios' },
+  { id: 'system', label: 'System', description: 'Settings, controls, and accessibility' },
+];
 
 function App() {
-  const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState(null);
-  const [useSmartUI, setUseSmartUI] = useState(true); // Toggle for new UI
+  const [selectedFacilityForUpgrade, setSelectedFacilityForUpgrade] = useState<PlacedFacility | null>(
+    null
+  );
+  const [useSmartUI, setUseSmartUI] = useState(true);
+  const [activeSection, setActiveSection] = useState<NavigationSectionId>('operations');
 
-  // Tutorial system
   const { startTutorial, TutorialComponent } = useTutorial();
-
-  // Use the smart toolbar hook
-  const { groups: toolbarGroups, modals } = useMainToolbar(startTutorial);
-
+  const { modals } = useMainToolbar(startTutorial);
   const { activeCrisis, CrisisModal } = useCrisisManager();
 
-  // Game loop and accessibility hooks
   useGameLoop();
   useHighContrastMode();
   const reducedMotion = useReducedMotion();
 
-  // Floating text for visual feedback
   const { FloatingTextComponent, addResourceChange, addFloatingText } = useFloatingText();
 
-  // Particle effects
   const {
     ParticleSystemComponent,
     triggerContainmentBreach,
@@ -65,31 +72,72 @@ function App() {
     triggerSmoke,
   } = useParticles();
 
-  // Campaign events system
   const { CampaignEventModal } = useCampaignEvents();
-
-  // Check if campaign is active
   const isCampaignActive = !!localStorage.getItem('current-campaign-scenario');
 
-  // Mobile detection
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
 
-  // Mobile interaction handlers
   const handleMobileMove = (direction: 'up' | 'down' | 'left' | 'right') => {
-    // Could be used for grid navigation or camera movement
     console.log(`Mobile move: ${direction}`);
   };
 
   const handleMobileAction = () => {
-    // Primary action - could trigger building placement
     console.log('Mobile primary action');
   };
 
   const handleMobileSecondaryAction = () => {
-    // Secondary action - could open context menu
     console.log('Mobile secondary action');
+  };
+
+  const toggleSmartUI = () => {
+    setUseSmartUI(value => !value);
+  };
+
+  const operationsPage = <OperationsPage gameGrid={<GameGrid />} />;
+
+  const renderActiveSection = () => {
+    switch (activeSection) {
+      case 'overview':
+        return <OverviewPage resourceTrends={<ResourceTrends />} isCampaignActive={isCampaignActive} />;
+      case 'operations':
+        return operationsPage;
+      case 'species':
+        return <SpeciesPage speciesPanel={useSmartUI ? <GroupedSpeciesPanel /> : <SpeciesPanel />} />;
+      case 'facilities':
+        return (
+          <FacilitiesPage facilityPanel={useSmartUI ? <GroupedFacilityPanel /> : <FacilityPanel />} />
+        );
+      case 'research':
+        return (
+          <ResearchPage
+            onOpenResearchTree={() => modals.setShowResearchTree(true)}
+            onOpenGeneticLab={() => modals.setShowGeneticLab(true)}
+            onOpenAchievements={() => modals.setShowAchievements(true)}
+          />
+        );
+      case 'campaign':
+        return (
+          <CampaignPage
+            isCampaignActive={isCampaignActive}
+            onOpenCampaign={() => modals.setShowCampaign(true)}
+            onOpenHistoricalScenarios={() => modals.setShowHistorical(true)}
+            onOpenCampaignStats={() => modals.setShowCampaignStats(true)}
+          />
+        );
+      case 'system':
+        return (
+          <SystemPage
+            useSmartUI={useSmartUI}
+            onToggleSmartUI={toggleSmartUI}
+            onOpenSettings={() => modals.setShowSettings(true)}
+            onStartTutorial={startTutorial}
+          />
+        );
+      default:
+        return operationsPage;
+    }
   };
 
   return (
@@ -106,221 +154,67 @@ function App() {
           <SwipeGesture
             onSwipeLeft={() => isMobile && modals.setShowSettings(false)}
             onSwipeRight={() => isMobile && modals.setShowSettings(true)}
-            className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-green-400"
+            className="min-h-screen text-slate-100"
           >
-              {/* Accessibility Features */}
-              <SkipNavigation />
+            <SkipNavigation />
+            {!reducedMotion && <AnimatedBackground />}
 
-              {/* Animated Background */}
-              {!reducedMotion && <AnimatedBackground />}
+            {activeCrisis && (
+              <ScreenReaderAnnouncement
+                message={`Crisis event: ${activeCrisis.event.name}`}
+                priority="assertive"
+              />
+            )}
 
-              {/* Screen Reader Announcements */}
-              {activeCrisis && (
-                <ScreenReaderAnnouncement
-                  message={`Crisis event: ${activeCrisis.event.name}`}
-                  priority="assertive"
+            <AppShell
+              topBar={
+                <TopBar
+                  title="Xenomorph Park"
+                  modeLabel="Building"
+                  useSmartUI={useSmartUI}
+                  onToggleSmartUI={toggleSmartUI}
+                  controls={<GameControls />}
+                  timeDisplay={<TimeDisplay />}
+                  resourceDisplay={useSmartUI ? <SmartResourceDisplay /> : <ResourceCounter />}
+                  biomeDisplay={<BiomeDisplay />}
                 />
-              )}
-
-              {/* Unified Header Bar */}
-              <header className="bg-slate-900/98 border-b border-green-400/30 sticky top-0 z-30 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                  {/* Desktop Layout */}
-                  <div className="hidden lg:flex items-center gap-12">
-                    {/* Primary: Game Identity - Prominent left section */}
-                    <div className="flex items-center gap-4 bg-slate-800/30 rounded-lg px-4 py-2.5 border border-slate-700/50 shadow-sm">
-                      <h1 className="text-xl font-bold text-green-400 glow tracking-wide">
-                        XENOMORPH PARK
-                      </h1>
-                      <div className="px-3 py-1.5 bg-green-400/20 text-green-400 rounded-md text-sm font-medium border border-green-400/40 shadow-sm">
-                        🏗️ Building Mode
-                      </div>
-                    </div>
-
-                    {/* Secondary Information - Central grouped section */}
-                    <div className="flex items-center gap-8 flex-1 justify-center">
-                      {/* Game Status */}
-                      <div className="bg-slate-800/20 rounded-lg px-4 py-2 border border-slate-700/30">
-                        <TimeDisplay />
-                      </div>
-
-                      {/* Resources */}
-                      <div className="bg-slate-800/20 rounded-lg px-4 py-2 border border-slate-700/30">
-                        {useSmartUI ? <SmartResourceDisplay /> : <ResourceCounter />}
-                      </div>
-
-                      {/* Environment */}
-                      <div className="bg-slate-800/20 rounded-lg px-3 py-2 border border-slate-700/30">
-                        <BiomeDisplay />
-                      </div>
-                    </div>
-
-                    {/* Tertiary: Actions - De-emphasized right section */}
-                    <div className="flex items-center gap-2 bg-slate-800/15 rounded-lg px-3 py-2 border border-slate-700/20">
-                      <GameControls />
-
-                      <div className="w-px h-4 bg-slate-600/40 mx-2"></div>
-
-                      <button
-                        onClick={() => setUseSmartUI(!useSmartUI)}
-                        className="p-2 text-slate-400 hover:text-green-400 transition-all duration-200 text-xs rounded hover:bg-slate-700/50 hover:scale-105"
-                        title="Toggle UI Mode"
-                      >
-                        {useSmartUI ? '📋' : '🔧'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Mobile/Tablet Layout */}
-                  <div className="lg:hidden space-y-3">
-                    {/* Top Row: Identity + Controls */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 bg-slate-800/30 rounded-lg px-3 py-2 border border-slate-700/50">
-                        <h1 className="text-lg font-bold text-green-400 glow">XENOMORPH PARK</h1>
-                        <div className="px-2 py-1 bg-green-400/20 text-green-400 rounded text-xs font-medium border border-green-400/40">
-                          🏗️
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1 bg-slate-800/15 rounded-lg px-2 py-2 border border-slate-700/20">
-                        <GameControls />
-
-                        <div className="w-px h-3 bg-slate-600/40 mx-1"></div>
-
-                        <button
-                          onClick={() => setUseSmartUI(!useSmartUI)}
-                          className="p-1.5 text-slate-400 hover:text-green-400 transition-colors text-xs rounded hover:bg-slate-700/50"
-                          title="Toggle UI Mode"
-                        >
-                          {useSmartUI ? '📋' : '🔧'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Bottom Row: Information */}
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="bg-slate-800/20 rounded-lg px-3 py-1.5 border border-slate-700/30 flex-shrink-0">
-                        <TimeDisplay />
-                      </div>
-
-                      <div className="bg-slate-800/20 rounded-lg px-3 py-1.5 border border-slate-700/30 flex-1 min-w-0">
-                        {useSmartUI ? <SmartResourceDisplay /> : <ResourceCounter />}
-                      </div>
-
-                      <div className="bg-slate-800/20 rounded-lg px-2 py-1.5 border border-slate-700/30 flex-shrink-0">
-                        <BiomeDisplay />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <div id="main-content" className="max-w-7xl mx-auto px-4 py-6 relative z-10">
-                {/* Smart Toolbar (if enabled) */}
-                {useSmartUI && (
-                  <div className="mb-6">
-                    <SmartToolbar groups={toolbarGroups} />
-                  </div>
-                )}
-
-                <div className="space-y-6">
-                  {/* Resource Trends */}
-                  <ResourceTrends />
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Panel - Facilities & Species */}
-                    <div className="lg:col-span-1 space-y-4">
-                      {useSmartUI ? (
-                        <>
-                          <GroupedFacilityPanel />
-                          <GroupedSpeciesPanel />
-                        </>
-                      ) : (
-                        <>
-                          <FacilityPanel />
-                          <SpeciesPanel />
-                        </>
-                      )}
-                    </div>
-
-                    {/* Right Panel - Game Grid */}
-                    <div className="lg:col-span-2">
-                      <GameGrid />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <footer className="mt-12 text-center text-slate-500 text-sm">
-                  <p>Xenomorph Park © 2025 - WebHatchery Project</p>
+              }
+              sidebar={
+                <SidebarNav
+                  items={navigationItems}
+                  activeSection={activeSection}
+                  onSelectSection={setActiveSection}
+                />
+              }
+            >
+              <ContentFrame>
+                {renderActiveSection()}
+                <footer className="mt-10 border-t border-slate-700/70 pt-4 text-center text-sm text-slate-400">
+                  <p>Xenomorph Park (c) 2025 - WebHatchery Project</p>
                   <p className="mt-1 text-xs">
-                    Press <kbd className="px-1 py-0.5 bg-slate-700 rounded text-slate-300">H</kbd>{' '}
-                    for keyboard shortcuts
+                    Press <kbd className="rounded bg-slate-700 px-1 py-0.5 text-slate-200">H</kbd> for
+                    keyboard shortcuts
                   </p>
                 </footer>
-              </div>
+              </ContentFrame>
+            </AppShell>
 
-              {/* Global Components */}
-              <KeyboardShortcuts />
-              <NotificationSystem position="top-right" />
-              <SettingsModal
-                isOpen={modals.showSettings}
-                onClose={() => modals.setShowSettings(false)}
-              />
-              <ResearchTreeView
-                isOpen={modals.showResearchTree}
-                onClose={() => modals.setShowResearchTree(false)}
-              />
-              <AchievementSystem
-                isOpen={modals.showAchievements}
-                onClose={() => modals.setShowAchievements(false)}
-              />
-              <CampaignMode
-                isOpen={modals.showCampaign}
-                onClose={() => modals.setShowCampaign(false)}
-              />
-              <HistoricalScenarios
-                isOpen={modals.showHistorical}
-                onClose={() => modals.setShowHistorical(false)}
-              />
-              <CampaignStatistics
-                isOpen={modals.showCampaignStats}
-                onClose={() => modals.setShowCampaignStats(false)}
-              />
-              <GeneticModification
-                isOpen={modals.showGeneticLab}
-                onClose={() => modals.setShowGeneticLab(false)}
-              />
-              <FacilityUpgrade
-                isOpen={!!selectedFacilityForUpgrade}
-                facility={selectedFacilityForUpgrade}
-                onClose={() => setSelectedFacilityForUpgrade(null)}
-              />
-              <CrisisModal isOpen={!!activeCrisis} onClose={() => {}} />
-
-              {/* Floating Text for Visual Feedback */}
-              <FloatingTextComponent />
-
-              {/* Particle Effects */}
-              <ParticleSystemComponent />
-
-              {/* Tutorial System */}
-              <TutorialComponent />
-
-              {/* Campaign Objective Tracker */}
-              <CampaignObjectiveTracker isActive={isCampaignActive} />
-
-              {/* Campaign Events */}
-              <CampaignEventModal />
-
-              {/* Mobile Touch Controls */}
-              {isMobile && (
-                <TouchControls
-                  onMove={handleMobileMove}
-                  onAction={handleMobileAction}
-                  onSecondaryAction={handleMobileSecondaryAction}
-                />
-              )}
+            <GlobalOverlays
+              modals={modals}
+              selectedFacilityForUpgrade={selectedFacilityForUpgrade}
+              onCloseFacilityUpgrade={() => setSelectedFacilityForUpgrade(null)}
+              activeCrisis={activeCrisis}
+              CrisisModal={CrisisModal}
+              FloatingTextComponent={FloatingTextComponent}
+              ParticleSystemComponent={ParticleSystemComponent}
+              TutorialComponent={TutorialComponent}
+              CampaignEventModal={CampaignEventModal}
+              isCampaignActive={isCampaignActive}
+              isMobile={isMobile}
+              onMobileMove={handleMobileMove}
+              onMobileAction={handleMobileAction}
+              onMobileSecondaryAction={handleMobileSecondaryAction}
+            />
           </SwipeGesture>
         </BiomeSystem>
       </FloatingTextProvider>
