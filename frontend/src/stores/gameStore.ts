@@ -112,6 +112,95 @@ function isRemoveXenomorphActionData(data: unknown): data is RemoveXenomorphActi
   return isPlacedXenomorph(data.xenomorph);
 }
 
+function asNumber(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function asStringArray(value: unknown, fallback: string[] = []): string[] {
+  if (!Array.isArray(value)) return fallback;
+  return value.filter((item): item is string => typeof item === 'string');
+}
+
+function normalizeResources(value: unknown): GameState['resources'] {
+  const input = isRecord(value) ? value : {};
+  return {
+    credits: asNumber(input.credits, initialState.resources.credits),
+    power: asNumber(input.power, initialState.resources.power),
+    maxPower: asNumber(input.maxPower, initialState.resources.maxPower),
+    research: asNumber(input.research, initialState.resources.research),
+    security:
+      input.security === 'Low' ||
+      input.security === 'Medium' ||
+      input.security === 'High' ||
+      input.security === 'Maximum'
+        ? input.security
+        : initialState.resources.security,
+    visitors: asNumber(input.visitors, initialState.resources.visitors),
+    maxVisitors: asNumber(input.maxVisitors, initialState.resources.maxVisitors),
+    dailyRevenue: asNumber(input.dailyRevenue, initialState.resources.dailyRevenue),
+    dailyExpenses: asNumber(input.dailyExpenses, initialState.resources.dailyExpenses),
+  };
+}
+
+function normalizeResearch(value: unknown): GameState['research'] {
+  const input = isRecord(value) ? value : {};
+  const rawTree = isRecord(input.researchTree) ? input.researchTree : {};
+  const researchTree: GameState['research']['researchTree'] = {};
+
+  Object.entries(rawTree).forEach(([nodeId, nodeData]) => {
+    if (!isRecord(nodeData)) return;
+    researchTree[nodeId] = {
+      completed: Boolean(nodeData.completed),
+      inProgress: Boolean(nodeData.inProgress),
+      progress: asNumber(nodeData.progress, 0),
+      startedAt: asNumber(nodeData.startedAt, 0) || undefined,
+    };
+  });
+
+  return {
+    completed: asStringArray(input.completed),
+    inProgress: typeof input.inProgress === 'string' ? input.inProgress : null,
+    points: asNumber(input.points, 0),
+    available: asStringArray(input.available, ['Drone']),
+    researchTree,
+  };
+}
+
+function normalizeEconomics(value: unknown): GameState['economics'] {
+  const input = isRecord(value) ? value : {};
+  return {
+    totalRevenue: asNumber(input.totalRevenue, initialState.economics.totalRevenue),
+    totalExpenses: asNumber(input.totalExpenses, initialState.economics.totalExpenses),
+    profitMargin: asNumber(input.profitMargin, initialState.economics.profitMargin),
+    visitorSatisfaction: asNumber(
+      input.visitorSatisfaction,
+      initialState.economics.visitorSatisfaction
+    ),
+    attractionValue: asNumber(input.attractionValue, initialState.economics.attractionValue),
+    lastDayProfit: asNumber(input.lastDayProfit, initialState.economics.lastDayProfit),
+  };
+}
+
+function normalizePersistedState(
+  persistedState: unknown
+): Partial<GameState> & {
+  resources: GameState['resources'];
+  research: GameState['research'];
+  economics: GameState['economics'];
+} {
+  const input = isRecord(persistedState) ? persistedState : {};
+  return {
+    day: asNumber(input.day, initialState.day),
+    hour: asNumber(input.hour, initialState.hour),
+    tick: asNumber(input.tick, initialState.tick),
+    resources: normalizeResources(input.resources),
+    facilities: Array.isArray(input.facilities) ? (input.facilities as PlacedFacility[]) : [],
+    xenomorphs: Array.isArray(input.xenomorphs) ? (input.xenomorphs as PlacedXenomorph[]) : [],
+    research: normalizeResearch(input.research),
+    economics: normalizeEconomics(input.economics),
+  };
+}
+
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
@@ -752,26 +841,17 @@ export const useGameStore = create<GameStore>()(
         name: 'xenomorph-park-game',
         version: 1,
         migrate: (persistedState: unknown) => {
-          // Handle migration for research.available field
-          if (!persistedState || typeof persistedState !== 'object') return persistedState;
-
-          type PersistedState = Record<string, unknown> & {
-            research?: {
-              available?: string[];
-              researchTree?: Record<string, unknown>;
-            };
+          return normalizePersistedState(persistedState);
+        },
+        merge: (persistedState, currentState) => {
+          const normalized = normalizePersistedState(persistedState);
+          return {
+            ...currentState,
+            ...normalized,
+            resources: normalized.resources,
+            research: normalized.research,
+            economics: normalized.economics,
           };
-
-          const next = persistedState as PersistedState;
-          if (next.research) {
-            if (!next.research.available) {
-              next.research.available = ['Drone'];
-            }
-            if (!next.research.researchTree) {
-              next.research.researchTree = {};
-            }
-          }
-          return next;
         },
         partialize: state => ({
           // Only persist certain parts of the state
