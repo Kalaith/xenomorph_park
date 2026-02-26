@@ -40,7 +40,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       const responseData = error.response?.data as { login_url?: string } | undefined;
       const loginUrl = responseData?.login_url || import.meta.env.VITE_WEB_HATCHERY_LOGIN_URL;
-      if (loginUrl) {
+
+            if (loginUrl) {
         window.location.assign(loginUrl);
       }
     }
