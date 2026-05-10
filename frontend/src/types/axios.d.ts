@@ -10,6 +10,11 @@ declare module 'axios' {
     };
   }
 
+  export interface AxiosResponse<T = unknown> {
+    data: T;
+    status: number;
+  }
+
   interface InterceptorManager<T> {
     use(onFulfilled: (value: T) => T | Promise<T>, onRejected?: (error: AxiosError) => unknown): void;
   }
@@ -19,6 +24,8 @@ declare module 'axios' {
       request: InterceptorManager<InternalAxiosRequestConfig>;
       response: InterceptorManager<unknown>;
     };
+    get<T = unknown>(url: string): Promise<AxiosResponse<T>>;
+    post<T = unknown>(url: string, data?: unknown): Promise<AxiosResponse<T>>;
   }
 
   export interface AxiosStatic {

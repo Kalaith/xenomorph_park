@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ResourceCounter } from './components/game/ResourceCounter';
 import { SmartResourceDisplay } from './components/ui/SmartResourceDisplay';
 import { TimeDisplay } from './components/game/TimeDisplay';
@@ -36,6 +36,7 @@ import { ResearchPage } from './features/research/ResearchPage';
 import { CampaignPage } from './features/campaign/CampaignPage';
 import { SystemPage } from './features/system/SystemPage';
 import { GlobalOverlays } from './features/overlays/GlobalOverlays';
+import { useGameStore } from './stores/gameStore';
 
 const navigationItems: NavigationItem[] = [
   { id: 'overview', label: 'Reports', description: 'Resource trends, status reports, and summaries' },
@@ -53,6 +54,7 @@ function App() {
   );
   const [useSmartUI, setUseSmartUI] = useState(true);
   const [activeSection, setActiveSection] = useState<NavigationSectionId>('operations');
+  const loadBackendState = useGameStore(state => state.loadBackendState);
 
   const { startTutorial, TutorialComponent } = useTutorial();
   const { modals } = useMainToolbar(startTutorial);
@@ -74,6 +76,12 @@ function App() {
 
   const { CampaignEventModal } = useCampaignEvents();
   const isCampaignActive = !!localStorage.getItem('current-campaign-scenario');
+
+  useEffect(() => {
+    void loadBackendState().catch(error => {
+      console.error('Failed to load Xenomorph Park backend state:', error);
+    });
+  }, [loadBackendState]);
 
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent

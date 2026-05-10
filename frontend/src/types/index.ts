@@ -206,6 +206,7 @@ export interface GameStore extends GameState {
   canRedo: () => boolean;
 
   // Save/Load actions
+  loadBackendState: () => Promise<void>;
   saveGame: (slotId: string, name?: string) => boolean;
   loadGame: (slotId: string) => boolean;
   quickSave: () => boolean;

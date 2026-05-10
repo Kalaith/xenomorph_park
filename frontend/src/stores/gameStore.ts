@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { webhatcheryGameApi, type WebHatcheryGameState } from '../api/webhatcheryGameApi';
 import { GameStore, GameState, PlacedFacility, PlacedXenomorph } from '../types';
 import { gameConstants } from '../constants/gameConstants';
 import { researchTree } from '../data/researchTree';
-import { saveManager } from '../utils/saveManager';
+import { useWebHatcherySessionStore } from './webhatcherySessionStore';
 
 const initialState: GameState = {
   mode: 'building',
@@ -201,11 +202,80 @@ function normalizePersistedState(
   };
 }
 
+const loadOrCreateBackendGame = async (): Promise<WebHatcheryGameState> => {
+  const sessionStore = useWebHatcherySessionStore.getState();
+  try {
+    return await sessionStore.loadGame();
+  } catch {
+    return sessionStore.continueAsGuest();
+  }
+};
+
+const syncSessionState = (gameState: WebHatcheryGameState): void => {
+  useWebHatcherySessionStore.setState({
+    gameState,
+    user: gameState.user,
+    isLoading: false,
+    error: null,
+  });
+};
+
+const toBackendSnapshot = (state: GameStore): Record<string, unknown> => ({
+  mode: state.mode,
+  paused: state.paused,
+  day: state.day,
+  hour: state.hour,
+  tick: state.tick,
+  resources: state.resources,
+  facilities: state.facilities,
+  xenomorphs: state.xenomorphs,
+  selectedFacility: state.selectedFacility,
+  selectedSpecies: state.selectedSpecies,
+  research: state.research,
+  economics: state.economics,
+  undoRedo: state.undoRedo,
+});
+
+let backendSyncTimer: ReturnType<typeof setTimeout> | null = null;
+
+const syncBackendSnapshot = (intent: string, snapshot: Record<string, unknown>): void => {
+  if (backendSyncTimer) {
+    clearTimeout(backendSyncTimer);
+  }
+
+  backendSyncTimer = setTimeout(() => {
+    void webhatcheryGameApi
+      .applyIntent(intent, { state: snapshot })
+      .then(syncSessionState)
+      .catch(error => {
+        console.error('Failed to sync Xenomorph Park backend state:', error);
+      });
+  }, 750);
+};
+
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
       (set, get) => ({
         ...initialState,
+
+        loadBackendState: async () => {
+          const gameState = await loadOrCreateBackendGame();
+          syncSessionState(gameState);
+          const backendState = gameState.save.state;
+          if (!isRecord(backendState) || !isRecord(backendState.gameState)) {
+            return;
+          }
+
+          const normalized = normalizePersistedState(backendState.gameState);
+          set({
+            ...initialState,
+            ...(backendState.gameState as Partial<GameState>),
+            resources: normalized.resources,
+            research: normalized.research,
+            economics: normalized.economics,
+          });
+        },
 
         // Game management
         setMode: mode => set({ mode }),
@@ -443,51 +513,35 @@ export const useGameStore = create<GameStore>()(
         // Save management
         saveGame: (slotId: string, name?: string) => {
           const state = get();
-          const success = saveManager.saveGame(state, slotId, name);
-          if (success) {
-            state.addStatusMessage(
-              `Game saved successfully${name ? ` as "${name}"` : ''}`,
-              'success'
-            );
-          } else {
-            state.addStatusMessage('Failed to save game', 'error');
-          }
-          return success;
+          syncBackendSnapshot(`save_game:${slotId}`, toBackendSnapshot(state));
+          state.addStatusMessage(
+            `Game saved successfully${name ? ` as "${name}"` : ''}`,
+            'success'
+          );
+          return true;
         },
 
         loadGame: (slotId: string) => {
-          const saveData = saveManager.loadGame(slotId);
-          if (saveData) {
-            set({ ...initialState, ...saveData.gameState });
-            get().addStatusMessage('Game loaded successfully', 'success');
-            return true;
-          } else {
-            get().addStatusMessage('Failed to load game', 'error');
-            return false;
-          }
+          void get()
+            .loadBackendState()
+            .then(() => get().addStatusMessage(`Game loaded from ${slotId}`, 'success'))
+            .catch(() => get().addStatusMessage('Failed to load game', 'error'));
+          return true;
         },
 
         quickSave: () => {
           const state = get();
-          const success = saveManager.quickSave(state);
-          if (success) {
-            state.addStatusMessage('Quick save completed', 'success');
-          } else {
-            state.addStatusMessage('Quick save failed', 'error');
-          }
-          return success;
+          syncBackendSnapshot('quick_save', toBackendSnapshot(state));
+          state.addStatusMessage('Quick save completed', 'success');
+          return true;
         },
 
         quickLoad: () => {
-          const saveData = saveManager.quickLoad();
-          if (saveData) {
-            set({ ...initialState, ...saveData.gameState });
-            get().addStatusMessage('Quick load completed', 'success');
-            return true;
-          } else {
-            get().addStatusMessage('No quick save found', 'warning');
-            return false;
-          }
+          void get()
+            .loadBackendState()
+            .then(() => get().addStatusMessage('Quick load completed', 'success'))
+            .catch(() => get().addStatusMessage('No quick save found', 'warning'));
+          return true;
         },
 
         // Game mechanics
@@ -875,3 +929,25 @@ export const useGameStore = create<GameStore>()(
     { name: 'xenomorph-park-store' }
   )
 );
+
+useGameStore.subscribe((state, previousState) => {
+  if (
+    state.mode === previousState.mode &&
+    state.paused === previousState.paused &&
+    state.day === previousState.day &&
+    state.hour === previousState.hour &&
+    state.tick === previousState.tick &&
+    state.resources === previousState.resources &&
+    state.facilities === previousState.facilities &&
+    state.xenomorphs === previousState.xenomorphs &&
+    state.selectedFacility === previousState.selectedFacility &&
+    state.selectedSpecies === previousState.selectedSpecies &&
+    state.research === previousState.research &&
+    state.economics === previousState.economics &&
+    state.undoRedo === previousState.undoRedo
+  ) {
+    return;
+  }
+
+  syncBackendSnapshot('state_updated', toBackendSnapshot(state));
+});
